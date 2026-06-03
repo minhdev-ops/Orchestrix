@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Orchestrator | Automation Module</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e6e8ea",
+                    "on-primary-container": "#00424f",
+                    "secondary-fixed-dim": "#b9c7e0",
+                    "surface-container": "#eceef0",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#2d3133",
+                    "surface-dim": "#d8dadc",
+                    "outline": "#6d797d",
+                    "tertiary-fixed-dim": "#ffb873",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-secondary-container": "#57657b",
+                    "secondary-fixed": "#d5e3fd",
+                    "on-tertiary-fixed-variant": "#6a3b00",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-surface": "#191c1e",
+                    "on-secondary-fixed": "#0d1c2f",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#ffdcbf",
+                    "surface": "#f7f9fb",
+                    "inverse-primary": "#4cd7f6",
+                    "surface-bright": "#f7f9fb",
+                    "tertiary": "#8c5000",
+                    "on-primary-fixed-variant": "#004e5c",
+                    "secondary": "#515f74",
+                    "on-surface-variant": "#3d494c",
+                    "on-primary-fixed": "#001f26",
+                    "surface-variant": "#e0e3e5",
+                    "on-background": "#191c1e",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#2d1600",
+                    "primary-container": "#06b6d4",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "primary": "#00687a",
+                    "tertiary-container": "#e89337",
+                    "background": "#f7f9fb",
+                    "surface-tint": "#00687a",
+                    "primary-fixed": "#acedff",
+                    "outline-variant": "#bcc9cd",
+                    "surface-container-low": "#f2f4f6",
+                    "on-tertiary-container": "#5b3200",
+                    "on-secondary-fixed-variant": "#3a485c",
+                    "primary-fixed-dim": "#4cd7f6",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#d5e3fd",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-inner-shadow {
+            box-shadow: inset 0 2px 4px rgba(0, 104, 122, 0.02);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-fixed selection:text-on-primary-container">
+<!-- Top Navigation Bar -->
+<nav class="bg-white/80 backdrop-blur-md font-['Space_Grotesk'] tracking-tight shadow-[0_12px_32px_rgba(0,104,122,0.06)] docked full-width top-0 sticky z-40 flex justify-between items-center w-full px-6 py-3">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-slate-900">System Orchestrator</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-cyan-700 font-bold border-b-2 border-cyan-600 px-1 py-1" href="#">Dashboard</a>
+<a class="text-slate-500 hover:bg-slate-50 transition-colors duration-200 px-3 py-1 rounded-sm" href="#">Nodes</a>
+<a class="text-slate-500 hover:bg-slate-50 transition-colors duration-200 px-3 py-1 rounded-sm" href="#">Telemetry</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="bg-surface-container-low border-none rounded-sm pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all" placeholder="Global search..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-cyan-600 hover:bg-slate-50 rounded-sm transition-all active:scale-95"><span class="material-symbols-outlined">monitor_heart</span></button>
+<button class="p-2 text-cyan-600 hover:bg-slate-50 rounded-sm transition-all active:scale-95"><span class="material-symbols-outlined">settings</span></button>
+<button class="p-2 text-cyan-600 hover:bg-slate-50 rounded-sm transition-all active:scale-95 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border border-outline-variant/30 object-cover" data-alt="Close up portrait of a professional male administrator in a clean white office setting, soft professional lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3uP5kv-GYPHOy8lMboS2lWJjd-dS01Y60lKYXbLdcKu__yCVwQhEXH33rDyBoPwdXMApx0UUyC8RaV23RZbuBkOoLbP-4oE-Rs2HEt9t8da1ahhbGBHDTJ3Kl3UkbcXHihhkTqQ1hhq5boO229b42KWHbAZFfTSfyDSO-zeE4zHvY7rORRcZFPigIR3pIUflhTObuyOJRey54VDV1uD2rLvrsZKLtfNzA16vE7PnBoUDBN69Il4DeAhenODZQSE0ZwUP-wN-J4_g"/>
+</div>
+</nav>
+<div class="flex min-h-[calc(100vh-64px)]">
+<!-- Sidebar Navigation -->
+<aside class="hidden lg:flex flex-col h-[calc(100vh-64px)] w-64 fixed left-0 top-16 z-30 bg-slate-50 border-r border-slate-200/50 font-['Inter'] font-medium text-sm">
+<div class="p-6">
+<h2 class="text-lg font-black text-slate-800 tracking-tight">Core Engine</h2>
+<p class="text-[10px] uppercase tracking-widest text-slate-400">v2.4.0-stable</p>
+</div>
+<div class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-cyan-600 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-cyan-700 font-semibold bg-white rounded-sm shadow-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">hub</span> Nodes
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-cyan-600 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span> Telemetry
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-cyan-600 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">shield</span> Security
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-cyan-600 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">terminal</span> Logs
+                </a>
+</div>
+<div class="p-4 mt-auto border-t border-slate-200/50">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-2.5 rounded-sm font-semibold text-xs tracking-wider uppercase mb-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
+                    Deploy New Node
+                </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-cyan-600 transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">help</span> Support
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-cyan-600 transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">description</span> Documentation
+                    </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 lg:ml-64 p-8">
+<header class="mb-10">
+<div class="flex items-center gap-3 text-sm font-medium text-on-surface-variant mb-2">
+<span class="hover:text-primary cursor-pointer">Nodes</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface">Automation Module</span>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-headline text-4xl font-bold tracking-tight text-on-surface">Module Detail</h1>
+<p class="font-body text-on-surface-variant mt-1">Orchestration ID: <span class="font-mono text-xs bg-surface-container px-2 py-0.5 rounded-sm">auto-882-xf9</span></p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border border-outline-variant/30 text-on-surface-variant font-medium hover:bg-surface-container-low transition-colors rounded-sm text-sm">
+<span class="material-symbols-outlined text-[18px]">history</span> View Rollbacks
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-primary-container text-white font-bold rounded-sm text-sm shadow-sm active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">bolt</span> Execute Full Stack
+                        </button>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Automation Control Panel (Span 8) -->
+<section class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-sm p-8 border border-outline-variant/10 shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline text-xl font-semibold tracking-tight">Control Panel</h3>
+<div class="flex gap-2">
+<span class="bg-primary-fixed text-on-primary-container text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">System Ready</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- n8n Integration -->
+<div class="p-6 bg-surface-container-low rounded-sm relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[80px]">hub</span>
+</div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-white flex items-center justify-center rounded-sm shadow-sm">
+<span class="material-symbols-outlined text-primary">flowsheet</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">n8n Workflow</h4>
+<p class="text-xs text-on-surface-variant">Cloud Instance: prod-01</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Last Execution</span>
+<span class="font-mono text-xs">2m ago</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+<button class="w-full bg-white border border-outline-variant/30 text-primary font-bold py-2 rounded-sm text-xs hover:bg-primary/5 transition-colors">
+                                    Trigger Webhook
+                                </button>
+</div>
+</div>
+<!-- GitHub Action -->
+<div class="p-6 bg-surface-container-low rounded-sm relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[80px]">code</span>
+</div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-white flex items-center justify-center rounded-sm shadow-sm">
+<span class="material-symbols-outlined text-on-surface">commit</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">GitHub Actions</h4>
+<p class="text-xs text-on-surface-variant">Repo: core-v2-stable</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Build Status</span>
+<span class="text-xs font-bold text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">sync</span> Running
+                                    </span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-white border border-outline-variant/30 text-on-surface font-bold py-2 rounded-sm text-xs hover:bg-slate-50">
+                                        View Logs
+                                    </button>
+<button class="flex-1 bg-primary text-white font-bold py-2 rounded-sm text-xs shadow-sm hover:brightness-110">
+                                        Push Update
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Configuration Section (Span 4) -->
+<section class="col-span-12 lg:col-span-4 bg-surface-container-low rounded-sm p-8 border border-outline-variant/10 shadow-sm flex flex-col">
+<h3 class="font-headline text-xl font-semibold tracking-tight mb-8">Node Config</h3>
+<div class="space-y-6 flex-1">
+<div>
+<label class="block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">Endpoint URL</label>
+<input class="w-full bg-surface-container-lowest border-none border-b-2 border-primary/20 focus:border-primary focus:ring-0 text-sm font-mono py-2 rounded-t-sm" type="text" value="https://api.orchestrator.io/v2/auto-882"/>
+</div>
+<div>
+<label class="block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">API Secret Key</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none border-b-2 border-primary/20 focus:border-primary focus:ring-0 text-sm py-2 rounded-t-sm" type="password" value="••••••••••••••••"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="text-xs font-bold text-on-surface mb-4">Environment Flags</h4>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Production Lock</span>
+<span class="text-primary font-bold">ENABLED</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Verbose Logging</span>
+<span class="text-outline">DISABLED</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Auto-Rollback</span>
+<span class="text-primary font-bold">ENABLED</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 border border-primary text-primary font-bold py-3 rounded-sm text-sm hover:bg-primary/5 transition-all">
+                        Save Configuration
+                    </button>
+</section>
+<!-- Interaction Logs (Span 12) - High density telemetry -->
+<section class="col-span-12 bg-white rounded-sm border border-outline-variant/10 shadow-[0_12px_32px_rgba(0,104,122,0.06)] overflow-hidden">
+<div class="px-8 py-6 border-b border-outline-variant/10 flex justify-between items-center bg-slate-50/50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">list_alt</span>
+<h3 class="font-headline text-lg font-semibold tracking-tight">Interaction Logs</h3>
+</div>
+<div class="flex gap-2">
+<button class="p-1.5 hover:bg-surface-container rounded-sm transition-colors text-outline"><span class="material-symbols-outlined text-[20px]">filter_list</span></button>
+<button class="p-1.5 hover:bg-surface-container rounded-sm transition-colors text-outline"><span class="material-symbols-outlined text-[20px]">download</span></button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-outline-variant/10">
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-outline">Timestamp</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-outline">Source</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-outline">Action</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-outline">Status</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-outline">Duration</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-outline text-right">Payload</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-8 py-4 font-mono text-xs text-on-surface-variant">2023-10-24 14:02:11</td>
+<td class="px-8 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-sm font-medium">n8n_prod</span>
+</div>
+</td>
+<td class="px-8 py-4 text-sm font-semibold">WEBHOOK_INCOMING</td>
+<td class="px-8 py-4">
+<span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase">Success</span>
+</td>
+<td class="px-8 py-4 text-sm text-on-surface-variant">124ms</td>
+<td class="px-8 py-4 text-right">
+<button class="text-primary hover:underline text-xs font-bold">View JSON</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-8 py-4 font-mono text-xs text-on-surface-variant">2023-10-24 14:01:55</td>
+<td class="px-8 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-slate-400"></span>
+<span class="text-sm font-medium">github_actions</span>
+</div>
+</td>
+<td class="px-8 py-4 text-sm font-semibold">REPO_SCAN_INIT</td>
+<td class="px-8 py-4">
+<span class="text-[10px] bg-tertiary/10 text-tertiary px-2 py-0.5 rounded-full font-bold uppercase">Warning</span>
+</td>
+<td class="px-8 py-4 text-sm text-on-surface-variant">3.1s</td>
+<td class="px-8 py-4 text-right">
+<button class="text-primary hover:underline text-xs font-bold">View JSON</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-8 py-4 font-mono text-xs text-on-surface-variant">2023-10-24 13:58:10</td>
+<td class="px-8 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-sm font-medium">n8n_prod</span>
+</div>
+</td>
+<td class="px-8 py-4 text-sm font-semibold">DB_SYNC_EXECUTE</td>
+<td class="px-8 py-4">
+<span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase">Success</span>
+</td>
+<td class="px-8 py-4 text-sm text-on-surface-variant">892ms</td>
+<td class="px-8 py-4 text-right">
+<button class="text-primary hover:underline text-xs font-bold">View JSON</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 border-t border-outline-variant/10 flex justify-center">
+<button class="text-sm text-on-surface-variant hover:text-primary font-medium flex items-center gap-2">
+                            Load historical telemetry <span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- Floating Telemetry Stream (Glass Component) -->
+<div class="fixed bottom-8 right-8 w-80 bg-white/70 backdrop-blur-xl rounded-sm border border-outline-variant/20 shadow-2xl z-50 p-4 font-['Inter']">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface">Live Stream</span>
+</div>
+<button class="text-outline hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">close</span></button>
+</div>
+<div class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+<div class="flex gap-2 text-[11px]">
+<span class="text-primary font-mono">[14:05:22]</span>
+<span class="text-on-surface-variant">Heartbeat received from Node-882</span>
+</div>
+<div class="flex gap-2 text-[11px]">
+<span class="text-primary font-mono">[14:05:18]</span>
+<span class="text-on-surface-variant">n8n: Triggering routine backup...</span>
+</div>
+<div class="flex gap-2 text-[11px]">
+<span class="text-primary font-mono">[14:04:59]</span>
+<span class="text-on-surface-variant">GitHub: Merged PR #1192 to master</span>
+</div>
+<div class="flex gap-2 text-[11px]">
+<span class="text-primary font-mono">[14:04:45]</span>
+<span class="text-error font-mono font-bold">ERR: Latency spike detected (+40ms)</span>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20">
+<div class="flex justify-between items-center">
+<span class="text-[10px] text-outline">Network throughput</span>
+<span class="text-[10px] font-bold text-on-surface">1.2 GB/s</span>
+</div>
+</div>
+</div>
+</body></html>

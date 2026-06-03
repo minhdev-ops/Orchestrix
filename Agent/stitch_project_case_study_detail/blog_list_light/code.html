@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Architect.IO | Engineering Insights</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#bcc7de",
+                    "secondary": "#00687a",
+                    "outline-variant": "#c7c4d7",
+                    "surface-bright": "#f7f9fb",
+                    "tertiary-fixed": "#d8e3fb",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#c0c1ff",
+                    "surface-container-low": "#f2f4f6",
+                    "on-tertiary-container": "#fefcff",
+                    "surface-container": "#eceef0",
+                    "on-background": "#191c1e",
+                    "background": "#f7f9fb",
+                    "on-tertiary-fixed": "#111c2d",
+                    "primary-fixed": "#e1e0ff",
+                    "tertiary-container": "#6a758a",
+                    "primary-fixed-dim": "#c0c1ff",
+                    "error": "#ba1a1a",
+                    "surface": "#f7f9fb",
+                    "on-tertiary-fixed-variant": "#3c475a",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#001f26",
+                    "on-primary-fixed-variant": "#2f2ebe",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-tint": "#494bd6",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed-dim": "#4cd7f6",
+                    "primary": "#4648d4",
+                    "on-primary": "#ffffff",
+                    "primary-container": "#6063ee",
+                    "secondary-container": "#57dffe",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface": "#191c1e",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary-fixed-variant": "#004e5c",
+                    "surface-container-highest": "#e0e3e5",
+                    "outline": "#767586",
+                    "inverse-surface": "#2d3133",
+                    "on-surface-variant": "#464554",
+                    "tertiary": "#515c71",
+                    "secondary-fixed": "#acedff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#07006c",
+                    "on-primary-container": "#fffbff",
+                    "on-secondary-container": "#006172",
+                    "surface-variant": "#e0e3e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0_10px_30px_rgba(25,28,30,0.04)] font-['Inter'] antialiased tracking-tight">
+<nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+<div class="text-xl font-bold tracking-tighter text-slate-900 dark:text-white">Architect.IO</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all duration-200 ease-in-out hover:opacity-80" href="#">Home</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all duration-200 ease-in-out hover:opacity-80" href="#">Projects</a>
+<a class="text-indigo-600 dark:text-indigo-400 font-semibold border-b-2 border-indigo-600 transition-all duration-200 ease-in-out hover:opacity-80" href="#">Blog</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all duration-200 ease-in-out hover:opacity-80" href="#">Contact</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-5 py-2 rounded-lg font-medium text-sm transition-transform scale-95 active:scale-90">Resume</button>
+</div>
+</nav>
+</header>
+<main class="pt-32 pb-24 px-6 max-w-7xl mx-auto">
+<!-- Hero Search Section -->
+<div class="mb-16">
+<h1 class="text-5xl md:text-6xl font-extrabold text-on-surface tracking-tighter mb-6">Engineering <span class="text-primary">Journal</span></h1>
+<p class="text-on-surface-variant max-w-2xl text-lg mb-10 leading-relaxed">
+                Exploring the intersection of high-availability infrastructure, distributed systems, and editorial software design.
+            </p>
+<div class="relative max-w-2xl group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-6 focus:ring-0 focus:bg-surface-container-lowest transition-all duration-300 placeholder:text-outline/60 text-on-surface border-b-2 border-transparent focus:border-primary" placeholder="Search technical articles, stacks, or keywords..." type="text"/>
+<div class="absolute inset-0 rounded-xl bg-white/10 glass-effect -z-10 pointer-events-none"></div>
+</div>
+</div>
+<!-- Filter & Utility Bar -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+<div class="flex flex-wrap gap-2">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary text-sm font-semibold tracking-wide uppercase transition-all">All</button>
+<button class="px-6 py-2 rounded-full bg-secondary-fixed-dim text-on-secondary-fixed text-sm font-semibold tracking-wide uppercase hover:bg-secondary-container transition-all">DevOps</button>
+<button class="px-6 py-2 rounded-full bg-secondary-fixed-dim text-on-secondary-fixed text-sm font-semibold tracking-wide uppercase hover:bg-secondary-container transition-all">Backend</button>
+<button class="px-6 py-2 rounded-full bg-secondary-fixed-dim text-on-secondary-fixed text-sm font-semibold tracking-wide uppercase hover:bg-secondary-container transition-all">Architecture</button>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="text-xs font-bold tracking-widest uppercase">Sort By:</span>
+<select class="bg-transparent border-none text-sm font-medium focus:ring-0 cursor-pointer text-primary">
+<option>Latest Updates</option>
+<option>Most Popular</option>
+<option>Read Time</option>
+</select>
+</div>
+</div>
+<!-- Blog Grid (Bento Style Variation) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Featured Card (Large) -->
+<article class="md:col-span-8 group bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(25,28,30,0.04)] transition-all flex flex-col md:flex-row">
+<div class="md:w-1/2 relative h-64 md:h-auto overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Modern server room with glowing blue led lights and neatly organized cable management in a clean laboratory setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfnMCtqmdRKSmnIKw0sxlHTeqGHtK1xW8uokGuWKj8prjal8B9kfO5NP8Yaylac-_X0uYU1MbODtglkPTgC8ozC7ySxhXTGZHBz5YeTUs2PhvO_Y_rqyNV2Ux574kjQ-2ditm5jtMpGO4pLcJTYUCcQQfD17jJEQX-Q3DhmmTI_GEttV48WYnAjfZYmMbOjhDHbycreJcgEzylqdZ3RxiEBLSWG4o2edzUByt3ShwhDslBE40VGtpqUZy8ULLqC47GnzTBYbAxC3Y"/>
+</div>
+<div class="md:w-1/2 p-8 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-4">
+<span class="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed-variant text-[10px] font-bold tracking-widest uppercase rounded">Architecture</span>
+<span class="text-[10px] font-bold text-outline tracking-widest uppercase">12 Min Read</span>
+</div>
+<h2 class="text-3xl font-bold tracking-tighter text-on-surface mb-4 leading-tight">Implementing Zero-Trust Architecture in Legacy Cloud Environments</h2>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">A deep dive into transitioning monolithic infrastructure to a secure, identity-based perimeter model without downtime.</p>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-xs font-medium text-outline">Oct 24, 2024</span>
+<button class="text-primary text-sm font-bold tracking-tight flex items-center gap-1 group/btn">
+                            Read Protocol <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Secondary Card -->
+<article class="md:col-span-4 bg-surface-container-lowest rounded-xl p-8 shadow-[0_10px_30px_rgba(25,28,30,0.04)] flex flex-col justify-between border-t-4 border-primary">
+<div>
+<div class="flex items-center gap-3 mb-6">
+<span class="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed-variant text-[10px] font-bold tracking-widest uppercase rounded">DevOps</span>
+</div>
+<h3 class="text-xl font-bold tracking-tight text-on-surface mb-4">Automating Kubernetes Governance with OPA Gatekeeper</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Enforcing policy as code to prevent configuration drift in multi-cluster environments.</p>
+</div>
+<div class="mt-8 flex items-center justify-between pt-6 border-t border-surface-container">
+<span class="text-xs font-medium text-outline">8 Min Read</span>
+<span class="material-symbols-outlined text-primary">terminal</span>
+</div>
+</article>
+<!-- Regular Grid Items -->
+<article class="md:col-span-4 group bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(25,28,30,0.04)] transition-all">
+<div class="h-48 relative overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="High contrast close up of computer code on a monitor with syntax highlighting in indigo and cyan tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD87dyZIwFBPBvQu4s4idn3Iy8XDYm93dIxvbx9wPxrSOSClSIvKSrYL51x1aB75gQvQoRZjIZ9IhPxrulkDByLDFd3hqfEEaUxSorS76wyPqp4SwQUPtLYYJ968YmfpG9b76cY0CX1FoCaf9K693IUjxL7JD9mXZu3HXTMCg2tjH2HLqLz1wrI8jxvyaKTt_T36JTpbgV_Gv8ZH8JfPVC_1oeqrneTXQygTXPwm7vYt2xa3LeqeJW7hXW9KSRB82x-tTXwNRCDvLA"/>
+</div>
+<div class="p-6">
+<div class="flex gap-2 mb-4">
+<span class="text-[10px] font-bold text-primary tracking-widest uppercase">Backend</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface mb-3 leading-snug">The Rust Revolution: Why We Migrated Our Core API</h3>
+<p class="text-on-surface-variant text-xs leading-relaxed mb-6">A technical retrospective on memory safety and concurrency benefits in production.</p>
+<div class="flex items-center justify-between text-[10px] font-bold text-outline tracking-widest uppercase">
+<span>Sept 18, 2024</span>
+<span>15 Min Read</span>
+</div>
+</div>
+</article>
+<article class="md:col-span-4 group bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(25,28,30,0.04)] transition-all">
+<div class="h-48 relative overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Abstract geometric shapes representing data flow in a digital network with soft lighting and metallic textures" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6N--ioopGNJ7x8a9nafE0KftzrfaMepB0q-C34gYvqrD2pvr7lyFbOqV7j7zBygI8-JHCyAmAn5cMySn0HmOwN3lByS0R4em4z2AHrG_6dxHBNIHIZvPFn0W4RdgWkDShsSJyW8QAEXrYSq1GYgJ_X88e_eWCtMR4oyd9IyaS12jul7b2f_Ghp7i1tMALVCASg_0od8pojZnLmv2qBe6bmr6CoQygQDDgj_oJwd-u3FjJgEN2NZb_0UyPJVwRgpgj4Otbncf-QB8"/>
+</div>
+<div class="p-6">
+<div class="flex gap-2 mb-4">
+<span class="text-[10px] font-bold text-primary tracking-widest uppercase">Systems</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface mb-3 leading-snug">Distributed Caching Patterns for Global Scale</h3>
+<p class="text-on-surface-variant text-xs leading-relaxed mb-6">Balancing consistency and latency using Redis and localized edge workers.</p>
+<div class="flex items-center justify-between text-[10px] font-bold text-outline tracking-widest uppercase">
+<span>Sept 12, 2024</span>
+<span>10 Min Read</span>
+</div>
+</div>
+</article>
+<article class="md:col-span-4 group bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(25,28,30,0.04)] transition-all">
+<div class="h-48 relative overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Satellite view of digital connections across a stylized earth at night with glowing blue and white points of light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMLZZ2Z3gaBCEnRve_7-ETfFtHXs6ya0LKi562l_CTENQlde3YBtepRjl0o92vdgWH_KnRzyKCfYIu8o3wA_IoXtkSQmObZS9ShYkEwzWjS8CECtFp1diSdpRiuUDgZEVvX1GMph3Lrj5z_lV78DZWeKkGW5CdbMQBeSpowcU_EVP6-OqkxjMOGG-3skGAn_bMX6hwCAtmqMzD9X2Lb-YulXuLktGGEmwrFyEFzeFvs-7IVZ5dz8RjeQnxs38xLgkzQqQibu_Q--4"/>
+</div>
+<div class="p-6">
+<div class="flex gap-2 mb-4">
+<span class="text-[10px] font-bold text-primary tracking-widest uppercase">DevOps</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface mb-3 leading-snug">Terraform best practices for immutable infrastructure</h3>
+<p class="text-on-surface-variant text-xs leading-relaxed mb-6">Avoiding state file corruption and managing modular cloud resources efficiently.</p>
+<div class="flex items-center justify-between text-[10px] font-bold text-outline tracking-widest uppercase">
+<span>Aug 30, 2024</span>
+<span>6 Min Read</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Pagination -->
+<div class="mt-20 flex justify-center items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">3</button>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-slate-950 w-full py-12 border-t border-slate-100 dark:border-slate-900">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="font-['Inter'] text-sm tracking-wide uppercase font-medium text-slate-500 dark:text-slate-500">
+                © 2024 Technical Architect. Built for Scale.
+            </div>
+<div class="flex items-center gap-8">
+<a class="font-['Inter'] text-sm tracking-wide uppercase font-medium text-slate-500 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors opacity-100 hover:opacity-70" href="#">GitHub</a>
+<a class="font-['Inter'] text-sm tracking-wide uppercase font-medium text-slate-500 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors opacity-100 hover:opacity-70" href="#">LinkedIn</a>
+<a class="font-['Inter'] text-sm tracking-wide uppercase font-medium text-slate-500 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors opacity-100 hover:opacity-70" href="#">Twitter</a>
+<a class="font-['Inter'] text-sm tracking-wide uppercase font-medium text-slate-500 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors opacity-100 hover:opacity-70" href="#">RSS</a>
+</div>
+</div>
+</footer>
+</body></html>

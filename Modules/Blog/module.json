@@ -1,0 +1,6 @@
+{
+    "name": "Blog",
+    "enabled": true,
+    "icon": "extension",
+    "description": "This is the Blog module."
+}

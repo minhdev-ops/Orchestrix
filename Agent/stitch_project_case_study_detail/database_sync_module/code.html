@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORCHESTRA_X | Database Sync Module</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#4b4dd8",
+                        "on-primary-container": "#d9d8ff",
+                        "on-tertiary": "#003824",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary": "#4cd7f6",
+                        "tertiary": "#4edea3",
+                        "error": "#ffb4ab",
+                        "error-container": "#93000a",
+                        "surface-container-lowest": "#060e20",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#002113",
+                        "background": "#0b1326",
+                        "secondary-fixed": "#acedff",
+                        "surface-container-high": "#222a3d",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "on-surface-variant": "#c7c4d8",
+                        "on-error": "#690005",
+                        "surface-dim": "#0b1326",
+                        "on-background": "#dae2fd",
+                        "on-primary-fixed": "#07006c",
+                        "on-secondary-fixed": "#001f26",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "surface-container-low": "#131b2e",
+                        "primary-fixed": "#e1e0ff",
+                        "on-primary": "#1000a9",
+                        "on-secondary": "#003640",
+                        "on-secondary-container": "#00424e",
+                        "surface-container-highest": "#2d3449",
+                        "surface-tint": "#c0c1ff",
+                        "outline-variant": "#464555",
+                        "surface-variant": "#2d3449",
+                        "on-surface": "#dae2fd",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "surface-bright": "#31394d",
+                        "inverse-surface": "#dae2fd",
+                        "secondary-container": "#03b5d3",
+                        "outline": "#918fa1",
+                        "primary": "#c0c1ff",
+                        "inverse-on-surface": "#283044",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-container": "#67f4b7",
+                        "tertiary-container": "#006e4b",
+                        "surface-container": "#171f33",
+                        "surface": "#0b1326",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "inverse-primary": "#494bd6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(49, 57, 77, 0.4);
+            border-top: 0.5px solid rgba(145, 143, 161, 0.2);
+            border-left: 0.5px solid rgba(145, 143, 161, 0.2);
+        }
+        .status-glow-emerald { box-shadow: 0 0 12px rgba(78, 222, 163, 0.4); }
+        .status-glow-amber { box-shadow: 0 0 12px rgba(251, 191, 36, 0.4); }
+        .status-glow-rose { box-shadow: 0 0 12px rgba(255, 180, 171, 0.4); }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0b1326]/80 backdrop-blur-xl border-b border-[#464555]/15 shadow-[0_40px_40px_rgba(218,226,253,0.06)] flex justify-between items-center px-6 h-16">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#c0c1ff] font-['Space_Grotesk']">ORCHESTRA_X</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-[#dae2fd]/60 font-['Space_Grotesk'] tracking-tight hover:bg-[#2d3449]/50 transition-colors px-3 py-1 rounded" href="#">Automation</a>
+<a class="text-[#dae2fd]/60 font-['Space_Grotesk'] tracking-tight hover:bg-[#2d3449]/50 transition-colors px-3 py-1 rounded" href="#">Monitoring</a>
+<a class="text-[#dae2fd]/60 font-['Space_Grotesk'] tracking-tight hover:bg-[#2d3449]/50 transition-colors px-3 py-1 rounded" href="#">User Management</a>
+<a class="text-[#c0c1ff] font-semibold font-['Space_Grotesk'] tracking-tight px-3 py-1 rounded" href="#">Database Sync</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="bg-surface-container-lowest border-none rounded-lg pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-1 focus:ring-secondary" placeholder="Search parameters..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-[#c0c1ff] p-2 hover:bg-[#2d3449]/50 rounded-full transition-colors">notifications</button>
+<button class="material-symbols-outlined text-[#c0c1ff] p-2 hover:bg-[#2d3449]/50 rounded-full transition-colors">settings</button>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden border border-outline/20">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="Portrait of a focused professional tech lead in a dark workspace with soft blue backlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_9SvkkFQADB6nqof0qtPaErNyOO-3tuPY-9DAUdFjNEWZdPN3yZxfQAK2nrBHQR5p9kU1Y_6MOGZ7VEDM0kL4DaBh0rsUti9u4t4_3yUNyyG6OeQ48q7m68JVz7X0cGQrgcTGkLxAy9kVu2mzmmMGPV8yFZmjGyiPMCvzS9gYZ_fgS5-XVnsYTDS2NSmDm92qCIUvn_Qi7Ww4Ph1xg7HR-vX1iqvWnaQpXRJMyIwi3OgPXq-r7aMVgJEB5-Y0iB1n19IsINYOahU"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Hidden on small screens) -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 bg-[#131b2e] flex flex-col pt-20 pb-6 hidden md:flex">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-highest/30">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">database</span>
+</div>
+<div>
+<h3 class="text-on-surface font-semibold text-sm leading-none">NODE_01</h3>
+<p class="text-on-surface-variant text-xs mt-1">Primary Cluster</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#dae2fd]/50 hover:text-[#dae2fd] hover:bg-[#2d3449]/30 transition-all font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span> Automation
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#dae2fd]/50 hover:text-[#dae2fd] hover:bg-[#2d3449]/30 transition-all font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span> Monitoring
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#dae2fd]/50 hover:text-[#dae2fd] hover:bg-[#2d3449]/30 transition-all font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span> User Management
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#4cd7f6] bg-[#2d3449] border-r-2 border-[#4cd7f6] font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="sync_alt">sync_alt</span> Database Sync
+            </a>
+</nav>
+<div class="px-4 mt-auto space-y-4">
+<button class="w-full py-2.5 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold text-xs tracking-wider rounded-lg uppercase active:translate-x-1 duration-150 shadow-lg shadow-primary/10">
+                DEPLOY NEW
+            </button>
+<div class="pt-4 border-t border-outline-variant/15 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-2 rounded-lg text-[#dae2fd]/50 hover:text-[#dae2fd] transition-all text-xs" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="description">description</span> Docs
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 rounded-lg text-[#dae2fd]/50 hover:text-[#dae2fd] transition-all text-xs" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="help">help</span> Support
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-20 px-6 pb-12">
+<div class="max-w-7xl mx-auto">
+<!-- Breadcrumb & Title -->
+<div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 text-outline text-xs font-bold tracking-widest uppercase mb-2">
+<span>Cluster Alpha</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-secondary">Sync Module</span>
+</div>
+<h1 class="font-headline text-3xl font-bold text-on-surface">Database Sync: <span class="text-primary">DB_PROD_REPLICA</span></h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-tertiary/10 border border-tertiary/20">
+<span class="w-2 h-2 rounded-full bg-tertiary status-glow-emerald"></span>
+<span class="text-tertiary text-xs font-bold uppercase tracking-tight">Active Connection</span>
+</div>
+<div class="text-on-surface-variant text-xs">
+                        Last ping: <span class="text-on-surface">240ms</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Dashboard -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Sync Control Panel (Large) -->
+<section class="md:col-span-8 space-y-6">
+<!-- Progress Card -->
+<div class="bg-surface-container-high rounded-full p-6 relative overflow-hidden border border-outline-variant/15">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h3 class="text-secondary font-headline text-lg font-medium">Real-Time Synchronization</h3>
+<p class="text-on-surface-variant text-sm">Streaming 4.2TB Production Cluster</p>
+</div>
+<div class="text-right">
+<span class="text-3xl font-headline font-bold text-primary">82.4%</span>
+<p class="text-on-surface-variant text-[10px] uppercase tracking-widest">Est. Time: 14m 22s</p>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Multi-stage progress bar -->
+<div class="h-3 w-full bg-surface-container-lowest rounded-full overflow-hidden flex">
+<div class="h-full bg-primary" style="width: 45%"></div>
+<div class="h-full bg-secondary" style="width: 25%"></div>
+<div class="h-full bg-tertiary" style="width: 12.4%"></div>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded bg-primary"></span>
+<span class="text-xs text-on-surface-variant">Schema Mapping</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded bg-secondary"></span>
+<span class="text-xs text-on-surface-variant">Payload Transfer</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded bg-tertiary"></span>
+<span class="text-xs text-on-surface-variant">Index Rebuild</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Source vs Destination Comparison -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Source Card -->
+<div class="bg-surface-container-low rounded-full p-6 border-l-4 border-primary">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary-fixed-dim">upload</span>
+<span class="font-headline font-bold text-on-surface">SOURCE_ALPHA</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+<span class="text-xs text-on-surface-variant uppercase tracking-widest">Records</span>
+<span class="text-sm font-medium">124,592,001</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+<span class="text-xs text-on-surface-variant uppercase tracking-widest">Latency</span>
+<span class="text-sm font-medium text-tertiary">12ms</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-xs text-on-surface-variant uppercase tracking-widest">Last Write</span>
+<span class="text-sm font-medium">0.4s ago</span>
+</div>
+</div>
+</div>
+<!-- Destination Card -->
+<div class="bg-surface-container-low rounded-full p-6 border-l-4 border-secondary">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-secondary">download</span>
+<span class="font-headline font-bold text-on-surface">DEST_EPSILON</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+<span class="text-xs text-on-surface-variant uppercase tracking-widest">Records</span>
+<span class="text-sm font-medium">102,641,118</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+<span class="text-xs text-on-surface-variant uppercase tracking-widest">Integrity</span>
+<span class="text-sm font-medium text-primary">99.9% CRC</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-xs text-on-surface-variant uppercase tracking-widest">IOPS</span>
+<span class="text-sm font-medium">8.4k/s</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- "Sync Now" Control Panel (Sidebar) -->
+<section class="md:col-span-4 space-y-6">
+<div class="glass-panel rounded-full p-8 flex flex-col items-center text-center shadow-2xl">
+<div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 border border-primary/20">
+<span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">sync</span>
+</div>
+<h3 class="text-on-surface font-headline text-xl font-bold mb-2">Sync Control</h3>
+<p class="text-on-surface-variant text-sm mb-8">Manual override for cluster synchronization.</p>
+<div class="w-full space-y-4">
+<button class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold rounded-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                                SYNC NOW
+                            </button>
+<button class="w-full py-4 bg-surface-container-highest text-on-surface font-bold rounded-lg border border-outline-variant/15 hover:bg-surface-bright transition-colors">
+                                CONFIGURE TRIGGERS
+                            </button>
+</div>
+<div class="mt-10 pt-8 border-t border-outline-variant/10 w-full text-left">
+<h4 class="text-xs font-bold uppercase tracking-widest text-outline mb-4">Quick Toggle</h4>
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm text-on-surface">Auto-Healing</span>
+<div class="w-10 h-5 bg-tertiary rounded-full relative">
+<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm text-on-surface">Dry Run Mode</span>
+<div class="w-10 h-5 bg-surface-container-lowest border border-outline/30 rounded-full relative">
+<div class="absolute left-0.5 top-0.5 w-4 h-4 bg-outline rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Detailed Audit Trail (Full Width) -->
+<section class="md:col-span-12">
+<div class="bg-surface-container-low rounded-full overflow-hidden border border-outline-variant/15">
+<div class="px-8 py-6 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-lowest/50">
+<h3 class="text-secondary font-headline text-lg font-medium">Detailed Audit Trail</h3>
+<button class="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">download</span> Export Logs
+                            </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-high/30">
+<tr>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Timestamp</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Operation ID</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Action</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Status</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Duration</th>
+<th class="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Details</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-8 py-4 text-xs font-mono text-on-surface-variant">2023-11-24 14:22:01</td>
+<td class="px-8 py-4 text-xs font-mono text-secondary">SYNC_TR_9921</td>
+<td class="px-8 py-4 text-xs font-medium">Delta Replication</td>
+<td class="px-8 py-4">
+<div class="flex items-center gap-2 text-tertiary text-[10px] font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Success
+                                            </div>
+</td>
+<td class="px-8 py-4 text-xs">1m 12s</td>
+<td class="px-8 py-4"><span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface">visibility</span></td>
+</tr>
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-8 py-4 text-xs font-mono text-on-surface-variant">2023-11-24 13:00:00</td>
+<td class="px-8 py-4 text-xs font-mono text-secondary">SYNC_TR_9920</td>
+<td class="px-8 py-4 text-xs font-medium">Schema Migration</td>
+<td class="px-8 py-4">
+<div class="flex items-center gap-2 text-[#fbbf24] text-[10px] font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-[#fbbf24]"></span> Warning
+                                            </div>
+</td>
+<td class="px-8 py-4 text-xs">4m 45s</td>
+<td class="px-8 py-4"><span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface">visibility</span></td>
+</tr>
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-8 py-4 text-xs font-mono text-on-surface-variant">2023-11-24 12:45:12</td>
+<td class="px-8 py-4 text-xs font-mono text-secondary">SYNC_TR_9919</td>
+<td class="px-8 py-4 text-xs font-medium">Integrity Check</td>
+<td class="px-8 py-4">
+<div class="flex items-center gap-2 text-error text-[10px] font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Critical
+                                            </div>
+</td>
+<td class="px-8 py-4 text-xs">120ms</td>
+<td class="px-8 py-4"><span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface">visibility</span></td>
+</tr>
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-8 py-4 text-xs font-mono text-on-surface-variant">2023-11-24 10:15:33</td>
+<td class="px-8 py-4 text-xs font-mono text-secondary">SYNC_TR_9918</td>
+<td class="px-8 py-4 text-xs font-medium">Node Handshake</td>
+<td class="px-8 py-4">
+<div class="flex items-center gap-2 text-tertiary text-[10px] font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Success
+                                            </div>
+</td>
+<td class="px-8 py-4 text-xs">2s 14ms</td>
+<td class="px-8 py-4"><span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface">visibility</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#0b1326]/90 backdrop-blur-xl border-t border-[#464555]/20 px-4 h-16 flex justify-around items-center z-50">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">bolt</span>
+<span class="text-[10px]">Auto</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-[10px]">Stats</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync_alt</span>
+<span class="text-[10px] font-bold">Sync</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px]">Users</span>
+</a>
+</nav>
+</body></html>

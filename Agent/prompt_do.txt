@@ -1,0 +1,4 @@
+dựa vào file 
+planning-mode.txt
+và @skills để thiết kế giao diện cho tôi vẫn như bản gốc hiện tại mà giờ cải tiếng hơn và nếu đang
+thiếu màn hình nào thì thêm màn hình đó vào giúp tôi kiểm tra từng nơi có thể bấm được xem có đủ màn hình chưa nha

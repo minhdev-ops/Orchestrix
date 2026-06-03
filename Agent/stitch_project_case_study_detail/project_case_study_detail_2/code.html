@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Project Detail - THE KINETIC ARCHITECT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&amp;family=Space_Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffdcbf",
+                    "on-primary": "#003640",
+                    "surface-tint": "#4cd7f6",
+                    "error-container": "#93000a",
+                    "inverse-primary": "#00687a",
+                    "secondary-container": "#3131c0",
+                    "outline-variant": "#3d494c",
+                    "on-secondary-fixed-variant": "#2f2ebe",
+                    "on-tertiary-fixed": "#2d1600",
+                    "on-secondary-container": "#b0b2ff",
+                    "tertiary": "#ffb873",
+                    "on-secondary": "#1000a9",
+                    "surface-bright": "#39393b",
+                    "primary-fixed": "#acedff",
+                    "secondary-fixed-dim": "#c0c1ff",
+                    "surface": "#131315",
+                    "surface-container-low": "#1c1b1d",
+                    "outline": "#869397",
+                    "background": "#131315",
+                    "on-primary-fixed": "#001f26",
+                    "error": "#ffb4ab",
+                    "surface-container-lowest": "#0e0e10",
+                    "secondary": "#c0c1ff",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#004e5c",
+                    "surface-container-highest": "#353437",
+                    "on-surface-variant": "#bcc9cd",
+                    "secondary-fixed": "#e1e0ff",
+                    "surface-variant": "#353437",
+                    "primary-container": "#06b6d4",
+                    "on-background": "#e5e1e4",
+                    "surface-container": "#201f22",
+                    "on-secondary-fixed": "#07006c",
+                    "on-primary-container": "#00424f",
+                    "on-surface": "#e5e1e4",
+                    "on-tertiary": "#4b2800",
+                    "tertiary-fixed-dim": "#ffb873",
+                    "surface-dim": "#131315",
+                    "inverse-surface": "#e5e1e4",
+                    "primary-fixed-dim": "#4cd7f6",
+                    "primary": "#4cd7f6",
+                    "inverse-on-surface": "#313032",
+                    "surface-container-high": "#2a2a2c",
+                    "on-tertiary-fixed-variant": "#6a3b00",
+                    "on-tertiary-container": "#5b3200",
+                    "tertiary-container": "#e89337",
+                    "on-error": "#690005"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(19, 19, 21, 0.4);
+            backdrop-filter: blur(24px);
+        }
+        .glowing-border {
+            position: relative;
+        }
+        .glowing-border::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(45deg, #4cd7f6, #3131c0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.15;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#131315]/40 backdrop-blur-xl shadow-[0_0_40px_rgba(76,215,246,0.05)]">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+<div class="text-xl font-bold tracking-tighter text-cyan-400 font-['Space_Grotesk']">THE KINETIC ARCHITECT</div>
+<div class="hidden md:flex items-center gap-8 font-['Inter'] tracking-tight">
+<a class="text-slate-400 hover:text-cyan-300 transition-colors" href="#">Home</a>
+<a class="text-slate-400 hover:text-cyan-300 transition-colors" href="#">About</a>
+<a class="text-slate-400 hover:text-cyan-300 transition-colors" href="#">Skills</a>
+<a class="text-cyan-400 font-bold border-b-2 border-cyan-400 pb-1" href="#">Projects</a>
+<a class="text-slate-400 hover:text-cyan-300 transition-colors" href="#">Blog</a>
+<a class="text-slate-400 hover:text-cyan-300 transition-colors" href="#">Contact</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:bg-cyan-500/5 transition-all duration-300 active:scale-95 rounded-full">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+</div>
+</div>
+<div class="bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 h-[1px] w-full absolute bottom-0"></div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative h-[716px] w-full overflow-hidden">
+<img class="w-full h-full object-cover opacity-60" data-alt="Futuristic data center interior with glowing blue server racks and digital interface overlays representing high-scale cloud infrastructure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD61AYITHsE-_n4INaJ_QCCkOWytt_PIN-_fKQYJUN8gQHe1P1-OYmRfane0mMMbrl1EcUYKeIgKFQ8xFNPUX9LP-vzLzhYkV6wixF5tow_xuis16P4mkGVtMfkeZMu7WtJeAbLk-UKtI0ASB8rUjNetv8FYy1r5YaCP-_Ig3IO7Xpj462J3f8KLGkI3IDF36lnsC-_uNVtqOiLG3R2W6vUeRjwApINtl7Ez0zfkmX59xS5DG_4gsuTm4xUqHspiU5O-i5ZW2w4vjk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-8 md:p-16 max-w-7xl mx-auto">
+<div class="flex flex-wrap gap-3 mb-6">
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-[10px] font-label uppercase tracking-widest text-primary border border-outline-variant/20">AWS</span>
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-[10px] font-label uppercase tracking-widest text-primary border border-outline-variant/20">Kubernetes</span>
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-[10px] font-label uppercase tracking-widest text-primary border border-outline-variant/20">Terraform</span>
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-[10px] font-label uppercase tracking-widest text-primary border border-outline-variant/20">Go</span>
+</div>
+<h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-4 text-on-surface">Cloud-Native Scale Engine</h1>
+<p class="text-xl text-on-surface-variant max-w-2xl font-light leading-relaxed">Architecting a resilient, auto-scaling microservices ecosystem for global real-time data processing.</p>
+</div>
+</section>
+<!-- Project Content Bento Grid -->
+<section class="max-w-7xl mx-auto px-8 py-24">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Problem Statement -->
+<div class="md:col-span-7 bg-surface-container-low p-8 rounded-xl glowing-border">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-tertiary" data-icon="report_problem">report_problem</span>
+<h2 class="text-sm font-label uppercase tracking-[0.2em] text-on-surface-variant">Problem Statement</h2>
+</div>
+<p class="text-lg leading-relaxed text-on-surface/90">
+                        The legacy infrastructure suffered from inconsistent deployment cycles and significant downtime during traffic spikes. The monlithic architecture prevented individual service scaling, leading to excessive cloud costs and slow feature velocity.
+                    </p>
+</div>
+<!-- Stats/Quick Info -->
+<div class="md:col-span-5 bg-surface-container-high p-8 rounded-xl flex flex-col justify-between">
+<div>
+<h3 class="text-[10px] font-label uppercase tracking-widest text-primary mb-6">Execution Metrics</h3>
+<div class="space-y-6">
+<div class="flex justify-between items-end border-b border-outline-variant/10 pb-2">
+<span class="text-sm text-on-surface-variant">Uptime SLA</span>
+<span class="text-2xl font-label text-primary">99.99%</span>
+</div>
+<div class="flex justify-between items-end border-b border-outline-variant/10 pb-2">
+<span class="text-sm text-on-surface-variant">Deployment Time</span>
+<span class="text-2xl font-label text-primary">4m 12s</span>
+</div>
+<div class="flex justify-between items-end border-b border-outline-variant/10 pb-2">
+<span class="text-sm text-on-surface-variant">Cost Reduction</span>
+<span class="text-2xl font-label text-primary">40%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Solution Description -->
+<div class="md:col-span-12 bg-surface-container-low p-8 md:p-12 rounded-xl">
+<div class="grid md:grid-cols-2 gap-12">
+<div>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-secondary" data-icon="architecture">architecture</span>
+<h2 class="text-sm font-label uppercase tracking-[0.2em] text-on-surface-variant">Solution Architecture</h2>
+</div>
+<h3 class="text-3xl font-bold mb-6">Microservices &amp; CI/CD Orchestration</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                                We migrated the core services to a containerized Go environment managed by EKS. Terraform was used to achieve 100% infrastructure-as-code, ensuring parity between staging and production environments.
+                            </p>
+<div class="flex items-center gap-2 text-primary font-label text-sm uppercase tracking-widest">
+<span>Deployment automated via GitHub Actions</span>
+<span class="material-symbols-outlined text-xs" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-highest p-6 rounded-lg border border-outline-variant/5">
+<span class="material-symbols-outlined mb-4 text-primary" data-icon="hub">hub</span>
+<h4 class="font-bold mb-2">Microservices</h4>
+<p class="text-xs text-on-surface-variant">Decoupled logic for horizontal scalability.</p>
+</div>
+<div class="bg-surface-container-highest p-6 rounded-lg border border-outline-variant/5">
+<span class="material-symbols-outlined mb-4 text-primary" data-icon="sync">sync</span>
+<h4 class="font-bold mb-2">CI/CD</h4>
+<p class="text-xs text-on-surface-variant">Automated testing and canary deployments.</p>
+</div>
+<div class="bg-surface-container-highest p-6 rounded-lg border border-outline-variant/5">
+<span class="material-symbols-outlined mb-4 text-primary" data-icon="security">security</span>
+<h4 class="font-bold mb-2">IAM Identity</h4>
+<p class="text-xs text-on-surface-variant">Zero-trust networking within the cluster.</p>
+</div>
+<div class="bg-surface-container-highest p-6 rounded-lg border border-outline-variant/5">
+<span class="material-symbols-outlined mb-4 text-primary" data-icon="monitoring">monitoring</span>
+<h4 class="font-bold mb-2">Observability</h4>
+<p class="text-xs text-on-surface-variant">Prometheus &amp; Grafana visual logic.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Gallery & Diagram Section -->
+<div class="md:col-span-8 bg-surface-container-low overflow-hidden rounded-xl h-96 relative group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Technical architectural diagram showing cloud services, load balancers, and container clusters with neon connecting lines on a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBpfgGL6IseuaCkD1qavkwXnSqeXmqafLf6WhQWSZAbUGdn8fDNno42_i1BurpdzvPDuBkRBx0DJ35pSVE2O2igR9VqeNTgMCPCW5lOIfStAw6XvdSJq81_CaV2xtXb-A1R6p_Kc7qyCL8aXyO84OVhP_Hz14qkscK5XO14HYPWfbLfgJDuAbcj6ye1XT3D4nA2SpG8QXTOsY1G-vXL_de7zLy9lsLEjP2z-1rmW_AQuTr3XmTs64axGqsRyeRphJrp6NbKHoSEaw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<span class="text-xs font-label uppercase tracking-widest text-primary">Technical Documentation</span>
+<h4 class="text-xl font-bold">System Architecture Diagram</h4>
+</div>
+</div>
+<div class="md:col-span-4 bg-surface-container-high p-8 rounded-xl flex flex-col">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="list_alt">list_alt</span>
+<h2 class="text-sm font-label uppercase tracking-[0.2em] text-on-surface-variant">Key Features</h2>
+</div>
+<ul class="space-y-6 flex-grow">
+<li class="flex gap-4">
+<span class="text-primary font-label text-sm">01</span>
+<span class="text-sm text-on-surface-variant">Real-time load balancing with NGINX Ingress Controllers.</span>
+</li>
+<li class="flex gap-4">
+<span class="text-primary font-label text-sm">02</span>
+<span class="text-sm text-on-surface-variant">Auto-scaling based on custom Prometheus metrics.</span>
+</li>
+<li class="flex gap-4">
+<span class="text-primary font-label text-sm">03</span>
+<span class="text-sm text-on-surface-variant">Multi-region database replication for disaster recovery.</span>
+</li>
+<li class="flex gap-4">
+<span class="text-primary font-label text-sm">04</span>
+<span class="text-sm text-on-surface-variant">Isolated staging environments using Kubernetes namespaces.</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Next Project Navigation -->
+<section class="max-w-7xl mx-auto px-8 pb-32">
+<a class="group relative block w-full bg-surface-container-low p-12 rounded-xl overflow-hidden glowing-border transition-all duration-300 hover:bg-surface-container-high" href="#">
+<div class="flex flex-col md:flex-row justify-between items-center relative z-10">
+<div class="text-center md:text-left mb-8 md:mb-0">
+<span class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Next Project</span>
+<h3 class="text-4xl font-bold mt-2 group-hover:text-primary transition-colors">Distributed Ledger Pipeline</h3>
+</div>
+<div class="flex items-center gap-4 text-primary">
+<span class="font-label text-sm uppercase tracking-widest">View Project</span>
+<span class="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-2" data-icon="trending_flat">trending_flat</span>
+</div>
+</div>
+<!-- Subtle glow effect behind -->
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 blur-[100px] rounded-full group-hover:bg-primary/20 transition-all"></div>
+</a>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 border-t border-slate-800/30 bg-[#131315]">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto">
+<div class="text-cyan-400 font-black font-['Space_Grotesk'] text-[10px] uppercase tracking-[0.2em] mb-4 md:mb-0">
+                © 2024 KINETIC ARCHITECT. ENGINEERED FOR PERFORMANCE.
+            </div>
+<div class="flex gap-8">
+<a class="text-slate-600 hover:text-cyan-400 transition-opacity font-['Space_Grotesk'] text-[10px] uppercase tracking-[0.2em]" href="#">GitHub</a>
+<a class="text-slate-600 hover:text-cyan-400 transition-opacity font-['Space_Grotesk'] text-[10px] uppercase tracking-[0.2em]" href="#">LinkedIn</a>
+<a class="text-slate-600 hover:text-cyan-400 transition-opacity font-['Space_Grotesk'] text-[10px] uppercase tracking-[0.2em]" href="#">Twitter</a>
+</div>
+</div>
+</footer>
+</body></html>
