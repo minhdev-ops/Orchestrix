@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Orchestrator | User Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-container": "#00424f",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "surface-container": "#eceef0",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "surface-dim": "#d8dadc",
+                        "outline": "#6d797d",
+                        "tertiary-fixed-dim": "#ffb873",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary-container": "#57657b",
+                        "secondary-fixed": "#d5e3fd",
+                        "on-tertiary-fixed-variant": "#6a3b00",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-surface": "#191c1e",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdcbf",
+                        "surface": "#f7f9fb",
+                        "inverse-primary": "#4cd7f6",
+                        "surface-bright": "#f7f9fb",
+                        "tertiary": "#8c5000",
+                        "on-primary-fixed-variant": "#004e5c",
+                        "secondary": "#515f74",
+                        "on-surface-variant": "#3d494c",
+                        "on-primary-fixed": "#001f26",
+                        "surface-variant": "#e0e3e5",
+                        "on-background": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#2d1600",
+                        "primary-container": "#06b6d4",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "primary": "#00687a",
+                        "tertiary-container": "#e89337",
+                        "background": "#f7f9fb",
+                        "surface-tint": "#00687a",
+                        "primary-fixed": "#acedff",
+                        "outline-variant": "#bcc9cd",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary-container": "#5b3200",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "primary-fixed-dim": "#4cd7f6",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#d5e3fd",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopNavBar Shell -->
+<header class="bg-white/80 backdrop-blur-md text-slate-500 font-['Space_Grotesk'] tracking-tight shadow-[0_12px_32px_rgba(0,104,122,0.06)] docked full-width top-0 sticky z-40 flex justify-between items-center w-full px-6 py-3">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-slate-900">System Orchestrator</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-slate-500 hover:bg-slate-50 transition-colors duration-200 px-3 py-1" href="#">Dashboard</a>
+<a class="text-cyan-700 font-bold border-b-2 border-cyan-600 px-3 py-1" href="#">Security</a>
+<a class="text-slate-500 hover:bg-slate-50 transition-colors duration-200 px-3 py-1" href="#">Logs</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="bg-surface-container-low border-none rounded-sm pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="Global Search..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-slate-50 transition-colors text-cyan-600">
+<span class="material-symbols-outlined">monitor_heart</span>
+</button>
+<button class="p-2 hover:bg-slate-50 transition-colors text-cyan-600">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 hover:bg-slate-50 transition-colors text-cyan-600">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="Administrator Profile" data-alt="close-up portrait of professional administrator in high-tech office setting with soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAewKh2NM7Id9V0xLNQzsEsHrLHUKIPi9Fujmton8AuGBnrKa5dcfGvdCmUIIFUHG7wVmAOZvfhSAE0WpK2ohssPHLSNnLy3nmfkp-P-tGvTn3-ADkitoM95etSkAMbp3q9dXWN32hNa_wisJLTdInCcCgonXzjHX0pz5P4bbOoxp6vJeVRNiTarNoeLJAbdzdZ5ZIisy3c7AOUeA__zIgDOZbUu_8lWLaqoIA1WZZX_AIgsIBSx31kCdtivah1C2eWaEQdQ2YRmXs"/>
+</div>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- SideNavBar Shell -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 z-50 bg-slate-50 border-r border-slate-200/50 font-['Inter'] font-medium text-sm pt-[72px]">
+<div class="px-6 py-4">
+<h2 class="text-lg font-black text-slate-800">Core Engine</h2>
+<p class="text-xs text-slate-500">v2.4.0-stable</p>
+</div>
+<nav class="flex-1 px-3 space-y-1 mt-4">
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-cyan-600 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-cyan-600 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span>Nodes</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-cyan-600 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Telemetry</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-cyan-700 font-semibold bg-white rounded-sm shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span>Security</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-cyan-600 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span>Logs</span>
+</a>
+</nav>
+<div class="px-4 py-6 border-t border-slate-200/50">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-2.5 rounded-sm font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-sm">add</span>
+                    Deploy New Node
+                </button>
+</div>
+<div class="px-3 pb-6 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-cyan-600 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-cyan-600 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">description</span>
+<span>Documentation</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 p-8">
+<div class="max-w-7xl mx-auto">
+<!-- Header & Action Row -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
+<div>
+<h1 class="text-3xl font-headline font-bold text-on-surface tracking-tight">User Management Module</h1>
+<p class="text-on-surface-variant font-body">Orchestrate high-level access and regional permissions across the cluster.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 text-primary font-semibold border-b-2 border-transparent hover:border-primary transition-all text-sm">Export Audit Log</button>
+<button class="px-5 py-2 bg-gradient-to-r from-primary to-primary-container text-white font-bold rounded-sm text-sm shadow-md hover:scale-[0.98] transition-all">Create Operator</button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Global Permission Matrix (Large Area) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-sm shadow-sm border border-outline-variant/10 overflow-hidden">
+<div class="p-6 border-b border-surface-container-high bg-surface-container-low flex justify-between items-center">
+<h3 class="font-headline font-bold text-lg text-slate-800">Cluster Permission Matrix</h3>
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest">Active Protocol</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container/30">
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Access Scope</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider text-center">Admin</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider text-center">Manager</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider text-center">User</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">
+<tr>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="font-semibold text-slate-800">Multi-Region Write</span>
+<span class="text-xs text-on-surface-variant">Capability to synchronize states across global edge nodes.</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-outline-variant/40">circle</span></td>
+</tr>
+<tr>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="font-semibold text-slate-800">Kernel Access</span>
+<span class="text-xs text-on-surface-variant">Low-level engine modifications and routine debugging.</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-outline-variant/40">circle</span></td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-outline-variant/40">circle</span></td>
+</tr>
+<tr>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="font-semibold text-slate-800">Backup Orchestration</span>
+<span class="text-xs text-on-surface-variant">Triggering global snapshots and cold storage migrations.</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+<td class="px-6 py-5 text-center"><span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Active Operators (Vertical Card) -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+<div class="bg-white p-6 rounded-sm shadow-sm border border-outline-variant/10 flex-1">
+<h3 class="font-headline font-bold text-slate-800 mb-6 flex items-center justify-between">
+                                Active Operators
+                                <span class="text-xs font-normal text-on-surface-variant">Total: 4</span>
+</h3>
+<div class="space-y-6">
+<!-- Operator 1 -->
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="Operator" class="h-10 w-10 rounded-sm object-cover" data-alt="headshot of male tech operator with a focused expression in a modern bright workspace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACGZCMWIFjnvZUdsjiZq7xV5HezCeLjFPEeafKdSoT04cMZdYRVywPSySNXSFw8mA578HPMbMBYwQwIoi57RGBqsB3Hmt5CCdCHC3O1VNoy5PY7je9rBrrxWkLmSvwEJGlWzuOfiFfmqlFzlfZNLbq4lYsY43HBCZZyBYjGzERK8TW851PH4oqIudcHIRani64nSzIZt7J94ZWF9P9oFIHbSSO_udaSPiGN32I6rYtyChUsu1VmovZD6mx_12zVgUaN-yAvS1agKE"/>
+<span class="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900">Dr. Elias Vance</p>
+<p class="text-[10px] text-on-surface-variant font-mono uppercase tracking-tighter">Admin • Region: EU-WEST-1</p>
+</div>
+<button class="p-1 text-outline hover:text-primary"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</div>
+<!-- Operator 2 -->
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="Operator" class="h-10 w-10 rounded-sm object-cover" data-alt="professional woman in tech industry, portrait with soft clean background and overhead lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzCliYDrUntk3CTDfml4OW9n3u_Fs-ejNuN9nEpacH5aoj81Wm9aWoZ6fnYeLwYFvgyRpA4_bfJGEGRt4PFAUhQr4SHSA1ouJHFlfCX23wUEZRYU_UreOXYInNH4bYyXwYEzlplFOKLwW-2CuvlChtP4XIsqEJB4jb8aPyvxJb9LbT0PQvyuKE3MVV2TNBm8_nYzpQ2FkYq7sbeD7hY81ngWf5FGsFZqNlrqYPrRZhsPRnUqgrauD4SdTMq6ntawBmMlPGK52W3lU"/>
+<span class="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900">Sarah Chen</p>
+<p class="text-[10px] text-on-surface-variant font-mono uppercase tracking-tighter">Manager • Region: ASIA-SOUTH-2</p>
+</div>
+<button class="p-1 text-outline hover:text-primary"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</div>
+<!-- Operator 3 -->
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="Operator" class="h-10 w-10 rounded-sm object-cover" data-alt="tech specialist male portrait, daylight lighting, looking directly at camera with professional demeanor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBfOt7kTf1fvrnFm4EHsGW0dSRqthbPXzVjWORtwTuRnTGpiHN14mvG2fXhwbseJGvbbxXYDe8qfg_1F_cf8eO3Ufpu3uI6CGUELNdCgNVKg_44DKLqjLDAPnpqt7jO7E-gsuOfmCRvB5CbotlvUiIXG-UAZqbxL1EDhXxXVy6GBU_L36VXht-5giElpLT2oawyCw7exsMxdApNuVKhIw_fY65dOE1ar2nmlWG82y5ciEWypkEy4QBs0pr9OnNUHUhJfAM_C6mN-M"/>
+<span class="absolute -bottom-1 -right-1 h-3 w-3 bg-slate-300 border-2 border-white rounded-full"></span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900">Marcus Thorne</p>
+<p class="text-[10px] text-on-surface-variant font-mono uppercase tracking-tighter">User • Region: US-EAST-1</p>
+</div>
+<button class="p-1 text-outline hover:text-primary"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</div>
+</div>
+</div>
+<!-- Telemetry Snippet -->
+<div class="glass-panel p-5 rounded-sm border border-primary/10 shadow-sm relative overflow-hidden">
+<div class="absolute -right-4 -top-4 text-primary/5 select-none">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'wght' 700;">security</span>
+</div>
+<h4 class="text-xs font-bold text-primary uppercase tracking-widest mb-3">Live Access Log</h4>
+<div class="font-mono text-[10px] space-y-1.5 text-on-surface-variant">
+<p><span class="text-primary-container font-bold">14:02:11</span> <span class="text-slate-800">Chen.S</span> AUTHORIZED: Snapshot</p>
+<p><span class="text-primary-container font-bold">13:58:45</span> <span class="text-slate-800">Vance.E</span> REJECTED: Kernel_W</p>
+<p><span class="text-primary-container font-bold">13:42:02</span> <span class="text-slate-800">System</span> SYNC_COMPLETE: EU-WEST-1</p>
+</div>
+</div>
+</div>
+<!-- Role Configuration Cards (Asymmetric Bottom Row) -->
+<div class="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Admin Config -->
+<div class="bg-surface-container-low p-6 rounded-sm border-b-2 border-primary">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary">key</span>
+<h3 class="font-headline font-bold text-slate-800">Admin Role</h3>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-6">Unrestricted orchestration across all logical layers. Full governance over user lifecycle and kernel parameters.</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-white text-[9px] font-bold text-primary border border-outline-variant/30 rounded-sm">FULL_WRITE</span>
+<span class="px-2 py-1 bg-white text-[9px] font-bold text-primary border border-outline-variant/30 rounded-sm">IAM_CONTROL</span>
+<span class="px-2 py-1 bg-white text-[9px] font-bold text-primary border border-outline-variant/30 rounded-sm">CORE_SYNC</span>
+</div>
+</div>
+<!-- Manager Config -->
+<div class="bg-surface-container-low p-6 rounded-sm border-b-2 border-secondary">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-secondary">manage_accounts</span>
+<h3 class="font-headline font-bold text-slate-800">Manager Role</h3>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-6">Regional management and telemetry analysis. Can initiate backups but requires approval for kernel access.</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-white text-[9px] font-bold text-secondary border border-outline-variant/30 rounded-sm">REGIONAL_SNAPSHOT</span>
+<span class="px-2 py-1 bg-white text-[9px] font-bold text-secondary border border-outline-variant/30 rounded-sm">USER_INVITE</span>
+</div>
+</div>
+<!-- User Config -->
+<div class="bg-surface-container-low p-6 rounded-sm border-b-2 border-outline-variant">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-outline">visibility</span>
+<h3 class="font-headline font-bold text-slate-800">User Role</h3>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-6">Read-only access to standard telemetry. Basic orchestration for assigned nodes and backup retrieval.</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-white text-[9px] font-bold text-outline border border-outline-variant/30 rounded-sm">TELEMETRY_VIEW</span>
+<span class="px-2 py-1 bg-white text-[9px] font-bold text-outline border border-outline-variant/30 rounded-sm">NODE_STATUS</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Responsive Mobile NavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant/10 px-6 py-4 flex justify-between items-center z-50">
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold uppercase">Main</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="text-[10px] font-bold uppercase">Security</span>
+</button>
+<div class="relative -top-8">
+<button class="h-14 w-14 bg-gradient-to-br from-primary to-primary-container text-white rounded-full shadow-lg shadow-primary/40 flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-bold uppercase">Data</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold uppercase">Config</span>
+</button>
+</nav>
+</body></html>

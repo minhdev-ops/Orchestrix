@@ -21,16 +21,9 @@ class ModuleController extends Controller
         $moduleManager = app(\App\Services\ModuleManagerService::class);
         $modules = $moduleManager->getActiveModules();
 
-        $stats = [
-            'portfolio' => ['projects' => 0, 'contacts' => 0],
-            'blog' => ['posts' => 0],
-        ];
+        $stats = [];
 
         try {
-            $stats['portfolio']['projects'] = class_exists(\Modules\Portfolio\Models\Project::class) ? \Modules\Portfolio\Models\Project::count() : 0;
-            $stats['portfolio']['contacts'] = class_exists(\Modules\Portfolio\Models\Contact::class) ? \Modules\Portfolio\Models\Contact::count() : 0;
-
-            $stats['blog']['posts'] = class_exists(\Modules\Blog\Models\BlogPost::class) ? \Modules\Blog\Models\BlogPost::where('is_published', true)->count() : 0;
         } catch (\Exception $e) {
             // Log error or notify admin, but don't crash the dashboard
             report($e);

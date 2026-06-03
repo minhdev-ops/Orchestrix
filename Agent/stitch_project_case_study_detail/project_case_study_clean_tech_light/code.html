@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Project Case Study | TECH_ARCHITECT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#ffb873",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-primary": "#4cd7f6",
+                        "tertiary": "#8c5000",
+                        "outline": "#6d797d",
+                        "secondary-container": "#dae2fd",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#5c647a",
+                        "inverse-surface": "#213145",
+                        "on-surface-variant": "#3d494c",
+                        "on-primary-container": "#00424f",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001f26",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#d3e4fe",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#e89337",
+                        "surface-tint": "#00687a",
+                        "primary-container": "#06b6d4",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed-variant": "#6a3b00",
+                        "surface-container-high": "#dce9ff",
+                        "primary-fixed": "#acedff",
+                        "secondary-fixed": "#dae2fd",
+                        "on-surface": "#0b1c30",
+                        "background": "#f8f9ff",
+                        "secondary": "#565e74",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#bcc9cd",
+                        "tertiary-fixed": "#ffdcbf",
+                        "on-secondary-fixed": "#131b2e",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed-variant": "#004e5c",
+                        "primary-fixed-dim": "#4cd7f6",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-tertiary-fixed": "#2d1600",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "primary": "#00687a",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-container": "#5b3200",
+                        "surface": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tech-gradient {
+            background: linear-gradient(135deg, #00687a 0%, #06b6d4 100%);
+        }
+        .frosted-glass {
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+            color: #0b1c30;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f8f9ff]/80 dark:bg-[#0b1c30]/80 backdrop-blur-xl">
+<div class="flex justify-between items-center h-16 px-8 max-w-7xl mx-auto">
+<div class="text-xl font-bold tracking-tighter text-slate-900 dark:text-slate-50 font-['Space_Grotesk']">
+                TECH_ARCHITECT
+            </div>
+<div class="hidden md:flex items-center space-x-8 font-['Space_Grotesk'] tracking-tight">
+<a class="text-slate-600 dark:text-slate-400 pb-1 hover:text-cyan-500 transition-colors duration-200" href="#">Home</a>
+<a class="text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400 pb-1 hover:text-cyan-500 transition-colors duration-200" href="#">Projects</a>
+<a class="text-slate-600 dark:text-slate-400 pb-1 hover:text-cyan-500 transition-colors duration-200" href="#">Blog</a>
+<a class="text-slate-600 dark:text-slate-400 pb-1 hover:text-cyan-500 transition-colors duration-200" href="#">Contact</a>
+</div>
+<button class="tech-gradient text-on-primary px-6 py-2 rounded-lg font-medium tracking-tight hover:opacity-90 active:scale-95 transition-all">
+                Resume
+            </button>
+</div>
+</nav>
+<main class="pt-32 pb-24 px-8 max-w-7xl mx-auto">
+<!-- Hero Case Study Header -->
+<header class="mb-24 flex flex-col md:flex-row items-end justify-between gap-12">
+<div class="max-w-3xl">
+<span class="text-sm font-bold tracking-[0.2em] text-primary mb-4 block uppercase">Project Case Study / 04</span>
+<h1 class="text-6xl md:text-8xl font-bold tracking-tighter text-on-surface leading-[0.9] mb-8">
+                    Quantum<br/>Scalability.
+                </h1>
+<p class="text-xl text-on-surface-variant max-w-xl leading-relaxed">
+                    Engineering a high-availability infrastructure for real-time data ingestion across distributed cloud clusters. Redefining latency boundaries.
+                </p>
+</div>
+<div class="hidden lg:block w-32 h-32 bg-surface-container-low rounded-full border border-outline-variant/15 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="architecture">architecture</span>
+</div>
+</header>
+<!-- Problem Statement Section - Asymmetric Layout -->
+<section class="mb-32 grid md:grid-cols-12 gap-8 items-start">
+<div class="md:col-span-4 py-12 px-8 bg-surface-container-low rounded-xl">
+<h2 class="text-3xl font-bold tracking-tight mb-6">The Conflict</h2>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                    Legacy systems were failing under peak 100k requests/sec. Synchronization between regional clusters introduced 250ms of unacceptable lag.
+                </p>
+<div class="flex items-center gap-4 text-error font-mono text-sm">
+<span class="material-symbols-outlined" data-icon="error">error</span>
+                    CRITICAL FAILURE AT SCALE
+                </div>
+</div>
+<div class="md:col-span-8 h-96 relative overflow-hidden rounded-xl">
+<img alt="Server room with cyan glowing lights" class="w-full h-full object-cover" data-alt="Modern high-tech server room with glowing cyan cabling and sleek brushed metal server racks in a perspective view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4vUhstSFQScz61hlN3McDJIad7tJ6NIw89F_FXjk183wohTx-MBKsdBAhDKpecRrwfqU_2u6JcmuY19SLt_TEaAu5U7uNfMhmV3Ke_8bYp7qfVhM3g4Ian3rVxtWBWI3VKVHRSsoeRuGFB4eD2ha-5HvKtMWOYlhEqyFjQNmaLcW71be6JtZyG4N2mOfCFCyXYf1SkByPM05MpO7GT5WzhopJP8_1PpQUplxOtNPeDgwFtxH3XIpU-ggHPVktUM-1gLVVaxRGaWA"/>
+<div class="absolute inset-0 bg-gradient-to-r from-on-surface/40 to-transparent"></div>
+</div>
+</section>
+<!-- Solution Architecture - Tech Diagram Style -->
+<section class="mb-32">
+<div class="flex items-center gap-4 mb-12">
+<div class="h-[2px] w-12 bg-primary"></div>
+<h2 class="text-4xl font-bold tracking-tight">Solution Architecture</h2>
+</div>
+<div class="grid md:grid-cols-3 gap-6">
+<!-- Step 1 -->
+<div class="p-8 bg-surface-container-lowest border border-outline-variant/15 rounded-xl">
+<div class="mb-6 flex justify-between">
+<span class="text-4xl font-black text-surface-container-highest">01</span>
+<span class="material-symbols-outlined text-primary" data-icon="dynamic_feed">dynamic_feed</span>
+</div>
+<h3 class="text-xl font-bold mb-4">Ingestion Layer</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                        Implementation of an event-driven Kafka cluster with multi-threaded producers optimized for high-throughput stream processing.
+                    </p>
+</div>
+<!-- Step 2 -->
+<div class="p-8 bg-surface-container-lowest border border-outline-variant/15 rounded-xl shadow-2xl shadow-primary/5">
+<div class="mb-6 flex justify-between">
+<span class="text-4xl font-black text-surface-container-highest">02</span>
+<span class="material-symbols-outlined text-primary" data-icon="hub">hub</span>
+</div>
+<h3 class="text-xl font-bold mb-4">Central Orchestrator</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                        Kubernetes-native sidecar architecture ensuring zero-downtime deployments and localized data validation before global propagation.
+                    </p>
+</div>
+<!-- Step 3 -->
+<div class="p-8 bg-surface-container-lowest border border-outline-variant/15 rounded-xl">
+<div class="mb-6 flex justify-between">
+<span class="text-4xl font-black text-surface-container-highest">03</span>
+<span class="material-symbols-outlined text-primary" data-icon="database">database</span>
+</div>
+<h3 class="text-xl font-bold mb-4">State Persistence</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                        Global Aurora PostgreSQL instance with regional read-replicas, achieving &lt;10ms cross-region latency via custom caching drivers.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Execution Metrics - Data Driven -->
+<section class="mb-32 p-12 bg-on-surface text-surface rounded-xl overflow-hidden relative">
+<div class="relative z-10 grid md:grid-cols-4 gap-12 text-center md:text-left">
+<div>
+<span class="block text-primary-container text-sm font-bold tracking-widest uppercase mb-2">Throughput</span>
+<span class="text-6xl font-black text-white leading-none">10x</span>
+<p class="mt-4 text-slate-400 text-sm">Increase in data processing capacity vs legacy.</p>
+</div>
+<div>
+<span class="block text-primary-container text-sm font-bold tracking-widest uppercase mb-2">Latency</span>
+<span class="text-6xl font-black text-white leading-none">-84%</span>
+<p class="mt-4 text-slate-400 text-sm">Reduction in end-to-end request lifecycle duration.</p>
+</div>
+<div>
+<span class="block text-primary-container text-sm font-bold tracking-widest uppercase mb-2">Availability</span>
+<span class="text-6xl font-black text-white leading-none">99.9</span>
+<p class="mt-4 text-slate-400 text-sm">Targeted uptime achieved during stress tests.</p>
+</div>
+<div>
+<span class="block text-primary-container text-sm font-bold tracking-widest uppercase mb-2">Efficiency</span>
+<span class="text-6xl font-black text-white leading-none">40%</span>
+<p class="mt-4 text-slate-400 text-sm">Cost reduction in compute resource allocation.</p>
+</div>
+</div>
+<!-- Decorative abstract element -->
+<div class="absolute -right-24 -bottom-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px]"></div>
+</section>
+<!-- Technical Detail Grid - Bento Style -->
+<section class="grid md:grid-cols-3 md:grid-rows-2 gap-4 h-auto md:h-[600px]">
+<div class="md:col-span-2 md:row-span-1 bg-surface-container-low rounded-xl p-8 flex flex-col justify-between border border-outline-variant/10">
+<h4 class="text-lg font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="code">code</span>
+                    Deployment Scripting
+                </h4>
+<div class="bg-[#0b1c30] p-6 rounded-lg font-mono text-sm text-cyan-400 overflow-x-auto">
+<span class="text-slate-500">// Initialize cluster</span><br/>
+                    terraform apply -var="env=prod" -auto-approve<br/>
+                    kubectl apply -f ./manifests/quantum-core.yaml
+                </div>
+</div>
+<div class="md:col-span-1 md:row-span-2 bg-primary text-on-primary rounded-xl p-8 flex flex-col justify-end relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="text-2xl font-bold mb-4">Precision over speed.</h4>
+<p class="opacity-80 text-sm">We don't just ship code; we architect systems that stand the test of entropy. Our metrics prove that architectural logic beats brute force scaling every time.</p>
+</div>
+<span class="absolute -top-10 -right-10 material-symbols-outlined text-[180px] opacity-10" data-icon="precision_manufacturing">precision_manufacturing</span>
+</div>
+<div class="md:col-span-1 md:row-span-1 bg-surface-container-highest rounded-xl p-8 flex items-center justify-center border border-outline-variant/10">
+<div class="text-center">
+<span class="material-symbols-outlined text-5xl text-primary mb-4" data-icon="security">security</span>
+<h4 class="font-bold">Zero-Trust Security</h4>
+</div>
+</div>
+<div class="md:col-span-1 md:row-span-1 bg-white rounded-xl p-8 flex flex-col justify-center border border-outline-variant/10">
+<h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Tech Stack</h4>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container-low text-primary text-xs font-bold rounded">K8S</span>
+<span class="px-3 py-1 bg-surface-container-low text-primary text-xs font-bold rounded">RUST</span>
+<span class="px-3 py-1 bg-surface-container-low text-primary text-xs font-bold rounded">AWS</span>
+<span class="px-3 py-1 bg-surface-container-low text-primary text-xs font-bold rounded">REDIS</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-[#bcc9cd]/15 bg-[#f8f9ff] dark:bg-[#0b1c30]">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-7xl mx-auto font-['Inter'] text-sm tracking-wide">
+<div class="text-lg font-black text-slate-900 dark:text-slate-50 mb-8 md:mb-0">
+                TECH_ARCHITECT
+            </div>
+<div class="flex gap-8 mb-8 md:mb-0 text-slate-500 dark:text-slate-400">
+<a class="hover:text-cyan-500 underline decoration-2 underline-offset-4 transition-all duration-300" href="#">Github</a>
+<a class="hover:text-cyan-500 underline decoration-2 underline-offset-4 transition-all duration-300" href="#">LinkedIn</a>
+<a class="hover:text-cyan-500 underline decoration-2 underline-offset-4 transition-all duration-300" href="#">RSS</a>
+</div>
+<div class="text-slate-500 dark:text-slate-400">
+                © 2024 Technical Precision. Built with Architectural Logic.
+            </div>
+</div>
+</footer>
+</body></html>

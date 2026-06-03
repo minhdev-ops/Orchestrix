@@ -17,13 +17,6 @@ class ModuleManagerService
             'color' => '#4648d4',
         ]);
 
-        $this->registerModule('blog', [
-            'name' => 'Blog Engine',
-            'icon' => 'edit_note',
-            'description' => 'Quản lý các bài viết tin tức và kiến thức kỹ thuật.',
-            'route' => 'blog.index', // Redirecting to existing blog for now
-            'color' => '#4cd7f6',
-        ]);
 
         $this->registerModule('contact', [
             'name' => 'Message Inbox',

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TECH_ARCHITECT | Building Scalable &amp; Automated Solutions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3, .font-headline {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#ffb873",
+                      "on-error-container": "#93000a",
+                      "surface-bright": "#f8f9ff",
+                      "error": "#ba1a1a",
+                      "surface-container-highest": "#d3e4fe",
+                      "inverse-primary": "#4cd7f6",
+                      "tertiary": "#8c5000",
+                      "outline": "#6d797d",
+                      "secondary-container": "#dae2fd",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#5c647a",
+                      "inverse-surface": "#213145",
+                      "on-surface-variant": "#3d494c",
+                      "on-primary-container": "#00424f",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed": "#001f26",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-variant": "#d3e4fe",
+                      "error-container": "#ffdad6",
+                      "tertiary-container": "#e89337",
+                      "surface-tint": "#00687a",
+                      "primary-container": "#06b6d4",
+                      "on-tertiary": "#ffffff",
+                      "on-background": "#0b1c30",
+                      "on-tertiary-fixed-variant": "#6a3b00",
+                      "surface-container-high": "#dce9ff",
+                      "primary-fixed": "#acedff",
+                      "secondary-fixed": "#dae2fd",
+                      "on-surface": "#0b1c30",
+                      "background": "#f8f9ff",
+                      "secondary": "#565e74",
+                      "on-secondary": "#ffffff",
+                      "outline-variant": "#bcc9cd",
+                      "tertiary-fixed": "#ffdcbf",
+                      "on-secondary-fixed": "#131b2e",
+                      "surface-dim": "#cbdbf5",
+                      "on-primary-fixed-variant": "#004e5c",
+                      "primary-fixed-dim": "#4cd7f6",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-tertiary-fixed": "#2d1600",
+                      "secondary-fixed-dim": "#bec6e0",
+                      "primary": "#00687a",
+                      "surface-container": "#e5eeff",
+                      "on-secondary-fixed-variant": "#3f465c",
+                      "surface-container-low": "#eff4ff",
+                      "on-tertiary-container": "#5b3200",
+                      "surface": "#f8f9ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Space Grotesk"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f8f9ff]/80 dark:bg-[#0b1c30]/80 backdrop-blur-xl">
+<div class="flex justify-between items-center h-16 px-8 max-w-7xl mx-auto">
+<div class="text-xl font-bold tracking-tighter text-slate-900 dark:text-slate-50 font-['Space_Grotesk']">
+                TECH_ARCHITECT
+            </div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-['Space_Grotesk'] tracking-tight text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400 pb-1 hover:text-cyan-500 transition-colors duration-200" href="#">Home</a>
+<a class="font-['Space_Grotesk'] tracking-tight text-slate-600 dark:text-slate-400 pb-1 hover:text-cyan-500 transition-colors duration-200" href="#">Projects</a>
+<a class="font-['Space_Grotesk'] tracking-tight text-slate-600 dark:text-slate-400 pb-1 hover:text-cyan-500 transition-colors duration-200" href="#">Blog</a>
+<a class="font-['Space_Grotesk'] tracking-tight text-slate-600 dark:text-slate-400 pb-1 hover:text-cyan-500 transition-colors duration-200" href="#">Contact</a>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-5 py-2 rounded-lg font-medium text-sm transition-all active:opacity-80 active:scale-95">
+                Resume
+            </button>
+</div>
+</nav>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[870px] flex items-center overflow-hidden px-8 max-w-7xl mx-auto">
+<div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+<div class="z-10">
+<span class="inline-block px-3 py-1 bg-surface-container-highest text-primary text-xs font-bold tracking-[0.2em] uppercase rounded-sm mb-6">
+                        System Architecture &amp; Automation
+                    </span>
+<h1 class="text-6xl md:text-8xl font-bold tracking-tighter leading-[0.9] text-on-surface mb-8">
+                        Building Scalable &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-container">Automated</span> Solutions
+                    </h1>
+<p class="text-lg text-on-surface-variant max-w-lg mb-10 leading-relaxed">
+                        Precision-engineered digital infrastructure for high-performance ecosystems. Specializing in cloud-native scaling and intelligent workflow orchestration.
+                    </p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-lg font-bold flex items-center gap-2">
+                            View Ecosystems
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="bg-surface-container-highest text-primary px-8 py-4 rounded-lg font-bold hover:bg-surface-container-high transition-colors">
+                            Technical Specs
+                        </button>
+</div>
+</div>
+<div class="relative hidden lg:block">
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px]"></div>
+<div class="bg-surface-container-low p-2 rounded-xl border border-outline-variant/15 shadow-2xl overflow-hidden">
+<img alt="Technical Precision" class="rounded-lg grayscale hover:grayscale-0 transition-all duration-700 aspect-square object-cover" data-alt="Close up of a high-tech circuit board with blue glowing pathways and precision components in a sterile laboratory environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzRcdbYkX2EN3M7XPjjVRep-TY97EjnsXLWIdI7Uw2BOxXwQZ9QiGMXYDe-gL8dpJVIFHTyvMjNfG3Bz55ekJ0yk4DUDPgtCyTqR-uYAV2ohaSrw4Gfrg1vDeV-Zhibl9sAL-nT6MUt9JG2_Xv_bvqSvp2DV7DmFhA8W5-QW5pJbatTIv4y5Q1vUNR0UeDf-zim6NuGIFC-CAPS1qOGQ3jd_YJ92NSfHelbRkumjjSsBHhkYh7W5xLPp-xLMmh1L22iS_DsF3v7CQ"/>
+</div>
+<!-- Data Floating Stats -->
+<div class="absolute -bottom-6 -left-6 bg-surface-container-lowest p-6 rounded-lg border border-outline-variant/15 shadow-xl">
+<div class="flex flex-col">
+<span class="text-primary text-3xl font-bold">99.9%</span>
+<span class="text-on-surface-variant text-xs font-bold tracking-widest uppercase">Uptime Reliability</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- About Me / Stats -->
+<section class="bg-surface-container-low py-24 px-8">
+<div class="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 items-start">
+<div class="md:col-span-4">
+<h2 class="text-4xl font-bold tracking-tight mb-6">The Methodology</h2>
+<p class="text-on-surface-variant leading-relaxed mb-8">
+                        My approach is rooted in the "No-Line" philosophy—where structural boundaries are defined by logic and flow rather than artificial constraints. I design systems that breathe.
+                    </p>
+</div>
+<div class="md:col-span-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-surface p-8 rounded-lg border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size: 32px;">architecture</span>
+<h3 class="font-bold mb-2">Architectural Integrity</h3>
+<p class="text-sm text-on-surface-variant">Core systems built with resilient foundational logic.</p>
+</div>
+<div class="bg-surface p-8 rounded-lg border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size: 32px;">precision_manufacturing</span>
+<h3 class="font-bold mb-2">Automated Flows</h3>
+<p class="text-sm text-on-surface-variant">Zero-manual-touch pipelines for rapid scaling.</p>
+</div>
+<div class="bg-surface p-8 rounded-lg border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size: 32px;">monitoring</span>
+<h3 class="font-bold mb-2">Real-time Analytics</h3>
+<p class="text-sm text-on-surface-variant">Telemetry-driven decision making at every node.</p>
+</div>
+<div class="bg-surface p-8 rounded-lg border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size: 32px;">security</span>
+<h3 class="font-bold mb-2">Security Mesh</h3>
+<p class="text-sm text-on-surface-variant">Embedded protocol protection across all layers.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Skills Bento Grid -->
+<section class="py-24 px-8 max-w-7xl mx-auto">
+<div class="mb-16">
+<h2 class="text-4xl font-bold tracking-tight mb-2">Technical Arsenal</h2>
+<div class="h-1 w-20 bg-gradient-to-r from-primary to-primary-container"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-auto md:h-[600px]">
+<!-- Cloud Infrastructure -->
+<div class="md:col-span-2 md:row-span-2 bg-surface-container-high rounded-lg p-8 flex flex-col justify-between group overflow-hidden relative">
+<div class="relative z-10">
+<span class="text-primary text-xs font-black tracking-widest uppercase mb-4 block">Primary Node</span>
+<h3 class="text-3xl font-bold mb-4">Cloud Infrastructure</h3>
+<div class="flex flex-wrap gap-2 mt-4">
+<span class="px-3 py-1 bg-surface-container-lowest text-on-surface-variant text-xs font-medium rounded-sm border border-outline-variant/10">AWS Solution Arch</span>
+<span class="px-3 py-1 bg-surface-container-lowest text-on-surface-variant text-xs font-medium rounded-sm border border-outline-variant/10">Kubernetes</span>
+<span class="px-3 py-1 bg-surface-container-lowest text-on-surface-variant text-xs font-medium rounded-sm border border-outline-variant/10">Terraform IaC</span>
+</div>
+</div>
+<div class="absolute right-0 bottom-0 opacity-10 translate-x-10 translate-y-10 group-hover:translate-x-0 transition-transform duration-700">
+<span class="material-symbols-outlined" style="font-size: 240px;">cloud</span>
+</div>
+<div class="relative z-10 mt-12">
+<p class="text-on-surface-variant text-sm">Orchestrating multi-region distributed systems with focus on latency minimization and high availability.</p>
+</div>
+</div>
+<!-- Backend Systems -->
+<div class="md:col-span-2 bg-surface-container-low rounded-lg p-8 border border-outline-variant/10 flex items-center justify-between group">
+<div>
+<h3 class="text-xl font-bold mb-2">Scalable Backend</h3>
+<p class="text-sm text-on-surface-variant mb-4">GoLang, Node.js, Python systems.</p>
+<div class="flex gap-4">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-primary">Latency</span>
+<span class="text-lg font-black">&lt;40ms</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-primary">Throughput</span>
+<span class="text-lg font-black">10k req/s</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary-container group-hover:scale-110 transition-transform" style="font-size: 48px;">terminal</span>
+</div>
+<!-- DevOps & Automation -->
+<div class="bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-lg p-6 flex flex-col justify-end">
+<span class="material-symbols-outlined mb-4" style="font-size: 32px;">rebase_edit</span>
+<h3 class="font-bold">DevOps CI/CD</h3>
+<p class="text-xs text-on-primary/80 mt-1">Full-stack automation.</p>
+</div>
+<!-- Database Design -->
+<div class="bg-surface-container-lowest rounded-lg p-6 border border-outline-variant/15 flex flex-col justify-end">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size: 32px;">database</span>
+<h3 class="font-bold">Data Architecture</h3>
+<p class="text-xs text-on-surface-variant mt-1">SQL &amp; NoSQL optimization.</p>
+</div>
+</div>
+</section>
+<!-- Career Evolution Timeline -->
+<section class="bg-surface-container-low py-24 px-8">
+<div class="max-w-4xl mx-auto">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold tracking-tight mb-4">Career Evolution</h2>
+<p class="text-on-surface-variant font-medium tracking-wide">A history of technical milestones and architectural growth.</p>
+</div>
+<div class="relative">
+<!-- Timeline Line -->
+<div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-outline-variant/30 md:-translate-x-1/2"></div>
+<!-- Milestone 1 -->
+<div class="relative mb-20">
+<div class="flex flex-col md:flex-row items-center">
+<div class="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
+<span class="text-xs font-black tracking-widest text-primary uppercase">2022 - Present</span>
+<h3 class="text-xl font-bold mt-1">Lead Systems Architect</h3>
+<p class="text-sm text-on-surface-variant mt-2">Spearheading the transition to a serverless microservices mesh. Reduced infrastructure costs by 45% while increasing scaling capacity by 3x.</p>
+</div>
+<div class="z-10 w-4 h-4 rounded-full bg-primary ring-4 ring-surface-container-low"></div>
+<div class="md:w-1/2 md:pl-12">
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/10 inline-flex gap-4">
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">K8s</span>
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">AWS</span>
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">Go</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Milestone 2 -->
+<div class="relative mb-20">
+<div class="flex flex-col md:flex-row-reverse items-center">
+<div class="md:w-1/2 md:pl-12 mb-4 md:mb-0">
+<span class="text-xs font-black tracking-widest text-primary uppercase">2019 - 2022</span>
+<h3 class="text-xl font-bold mt-1">Senior DevOps Engineer</h3>
+<p class="text-sm text-on-surface-variant mt-2">Architected global delivery pipelines for a FinTech platform. Implemented automated compliance auditing and real-time security scanning.</p>
+</div>
+<div class="z-10 w-4 h-4 rounded-full bg-primary-container ring-4 ring-surface-container-low"></div>
+<div class="md:w-1/2 md:pr-12 md:text-right">
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/10 inline-flex gap-4">
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">Terraform</span>
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">Jenkins</span>
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">Python</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Milestone 3 -->
+<div class="relative">
+<div class="flex flex-col md:flex-row items-center">
+<div class="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
+<span class="text-xs font-black tracking-widest text-primary uppercase">2016 - 2019</span>
+<h3 class="text-xl font-bold mt-1">Full Stack Developer</h3>
+<p class="text-sm text-on-surface-variant mt-2">Developed core product features using React and Node.js. Optimized database queries improving response times by 60%.</p>
+</div>
+<div class="z-10 w-4 h-4 rounded-full bg-outline-variant ring-4 ring-surface-container-low"></div>
+<div class="md:w-1/2 md:pl-12">
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/10 inline-flex gap-4">
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">React</span>
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">PostgreSQL</span>
+<span class="px-2 py-1 bg-primary/5 text-primary text-[10px] font-bold rounded">Redis</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-24 px-8 max-w-7xl mx-auto text-center">
+<div class="bg-surface-container-lowest rounded-2xl p-16 border border-outline-variant/10 relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative z-10">
+<h2 class="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Need a scalable blueprint?</h2>
+<p class="text-on-surface-variant text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+                        I am currently available for high-level architectural consulting and complex automation audits. Let's build the future of your infrastructure together.
+                    </p>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-10 py-5 rounded-lg font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:-translate-y-1 active:scale-95">
+                        Initiate Connection
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-[#bcc9cd]/15 bg-[#f8f9ff] dark:bg-[#0b1c30]">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-7xl mx-auto">
+<div class="mb-8 md:mb-0">
+<div class="text-lg font-black text-slate-900 dark:text-slate-50 font-headline mb-2">TECH_ARCHITECT</div>
+<p class="font-['Inter'] text-sm tracking-wide text-slate-500 dark:text-slate-400">© 2024 Technical Precision. Built with Architectural Logic.</p>
+</div>
+<div class="flex gap-10">
+<a class="font-['Inter'] text-sm tracking-wide text-slate-500 dark:text-slate-400 hover:text-cyan-500 underline decoration-2 underline-offset-4 transition-all duration-300 ease-in-out" href="#">Github</a>
+<a class="font-['Inter'] text-sm tracking-wide text-slate-500 dark:text-slate-400 hover:text-cyan-500 underline decoration-2 underline-offset-4 transition-all duration-300 ease-in-out" href="#">LinkedIn</a>
+<a class="font-['Inter'] text-sm tracking-wide text-slate-500 dark:text-slate-400 hover:text-cyan-500 underline decoration-2 underline-offset-4 transition-all duration-300 ease-in-out" href="#">RSS</a>
+</div>
+</div>
+</footer>
+</body></html>

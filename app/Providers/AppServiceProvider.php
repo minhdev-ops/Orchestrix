@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
             $projectModules = $projectsConfig[$host]['modules'] ?? $projectsConfig['localhost']['modules'] ?? $projectsConfig['orchestrix.test']['modules'] ?? [];
 
             if (app()->environment('testing') || app()->runningInConsole() || $host === 'localhost' || $host === '127.0.0.1') {
-                $projectModules = ['Blog', 'Portfolio'];
+                $projectModules = ['Portfolio'];
             }
 
             foreach ($projectModules as $moduleName) {
@@ -70,12 +70,6 @@ class AppServiceProvider extends ServiceProvider
             'description' => 'Quản lý Dự án & Kỹ năng kỹ thuật'
         ]);
 
-        $moduleManager->registerModule('blog', [
-            'name' => 'Blog Engine',
-            'icon' => 'article',
-            'route' => 'admin.blog.index',
-            'description' => 'Quản lý Bài viết & Kiến thức chia sẻ'
-        ]);
 
 
         if (class_exists(\Dedoc\Scramble\Scramble::class)) {
@@ -84,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
                 return \Illuminate\Support\Str::startsWith($uri, 'api') ||
                     \Illuminate\Support\Str::startsWith($uri, 'admin') ||
 
-                    \Illuminate\Support\Str::startsWith($uri, 'blog');
+                    true;
             });
         }
     }
