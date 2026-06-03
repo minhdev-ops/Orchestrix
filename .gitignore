@@ -23,6 +23,25 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
+# Junk / scaffolding files
+.stitch/
+Agent/
+orchestrix
+ckfinder/
+public/js/ckfinder/
+public/userfiles/
+public/images/stitch/
+playwright-report/
+test-results/
+simple_api_test.php
+test_all_apis.php
+ADMIN_MODULE_GUIDE.md
+ARCHITECTURE.md
+AUDIT_REPORT.md
+DEVELOPMENT_PLAN.md
+MISSING_FEATURES.md
+PROJECT_GUIDE.md
+
 /.stitch/
 /Agent/
 /orchestrix
