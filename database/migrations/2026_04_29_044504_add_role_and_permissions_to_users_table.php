@@ -13,7 +13,7 @@ return new class extends Migration
                 $table->string('role')->default('staff')->after('email');
             }
             if (!Schema::hasColumn('users', 'permissions')) {
-                $table->json('permissions')->nullable()->after('role'); // Lưu mảng các quyền: ['blog.view', etc.]
+                $table->json('permissions')->nullable()->after('role'); // Lưu mảng các quyền
             }
         });
     }

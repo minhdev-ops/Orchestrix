@@ -54,12 +54,6 @@
                             án</a>
                         @endif
 
-                        @if(Route::has('blog.index'))
-                        <a href="{{ route('blog.index') }}"
-                            class="text-[14px] font-bold {{ request()->routeIs('blog.*') ? 'text-brand' : 'text-text-muted' }} hover:text-brand transition-colors">Bài
-                            viết</a>
-                        @endif
-
                         <a href="{{ url('/#signals') }}"
                             class="text-[14px] font-bold text-text-muted hover:text-brand transition-colors">Liên hệ</a>
                     </div>

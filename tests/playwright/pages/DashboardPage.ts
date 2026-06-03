@@ -4,7 +4,6 @@ import { AdminBasePage } from './AdminBasePage';
 export class DashboardPage extends AdminBasePage {
     readonly commandHeader: Locator;
     readonly statsPortfolio: Locator;
-    readonly statsBlog: Locator;
     readonly statsSystem: Locator;
     readonly manageModulesLink: Locator;
     readonly moduleRegistryCard: Locator;
@@ -15,7 +14,6 @@ export class DashboardPage extends AdminBasePage {
         this.commandHeader = page.locator('h2, h1').filter({ hasText: /Quantum Dashboard/i }).first();
 
         this.statsPortfolio = page.locator('div, section').filter({ hasText: /Portfolio Projects/i }).first();
-        this.statsBlog = page.locator('div, section').filter({ hasText: /Blog Posts/i }).first();
         this.statsSystem = page.locator('div, section').filter({ hasText: /Core Version/i }).first();
 
         this.moduleRegistryCard = page.locator('div, section').filter({ hasText: /Active Neural Modules/i }).first();

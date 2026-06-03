@@ -38,9 +38,6 @@ test.describe('Orchestrix Admin UI Skill Test', () => {
         await dashboardPage.sidebarPortfolio.click();
         await expect(page).toHaveURL(/\/admin\/portfolio\/projects/);
 
-        await dashboardPage.sidebarBlog.click();
-        await expect(page).toHaveURL(/\/admin\/blog/);
-
         await dashboardPage.sidebarDashboard.click();
         await expect(page).toHaveURL(/\/admin$/);
     });

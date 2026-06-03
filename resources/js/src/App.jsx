@@ -12,7 +12,6 @@ const Experience = lazy(() => import('./sections/Experience'));
 const Testimonials = lazy(() => import('./sections/Testimonials'));
 const Certifications = lazy(() => import('./sections/Certifications'));
 const Architecture = lazy(() => import('./sections/Architecture'));
-const Blog = lazy(() => import('./sections/Blog'));
 const Contact = lazy(() => import('./sections/Contact'));
 import CustomCursor from './components/ui/CustomCursor';
 import GlobalCanvas from './canvas/GlobalCanvas';
@@ -66,7 +65,6 @@ const App = () => {
                             <Certifications />
                             <Architecture />
                             <Testimonials />
-                            <Blog />
                             <Contact />
                         </motion.div>
                     </AnimatePresence>

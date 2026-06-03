@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use Modules\Portfolio\Models\PortfolioHome;
-use Modules\Blog\Models\BlogPost;
 use Modules\Portfolio\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -20,18 +19,6 @@ class HybridPortfolioTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('id="app"', false); // React root
         $response->assertSee('Orchestrix');
-    }
-
-    /**
-     * Test the Blog index page (Blade rendered).
-     */
-    public function test_blog_index_loads(): void
-    {
-        $response = $this->get('/blog');
-
-        $response->assertStatus(200);
-        $response->assertSee('id="three-canvas"', false); // Standalone 3D canvas
-        $response->assertSee('Tất cả bài viết'); // Vietnamese localization
     }
 
     /**

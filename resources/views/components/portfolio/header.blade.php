@@ -20,7 +20,6 @@
                     ['label' => 'Dossier', 'url' => route('portfolio.about')],
                     ['label' => 'Stack', 'url' => route('portfolio.skills.index')],
                     ['label' => 'Registry', 'url' => route('portfolio.projects.index')],
-                    ['label' => 'Signals', 'url' => route('blog.index')],
                 ];
             @endphp
 

@@ -6,7 +6,6 @@ export class BasePage {
     readonly navAbout: Locator;
     readonly navTech: Locator;
     readonly navProjects: Locator;
-    readonly navBlog: Locator;
     readonly navContact: Locator;
     readonly standaloneCanvas: Locator;
 
@@ -17,18 +16,12 @@ export class BasePage {
         this.navAbout = page.locator('nav a').filter({ hasText: /Hồ/i });
         this.navTech = page.locator('nav a').filter({ hasText: /Công\s*nghệ/i });
         this.navProjects = page.locator('nav a').filter({ hasText: /Dự\s*án/i });
-        this.navBlog = page.locator('nav a').filter({ hasText: /Bài|Blog/i });
         this.navContact = page.locator('nav a').filter({ hasText: /Liên\s*hệ/i });
         this.standaloneCanvas = page.locator('#three-canvas, #quantum-canvas, canvas').first();
     }
 
     async verify3DBackground() {
         await expect(this.standaloneCanvas).toBeVisible();
-    }
-
-    async navigateToBlog() {
-        await this.navBlog.click();
-        await this.page.waitForURL('**/blog');
     }
 
     async navigateToProjects() {
