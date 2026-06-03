@@ -1,9 +1,0 @@
-{
-    "name": "Portfolio",
-    "enabled": true,
-    "icon": "extension",
-    "description": "This is the Portfolio module.",
-    "providers": [
-        "Modules\\Portfolio\\Providers\\PortfolioServiceProvider"
-    ]
-}

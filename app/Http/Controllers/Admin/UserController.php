@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\ModuleManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,9 +33,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $moduleManager = app(ModuleManagerService::class);
-        $allModules = $moduleManager->getAllModules();
-        return view('admin.users.create', compact('allModules'));
+        return view('admin.users.create');
     }
 
     /**
@@ -48,7 +45,7 @@ class UserController extends Controller
      *         required=true,
      *         @OA\JsonContent(ref="#/components/schemas/User")
      *     ),
-     *     @OA\Response(response=201, description="User created successfully")
+     *     @OA\Response(response=200, description="User created successfully")
      * )
      */
     public function store(Request $request)
@@ -58,7 +55,13 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'role' => 'required|string',
-            'permissions' => 'nullable|array',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
         ]);
 
         User::create([
@@ -83,9 +86,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $moduleManager = app(ModuleManagerService::class);
-        $allModules = $moduleManager->getAllModules();
-        return view('admin.users.edit', compact('user', 'allModules'));
+        return view('admin.users.edit', compact('user'));
     }
 
     /**

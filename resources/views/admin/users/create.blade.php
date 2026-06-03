@@ -57,25 +57,9 @@
                         <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                             <span class="material-symbols-outlined">security</span>
                         </div>
-                        <h3 class="text-xl font-black text-on-surface font-display">Phân quyền Module</h3>
+                        <h3 class="text-xl font-black text-on-surface font-display">Vai trò</h3>
                     </div>
-
-                    <div class="space-y-4">
-                        @foreach($allModules as $module)
-                        <label class="group flex items-center justify-between p-4 rounded-xl bg-surface-container-low/50 border border-transparent hover:border-primary/20 hover:bg-white transition-all cursor-pointer">
-                            <div class="flex items-center gap-4">
-                                <span class="material-symbols-outlined text-lg text-primary opacity-50">{{ $module['icon'] }}</span>
-                                <span class="text-sm font-bold text-on-surface">{{ $module['name'] }}</span>
-                            </div>
-                            <div class="relative flex items-center justify-center">
-                                <input type="checkbox" name="permissions[]" value="{{ $module['id'] }}.manage" class="peer hidden">
-                                <div class="w-5 h-5 rounded-lg border-2 border-outline-variant/30 peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-white text-[14px] scale-0 peer-checked:scale-100 transition-transform">check</span>
-                                </div>
-                            </div>
-                        </label>
-                        @endforeach
-                    </div>
+                    <p class="text-sm text-on-surface-variant opacity-70">Quyền truy cập được quản lý qua vai trò (role).</p>
                 </div>
             </div>
         </div>

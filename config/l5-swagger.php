@@ -46,7 +46,6 @@ return [
                 'annotations' => [
                     base_path('app/Annotations'),
                     base_path('app/Http/Controllers'),
-                    base_path('Modules/Portfolio'),
                 ],
             ],
         ],

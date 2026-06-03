@@ -21,43 +21,7 @@ return [
             'route' => 'admin.dashboard',
             'module' => 'core',
         ],
-        [
-            'name' => 'Projects',
-            'icon' => 'folder_special',
-            'route' => 'admin.projects.index',
-            'module' => 'portfolio',
-        ],
-        [
-            'name' => 'Skills',
-            'icon' => 'psychology',
-            'route' => 'admin.skills.index',
-            'module' => 'portfolio',
-        ],
-        [
-            'name' => 'Messages',
-            'icon' => 'mail',
-            'route' => 'admin.messages.index',
-            'module' => 'portfolio',
-        ],
-        // ── Blog ──
-        [
-            'name' => 'Blog Posts',
-            'icon' => 'article',
-            'route' => 'admin.blog.index',
-            'module' => 'blog',
-        ],
-        [
-            'name' => 'Categories',
-            'icon' => 'category',
-            'route' => 'admin.blog-categories.index',
-            'module' => 'blog',
-        ],
-        [
-            'name' => 'Comments',
-            'icon' => 'comment',
-            'route' => 'admin.blog-comments.index',
-            'module' => 'blog',
-        ],
+
         // ── Settings ──
         [
             'name' => 'Settings',

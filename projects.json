@@ -1,14 +1,1 @@
-{
-    "orchestrix.test": {
-        "modules": [
-            "portfolio",
-            "blog"
-        ]
-    },
-    "localhost": {
-        "modules": [
-            "Blog",
-            "Portfolio"
-        ]
-    }
-}
+{}

@@ -21,15 +21,7 @@ class ModuleController extends Controller
         $moduleManager = app(\App\Services\ModuleManagerService::class);
         $modules = $moduleManager->getActiveModules();
 
-        $stats = [];
-
-        try {
-        } catch (\Exception $e) {
-            // Log error or notify admin, but don't crash the dashboard
-            report($e);
-        }
-
-        return view('admin.dashboard', compact('modules', 'stats'));
+        return view('admin.dashboard', compact('modules'));
     }
 
     /**

@@ -8,23 +8,7 @@ class ModuleManagerService
 
     public function __construct()
     {
-        // Initial core modules
-        $this->registerModule('portfolio', [
-            'name' => 'Portfolio Manager',
-            'icon' => 'folder_special',
-            'description' => 'Quản lý các dự án kỹ thuật và ma trận kỹ năng của bạn.',
-            'route' => 'admin.portfolio.index',
-            'color' => '#4648d4',
-        ]);
-
-
-        $this->registerModule('contact', [
-            'name' => 'Message Inbox',
-            'icon' => 'inbox',
-            'description' => 'Theo dõi và phản hồi các yêu cầu liên hệ từ người dùng.',
-            'route' => 'admin.dashboard', // Placeholder
-            'color' => '#00687a',
-        ]);
+        // No modules registered in auth-only skeleton
     }
 
     public function registerModule(string $key, array $config): void

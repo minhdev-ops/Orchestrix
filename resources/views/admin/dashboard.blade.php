@@ -22,55 +22,6 @@
 
         {{-- Bento Grid --}}
         <div class="grid grid-cols-12 gap-6 auto-rows-[120px]">
-            {{-- Medium Stat - Portfolio --}}
-            <div class="col-span-12 md:col-span-4 row-span-2 glass-panel rounded-3xl p-8 flex flex-col justify-between group">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 text-white flex items-center justify-center">
-                        <span class="material-symbols-outlined text-2xl">account_tree</span>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="text-white/40 text-[10px] font-black uppercase tracking-[0.25em] mb-1">Portfolio Projects</h3>
-                    <p class="text-4xl font-black text-white tracking-tighter">{{ $stats['portfolio']['projects'] }}</p>
-                </div>
-                <div class="mt-6 pt-6 border-t border-white/5 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-white/40">New Messages</span>
-                        <span class="text-xs font-black text-white bg-white/10 px-2 py-0.5 rounded-md">{{ $stats['portfolio']['contacts'] }}</span>
-                    </div>
-                    <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <div class="h-full bg-white/20 rounded-full" style="width: 75%"></div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Wide Section - Module Registry --}}
-            <div class="col-span-12 md:col-span-9 row-span-3 glass-panel rounded-3xl p-8 flex flex-col group">
-                <div class="flex justify-between items-center mb-8">
-                    <div>
-                        <h3 class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.25em] mb-1">Registry</h3>
-                        <p class="text-xl font-black text-white tracking-tight">Active Neural Modules</p>
-                    </div>
-                    <a href="{{ route('admin.modules.index') }}" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-indigo-600 transition-all">
-                        <span class="material-symbols-outlined text-xl">east</span>
-                    </a>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pr-2">
-                    @foreach($modules as $module)
-                        <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all cursor-pointer flex items-center gap-4 group/item">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/60 group-hover/item:text-indigo-400 group-hover/item:scale-110 transition-all">
-                                <span class="material-symbols-outlined text-xl">{{ $module['icon'] }}</span>
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-white group-hover/item:text-indigo-400 transition-colors">{{ $module['name'] }}</span>
-                                <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Active</span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-
             {{-- Small Stat - System Version --}}
             <div class="col-span-12 md:col-span-3 row-span-1 glass-panel rounded-3xl p-6 flex items-center gap-4 group">
                 <div class="w-10 h-10 rounded-xl bg-white/5 text-white/40 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -127,14 +78,6 @@
                             <p class="text-sm font-bold text-white">System Core Update</p>
                             <p class="text-xs text-white/30">Successfully deployed v1.2.0 across all edge nodes.</p>
                             <p class="text-[9px] font-black text-indigo-400 uppercase mt-2 tracking-widest">2 min ago</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4 items-start">
-                        <div class="w-2 h-2 rounded-full bg-white/20 mt-1.5"></div>
-                        <div>
-                            <p class="text-sm font-bold text-white">Portfolio Sync</p>
-                            <p class="text-xs text-white/30">New project "Cyber-Safe" published to production.</p>
-                            <p class="text-[9px] font-black text-indigo-400 uppercase mt-2 tracking-widest">45 min ago</p>
                         </div>
                     </div>
                 </div>

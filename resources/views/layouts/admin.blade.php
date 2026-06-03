@@ -91,29 +91,11 @@
                     <span class="material-symbols-outlined text-[22px]">group</span>
                     <span class="text-sm">Nhân sự Hệ thống</span>
                 </a>
-                <a href="{{ route('admin.projects.index') }}"
-                    class="flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all {{ Request::routeIs('admin.projects.*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-500/25' : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
-                    <span class="material-symbols-outlined text-[22px]">account_tree</span>
-                    <span class="text-sm">Quản lý Dự án</span>
-                </a>
                 <a href="{{ route('admin.settings.index') }}"
                     class="flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all {{ Request::routeIs('admin.settings.*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-500/25' : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
                     <span class="material-symbols-outlined text-[22px]">settings</span>
                     <span class="text-sm">Cài đặt chung</span>
                 </a>
-
-                <div class="pt-8 pb-2 px-3">
-                    <span class="text-[10px] font-black text-white/30 uppercase tracking-[0.25em]">Modules</span>
-                </div>
-
-                @if(Route::has('admin.portfolio.projects'))
-                <a href="{{ route('admin.portfolio.projects') }}"
-                    class="flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all {{ Request::routeIs('admin.portfolio.*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-500/25' : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
-                    <span class="material-symbols-outlined text-[22px]">account_tree</span>
-                    <span class="text-sm">Dự án Đã làm</span>
-                </a>
-                @endif
-
 
             </nav>
 

@@ -134,6 +134,6 @@ return [
 
     'extensions' => [],
     'paths' => [
-        base_path('Modules/Portfolio'),
+        base_path('app'),
     ],
 ];

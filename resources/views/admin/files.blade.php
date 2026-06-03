@@ -2,10 +2,6 @@
 
 @section('page-title', 'Quản lý Tệp tin')
 
-@section('module-nav')
-    @include('portfolio::admin.partials.sidebar')
-@endsection
-
 @section('content')
     <div x-data="{ 
         showToast: false, 
