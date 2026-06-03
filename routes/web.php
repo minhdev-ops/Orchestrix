@@ -39,11 +39,7 @@ Route::middleware(['auth', 'checkAdmin'])->prefix('admin')->name('admin.')->grou
         require base_path('Modules/Portfolio/Routes/admin.php');
     }
 
-    if (($modulesConfig['blog'] ?? false) === true && file_exists(base_path('Modules/Blog/Routes/admin.php'))) {
-        Route::prefix('blog')->name('blog.')->group(function () {
-            require base_path('Modules/Blog/Routes/admin.php');
-        });
-    }
+
 
     // Project Management
     Route::resource('projects', ProjectController::class)->except(['show']);

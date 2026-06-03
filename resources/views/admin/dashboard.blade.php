@@ -70,16 +70,6 @@
                 </div>
             </div>
 
-            {{-- Small Stat - Blog --}}
-            <div class="col-span-12 md:col-span-3 row-span-1 glass-panel rounded-3xl p-6 flex items-center gap-4 group">
-                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-xl">article</span>
-                </div>
-                <div>
-                    <h3 class="text-white/30 text-[9px] font-black uppercase tracking-widest">Blog Posts</h3>
-                    <p class="text-xl font-black text-white tracking-tight">{{ $stats['blog']['posts'] }}</p>
-                </div>
-            </div>
 
             {{-- Small Stat - System Version --}}
             <div class="col-span-12 md:col-span-3 row-span-1 glass-panel rounded-3xl p-6 flex items-center gap-4 group">
