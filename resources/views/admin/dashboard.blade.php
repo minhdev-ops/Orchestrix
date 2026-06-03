@@ -22,27 +22,7 @@
 
         {{-- Bento Grid --}}
         <div class="grid grid-cols-12 gap-6 auto-rows-[120px]">
-            {{-- Medium Stat - Portfolio --}}
-            <div class="col-span-12 md:col-span-4 row-span-2 glass-panel rounded-3xl p-8 flex flex-col justify-between group">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 text-white flex items-center justify-center">
-                        <span class="material-symbols-outlined text-2xl">account_tree</span>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="text-white/40 text-[10px] font-black uppercase tracking-[0.25em] mb-1">Portfolio Projects</h3>
-                    <p class="text-4xl font-black text-white tracking-tighter">{{ $stats['portfolio']['projects'] }}</p>
-                </div>
-                <div class="mt-6 pt-6 border-t border-white/5 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-white/40">New Messages</span>
-                        <span class="text-xs font-black text-white bg-white/10 px-2 py-0.5 rounded-md">{{ $stats['portfolio']['contacts'] }}</span>
-                    </div>
-                    <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <div class="h-full bg-white/20 rounded-full" style="width: 75%"></div>
-                    </div>
-                </div>
-            </div>
+
 
             {{-- Wide Section - Module Registry --}}
             <div class="col-span-12 md:col-span-9 row-span-3 glass-panel rounded-3xl p-8 flex flex-col group">
@@ -139,14 +119,7 @@
                             <p class="text-[9px] font-black text-indigo-400 uppercase mt-2 tracking-widest">2 min ago</p>
                         </div>
                     </div>
-                    <div class="flex gap-4 items-start">
-                        <div class="w-2 h-2 rounded-full bg-white/20 mt-1.5"></div>
-                        <div>
-                            <p class="text-sm font-bold text-white">Portfolio Sync</p>
-                            <p class="text-xs text-white/30">New project "Cyber-Safe" published to production.</p>
-                            <p class="text-[9px] font-black text-indigo-400 uppercase mt-2 tracking-widest">45 min ago</p>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>

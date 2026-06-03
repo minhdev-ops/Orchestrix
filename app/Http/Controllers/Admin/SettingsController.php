@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Portfolio\Models\Setting;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Artisan;
 
 class SettingsController extends Controller

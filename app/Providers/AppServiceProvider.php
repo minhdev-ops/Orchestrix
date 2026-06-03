@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
             $projectModules = $projectsConfig[$host]['modules'] ?? $projectsConfig['localhost']['modules'] ?? $projectsConfig['orchestrix.test']['modules'] ?? [];
 
             if (app()->environment('testing') || app()->runningInConsole() || $host === 'localhost' || $host === '127.0.0.1') {
-                $projectModules = ['Blog', 'Portfolio'];
+                $projectModules = ['Blog'];
             }
 
             foreach ($projectModules as $moduleName) {
@@ -63,12 +63,6 @@ class AppServiceProvider extends ServiceProvider
 
         $moduleManager = app(ModuleManagerService::class);
 
-        $moduleManager->registerModule('portfolio', [
-            'name' => 'Portfolio Manager',
-            'icon' => 'account_tree',
-            'route' => 'admin.portfolio.index',
-            'description' => 'Quản lý Dự án & Kỹ năng kỹ thuật'
-        ]);
 
         $moduleManager->registerModule('blog', [
             'name' => 'Blog Engine',

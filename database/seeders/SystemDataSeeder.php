@@ -36,16 +36,6 @@ class SystemDataSeeder extends Seeder
             ]
         );
 
-        // 2. Portfolio Data
-        DB::table('projects')->updateOrInsert(
-            ['slug' => 'cyber-safe'],
-            [
-                'title' => 'Dự án Cyber-Safe',
-                'description' => 'Hệ thống bảo mật tiên tiến.',
-                'is_visible' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        );
+
     }
 }

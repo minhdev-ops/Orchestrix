@@ -35,9 +35,6 @@ Route::middleware(['auth', 'checkAdmin'])->prefix('admin')->name('admin.')->grou
     // Restore Module Routes
     $modulesConfig = json_decode(\Illuminate\Support\Facades\File::get(base_path('modules.json')), true);
 
-    if (($modulesConfig['portfolio'] ?? false) === true && file_exists(base_path('Modules/Portfolio/Routes/admin.php'))) {
-        require base_path('Modules/Portfolio/Routes/admin.php');
-    }
 
     if (($modulesConfig['blog'] ?? false) === true && file_exists(base_path('Modules/Blog/Routes/admin.php'))) {
         Route::prefix('blog')->name('blog.')->group(function () {

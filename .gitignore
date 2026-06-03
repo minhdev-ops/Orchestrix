@@ -22,3 +22,14 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+/.stitch/
+/Agent/
+/orchestrix
+/simple_api_test.php
+/test_all_apis.php
+/playwright-report/
+/test-results/
+/public/userfiles/
+/public/js/ckfinder/
+/public/images/stitch/

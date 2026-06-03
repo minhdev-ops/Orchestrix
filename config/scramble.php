@@ -135,6 +135,5 @@ return [
     'extensions' => [],
     'paths' => [
         base_path('Modules/Blog'),
-        base_path('Modules/Portfolio'),
     ],
 ];
