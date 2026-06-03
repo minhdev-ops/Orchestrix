@@ -176,7 +176,7 @@
                 <span class="text-sm font-bold" style="color: {{ $catColor }}">{{ $category->name }}</span>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('portfolio.index') }}"
+                <a href="{{ url('/') }}"
                     class="font-headline font-bold text-xl text-slate-900 dark:text-white italic uppercase">
                     Orchestrix<span class="text-blue-600">.</span>
                 </a>

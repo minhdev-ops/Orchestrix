@@ -3,7 +3,6 @@ import { BasePage } from './BasePage';
 
 export class AdminBasePage extends BasePage {
     readonly sidebarDashboard: Locator;
-    readonly sidebarPortfolio: Locator;
     readonly sidebarBlog: Locator;
     readonly topNavBrand: Locator;
 
@@ -11,7 +10,6 @@ export class AdminBasePage extends BasePage {
         super(page);
         // Matching labels from layout/admin.blade.php
         this.sidebarDashboard = page.locator('a').filter({ hasText: /Bảng điều khiển/i }).first();
-        this.sidebarPortfolio = page.locator('a').filter({ hasText: /Dự án Đã làm/i }).first();
         this.sidebarBlog = page.locator('a').filter({ hasText: /Blog Tin tức/i }).first();
         this.topNavBrand = page.getByText('ORCHESTRIX', { exact: true });
     }

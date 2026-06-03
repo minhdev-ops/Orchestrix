@@ -1,4 +1,4 @@
-@extends('layouts.portfolio')
+@extends('layouts.blog')
 
 @section('title', $post->title . ' | Orchestrix Intelligence')
 

@@ -1,4 +1,4 @@
-@extends('layouts.portfolio')
+@extends('layouts.blog')
 
 @section('title', 'Góc nhìn kỹ thuật | Orchestrix')
 

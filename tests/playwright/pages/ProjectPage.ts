@@ -11,11 +11,6 @@ export class ProjectPage extends BasePage {
         this.projectCards = page.locator('article');
     }
 
-    async navigate() {
-        await this.page.goto('/portfolio/projects');
-        await this.page.waitForLoadState('networkidle');
-    }
-
     async openProjectDetail(index: number = 0) {
         const card = this.projectCards.nth(index);
         const detailLink = card.locator('a').filter({ hasText: /Xem chi tiết/i });

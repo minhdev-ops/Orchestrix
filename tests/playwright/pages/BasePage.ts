@@ -33,6 +33,5 @@ export class BasePage {
 
     async navigateToProjects() {
         await this.navProjects.click();
-        await this.page.waitForURL('**/portfolio/projects');
     }
 }

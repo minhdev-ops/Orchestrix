@@ -9,7 +9,7 @@ export class ModuleRegistryPage extends AdminBasePage {
         this.registryHeader = page.locator('p, h2, h3').filter({ hasText: /Active Neural Modules|Registry/i }).first();
     }
 
-    async toggleModule(moduleName: 'Portfolio' | 'Blog') {
+    async toggleModule(moduleName: 'Blog') {
         const displayName = moduleName;
         // In the dashboard grid, modules are listed
         const moduleItem = this.page.locator('div').filter({ hasText: new RegExp(displayName, 'i') }).last();
@@ -23,7 +23,7 @@ export class ModuleRegistryPage extends AdminBasePage {
         await this.page.waitForLoadState('networkidle');
     }
 
-    async getModuleStatus(moduleName: 'Portfolio' | 'Blog'): Promise<string> {
+    async getModuleStatus(moduleName: 'Blog'): Promise<string> {
         const moduleItem = this.page.locator('div').filter({ hasText: new RegExp(moduleName, 'i') }).last();
         return await moduleItem.locator('span').filter({ hasText: /Active|Operational|Disabled/i }).innerText();
     }
