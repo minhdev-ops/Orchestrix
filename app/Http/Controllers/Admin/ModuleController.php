@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Store;
+use App\Models\Product;
+use App\Models\User;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
@@ -21,7 +25,12 @@ class ModuleController extends Controller
         $moduleManager = app(\App\Services\ModuleManagerService::class);
         $modules = $moduleManager->getActiveModules();
 
-        return view('admin.dashboard', compact('modules'));
+        $storesCount = Store::count();
+        $productsCount = Product::count();
+        $usersCount = User::count();
+        $ordersCount = Order::count();
+
+        return view('admin.dashboard', compact('modules', 'storesCount', 'productsCount', 'usersCount', 'ordersCount'));
     }
 
     /**
