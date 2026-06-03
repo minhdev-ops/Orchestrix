@@ -10,16 +10,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
-/**
- * Generic User model that can be extended for project-specific needs.
- * 
- * This model provides a flexible foundation for user authentication
- * while allowing easy extension through inheritance or traits.
- */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles;
+
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_SELLER = 'seller';
+    public const ROLE_EMPLOYEE = 'employee';
+    public const ROLE_BUYER = 'buyer';
+
+    public static array $roles = [
+        self::ROLE_ADMIN,
+        self::ROLE_SELLER,
+        self::ROLE_EMPLOYEE,
+        self::ROLE_BUYER,
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -48,6 +55,7 @@ class User extends Authenticatable
         'provider_id',
         'settings',
         'metadata',
+        'profile_info',
         'key',
         'keyTime',
         'last_login_at',
@@ -86,6 +94,7 @@ class User extends Authenticatable
             'birthday' => 'date',
             'settings' => 'array',
             'metadata' => 'array',
+            'profile_info' => 'array',
             'keyTime' => 'datetime',
         ];
     }
@@ -247,5 +256,55 @@ class User extends Authenticatable
     public function getRouteKeyName()
     {
         return 'uuid';
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function assets()
+    {
+        return $this->hasMany(ThreeDAsset::class);
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class)->where('status', 'active')->latest();
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function stores()
+    {
+        return $this->hasMany(Store::class, 'owner_id');
+    }
+
+    public function ordersAsBuyer()
+    {
+        return $this->hasMany(Order::class, 'buyer_id');
+    }
+
+    public function ordersAsSeller()
+    {
+        return $this->hasMany(Order::class, 'seller_id');
+    }
+
+    public function isSeller(): bool
+    {
+        return $this->hasRole(self::ROLE_SELLER);
+    }
+
+    public function isEmployee(): bool
+    {
+        return $this->hasRole(self::ROLE_EMPLOYEE);
+    }
+
+    public function isBuyer(): bool
+    {
+        return $this->hasRole(self::ROLE_BUYER);
     }
 }
