@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .glass-panel {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.7);
+    }
+    .vitals-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .5; }
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c4c8ba; border-radius: 10px; }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-container": "#fdaf7e",
+            "outline": "#74796c",
+            "on-primary-fixed-variant": "#314e1b",
+            "surface-container-low": "#f6f3f2",
+            "tertiary-container": "#a19f99",
+            "on-secondary": "#ffffff",
+            "on-primary": "#ffffff",
+            "on-surface": "#1b1c1c",
+            "on-primary-container": "#213d0b",
+            "on-tertiary-fixed-variant": "#474742",
+            "surface-container": "#f0eded",
+            "on-background": "#1b1c1c",
+            "tertiary-fixed-dim": "#c9c6c0",
+            "primary-fixed-dim": "#aed18f",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-fixed": "#0b2000",
+            "on-tertiary": "#ffffff",
+            "background": "#fcf9f8",
+            "secondary-fixed-dim": "#ffb68a",
+            "outline-variant": "#c4c8ba",
+            "on-secondary-fixed": "#321300",
+            "surface-tint": "#486730",
+            "surface": "#fcf9f8",
+            "on-tertiary-container": "#373632",
+            "inverse-surface": "#303030",
+            "error-container": "#ffdad6",
+            "surface-container-highest": "#e4e2e1",
+            "inverse-primary": "#aed18f",
+            "surface-dim": "#dcd9d9",
+            "tertiary": "#5f5e59",
+            "primary-fixed": "#c9eea9",
+            "on-secondary-container": "#784019",
+            "surface-container-high": "#eae7e7",
+            "secondary-fixed": "#ffdbc8",
+            "error": "#ba1a1a",
+            "secondary": "#8b4f27",
+            "tertiary-fixed": "#e5e2db",
+            "on-error": "#ffffff",
+            "inverse-on-surface": "#f3f0f0",
+            "surface-variant": "#e4e2e1",
+            "primary": "#486730",
+            "surface-bright": "#fcf9f8",
+            "primary-container": "#87a96b",
+            "on-error-container": "#93000a",
+            "on-surface-variant": "#43483d",
+            "on-tertiary-fixed": "#1c1c18",
+            "on-secondary-fixed-variant": "#6e3811"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-mobile": "20px",
+            "gutter": "24px",
+            "base": "8px",
+            "margin-desktop": "64px",
+            "container-max": "1280px"
+          },
+          "fontFamily": {
+            "body-lg": ["Hanken Grotesk"],
+            "caption": ["Hanken Grotesk"],
+            "body-md": ["Hanken Grotesk"],
+            "display-lg-mobile": ["EB Garamond"],
+            "display-lg": ["EB Garamond"],
+            "headline-sm": ["EB Garamond"],
+            "headline-md": ["EB Garamond"],
+            "label-md": ["Hanken Grotesk"]
+          },
+          "fontSize": {
+            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+            "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+            "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+            "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+            "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- Header -->
+<nav class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm sticky top-0 z-50 flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="font-display-lg text-display-lg italic text-on-surface dark:text-inverse-on-surface">Lumina Botanicals</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Shop All</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Rare Finds</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Care Guides</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Sustainability</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-primary cursor-pointer transition-all duration-300 hover:scale-110" data-icon="shopping_bag">shopping_bag</span>
+<span class="material-symbols-outlined text-primary cursor-pointer transition-all duration-300 hover:scale-110" data-icon="person">person</span>
+</div>
+</nav>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12">
+<!-- Header Title -->
+<header class="mb-12">
+<div class="flex items-center gap-2 mb-4 text-primary">
+<span class="material-symbols-outlined" data-icon="qr_code_2">qr_code_2</span>
+<span class="font-label-md text-label-md tracking-widest uppercase">Batch ID: LB-8842-X</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-2">Transit Real-Time Intel</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Tracking your Monstera Deliciosa 'Albo Variegata'. Our precision containers maintain a climate-controlled environment to ensure horticultural integrity.</p>
+</header>
+<!-- Main Grid: Map and Vitals -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-20">
+<!-- Real-time Map Container -->
+<section class="lg:col-span-8 relative rounded-xl overflow-hidden shadow-sm bg-surface-container-high border border-outline-variant h-[500px]">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover filter grayscale contrast-125 opacity-40" data-alt="A highly detailed overhead satellite view of a modern urban landscape with clean topological lines and soft neutral tones. The aesthetic is professional and high-tech, using a palette of muted greys and sage greens to indicate botanical routes. Soft ambient daylight illuminates the scene, creating a peaceful and precise digital map interface for logistics tracking." data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvMRFFprAo-6iVXCOnPXUHjT60S6sGGKwwhXyMpc8zbUOxLbKvu0gsrEtmgjm5ID1nnoQ5fAZJ7XJE0bC_iokAqXQyp-vv2X5eQfZIEHu-3lWkGnsy6L9-CvBg0YHPakJckgQ6foVgEAeMI8Gun5mjst-AcvumZ4ZdXL4zHFzM64fzkt9u0yI7qzH387w4KCV9oHIVWsh6nsTmSBO0CSWkYnQe1NyETQURUMefR_rBIk2Ec-XXVGcmYueI-9Nrmk9Vdt8QaU8djLY"/>
+</div>
+<!-- UI Overlays for Map -->
+<div class="absolute top-6 left-6 glass-panel p-4 rounded-lg shadow-sm border border-white/40 z-10">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 bg-primary rounded-full vitals-pulse"></div>
+<div>
+<p class="font-label-md text-label-md text-primary">Live Location</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">Transit Hub 04, CA</p>
+</div>
+</div>
+</div>
+<div class="absolute bottom-6 left-6 glass-panel p-4 rounded-lg shadow-sm border border-white/40 z-10 flex gap-6">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-outline">EST. ARRIVAL</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Oct 24, 14:00</span>
+</div>
+<div class="w-[1px] bg-outline-variant h-full"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-outline">CARRIER</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Lumina Air-Freight</span>
+</div>
+</div>
+<!-- Custom Marker -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+<div class="relative">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg text-white border-4 border-white">
+<span class="material-symbols-outlined" data-icon="potted_plant">potted_plant</span>
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-primary rotate-45"></div>
+</div>
+</div>
+</section>
+<!-- Live Specimen Vitals Panel -->
+<aside class="lg:col-span-4 flex flex-col gap-gutter">
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-sm flex-1">
+<div class="flex justify-between items-start mb-8">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Live Vitals</h2>
+<div class="px-3 py-1 bg-primary/10 text-primary rounded-full text-caption font-label-md border border-primary/20">STABLE</div>
+</div>
+<div class="space-y-8">
+<!-- Temperature -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="thermostat">thermostat</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Container Temp</span>
+</div>
+<span class="font-headline-md text-headline-md text-on-surface">22°C</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 65%;"></div>
+</div>
+<div class="flex justify-between mt-1">
+<span class="text-caption text-outline">Target: 20-24°C</span>
+<span class="text-caption text-primary font-bold">In Range</span>
+</div>
+</div>
+<!-- Humidity -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="humidity_percentage">humidity_percentage</span>
+<span class="font-label-md text-label-md text-on-surface-variant">RH Humidity</span>
+</div>
+<span class="font-headline-md text-headline-md text-on-surface">65%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container" style="width: 75%;"></div>
+</div>
+<div class="flex justify-between mt-1">
+<span class="text-caption text-outline">Target: 60-70%</span>
+<span class="text-caption text-secondary font-bold">Optimal</span>
+</div>
+</div>
+<!-- Light Exposure -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="light_mode">light_mode</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Luminous Flux</span>
+</div>
+<span class="font-headline-md text-headline-md text-on-surface">120 Lux</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container" style="width: 40%;"></div>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-8 border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+              DOWNLOAD BIO-DATA REPORT
+            </button>
+</div>
+</div>
+</aside>
+</div>
+<!-- Timeline Section -->
+<section class="max-w-4xl mx-auto mb-20">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-12 text-center">Specimen Journey</h2>
+<div class="relative space-y-0">
+<!-- Vertical Line -->
+<div class="absolute left-6 top-4 bottom-4 w-0.5 bg-outline-variant lg:left-1/2 lg:-translate-x-1/2"></div>
+<!-- Timeline Item 1 -->
+<div class="relative flex items-start lg:justify-between group">
+<div class="lg:w-[45%] hidden lg:block text-right">
+<span class="font-label-md text-label-md text-outline">Oct 20, 09:15 AM</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Specimen Selected</h3>
+<p class="text-body-md text-on-surface-variant">Our lead horticulturist hand-picked this Albo Variegata for its superior variegation patterns and root health.</p>
+</div>
+<div class="absolute left-6 -translate-x-1/2 w-4 h-4 bg-primary rounded-full z-10 lg:left-1/2 border-4 border-background"></div>
+<div class="ml-16 lg:ml-0 lg:w-[45%] block lg:hidden">
+<span class="font-label-md text-label-md text-outline">Oct 20, 09:15 AM</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Specimen Selected</h3>
+</div>
+<div class="lg:w-[45%] hidden lg:block"></div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative flex items-start lg:justify-between py-12 group">
+<div class="lg:w-[45%] hidden lg:block"></div>
+<div class="absolute left-6 -translate-x-1/2 w-4 h-4 bg-primary rounded-full z-10 lg:left-1/2 border-4 border-background"></div>
+<div class="ml-16 lg:ml-0 lg:w-[45%]">
+<span class="font-label-md text-label-md text-outline">Oct 21, 11:30 AM</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Eco-Packaging Applied</h3>
+<p class="text-body-md text-on-surface-variant">Secured in our biodegradable bio-mesh with moisture-lock technology and shock-absorbent mycelium cushioning.</p>
+</div>
+</div>
+<!-- Timeline Item 3 (Current) -->
+<div class="relative flex items-start lg:justify-between py-12 group">
+<div class="lg:w-[45%] hidden lg:block text-right">
+<span class="font-label-md text-label-md text-primary font-bold">ACTIVE</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Transit Initiated</h3>
+<p class="text-body-md text-on-surface-variant">Specimen entered the climate-controlled logistics network. GPS and biometrics link established.</p>
+</div>
+<div class="absolute left-6 -translate-x-1/2 w-6 h-6 bg-primary rounded-full z-10 lg:left-1/2 border-4 border-white vitals-pulse shadow-lg"></div>
+<div class="ml-16 lg:ml-0 lg:w-[45%] lg:hidden">
+<span class="font-label-md text-label-md text-primary font-bold">ACTIVE</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Transit Initiated</h3>
+<p class="text-body-md text-on-surface-variant">Specimen entered the climate-controlled logistics network.</p>
+</div>
+<div class="lg:w-[45%] hidden lg:block"></div>
+</div>
+<!-- Timeline Item 4 -->
+<div class="relative flex items-start lg:justify-between py-12 group opacity-40">
+<div class="lg:w-[45%] hidden lg:block"></div>
+<div class="absolute left-6 -translate-x-1/2 w-4 h-4 bg-outline-variant rounded-full z-10 lg:left-1/2 border-4 border-background"></div>
+<div class="ml-16 lg:ml-0 lg:w-[45%]">
+<span class="font-label-md text-label-md text-outline">Estimated Oct 24</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Final Mile Delivery</h3>
+<p class="text-body-md text-on-surface-variant">Hand-delivery to your botanical space by our local white-glove partners.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Support / Help Section -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="bg-surface-container p-8 rounded-xl flex items-center gap-6 group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="local_florist" style="font-size: 32px;">local_florist</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Acclimatization Guide</h4>
+<p class="text-body-md text-on-surface-variant">Learn how to introduce your new specimen to its home.</p>
+</div>
+</div>
+<div class="bg-surface-container p-8 rounded-xl flex items-center gap-6 group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="support_agent" style="font-size: 32px;">support_agent</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Expert Consultation</h4>
+<p class="text-body-md text-on-surface-variant">Speak with a botanist about your specimen's vitals.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-inverse-surface dark:bg-surface-container-highest mt-20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-20 max-w-container-max mx-auto">
+<div class="md:col-span-1">
+<div class="font-display-lg text-display-lg italic text-surface dark:text-on-surface mb-6">Lumina Botanicals</div>
+<p class="text-surface-variant dark:text-on-surface-variant font-body-md">Cultivating a greener future through precise horticulture.</p>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="text-surface font-label-md uppercase tracking-widest">Shop</h5>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">About Us</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Wholesale</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Sustainability Report</a>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="text-surface font-label-md uppercase tracking-widest">Customer Care</h5>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Shipping &amp; Returns</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Contact</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Privacy Policy</a>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="text-surface font-label-md uppercase tracking-widest">Connect</h5>
+<p class="text-surface-variant dark:text-on-surface-variant text-caption">Subscribe for rare specimen alerts and precision care techniques.</p>
+<div class="flex border-b border-surface-variant/30 py-2">
+<input class="bg-transparent border-none text-surface focus:ring-0 placeholder:text-surface-variant/50 w-full" placeholder="Email address" type="email"/>
+<button class="text-primary-fixed-dim font-bold underline">JOIN</button>
+</div>
+</div>
+</div>
+<div class="px-margin-desktop py-8 border-t border-surface-variant/10 text-center text-caption text-surface-variant/50 max-w-container-max mx-auto">
+      © 2024 Lumina Botanicals. Cultivating a greener future through precise horticulture.
+    </div>
+</footer>
+<script>
+    // Micro-interaction for vitals update simulation
+    setInterval(() => {
+      const temps = [21.8, 22.0, 22.1, 21.9, 22.2];
+      const humidity = [64, 65, 66, 65];
+      
+      const tempEl = document.querySelector('.font-headline-md.text-on-surface');
+      if(tempEl) {
+        tempEl.innerText = temps[Math.floor(Math.random() * temps.length)] + '°C';
+      }
+    }, 5000);
+  </script>
+</body></html>

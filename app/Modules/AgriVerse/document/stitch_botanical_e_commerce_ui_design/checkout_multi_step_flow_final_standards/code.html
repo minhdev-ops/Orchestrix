@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Checkout | Lumina Botanicals</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Hanken+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fcf9f8; /* Parchment */
+            color: #2C2C2C; /* Deep Charcoal */
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'EB Garamond', serif;
+        }
+        .step-transition {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary": "#87A96B", // Sage Green
+                "on-primary": "#ffffff",
+                "surface": "#FCF9F8", // Parchment
+                "on-surface": "#2C2C2C", // Deep Charcoal
+                "surface-container": "#f0eded",
+                "outline": "#74796c",
+                "outline-variant": "#c4c8ba"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "gutter": "24px",
+                "margin-desktop": "64px",
+                "container-max": "1280px",
+                "margin-mobile": "20px"
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="selection:bg-primary/30 selection:text-on-surface">
+<!-- Header: Blurred-glass, centered nav, utility zone -->
+<header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-outline/10">
+<div class="flex justify-between items-center px-margin-desktop h-20 max-w-container-max mx-auto">
+<!-- Logo: Italicized serif -->
+<a class="brand-font italic text-2xl font-semibold text-primary tracking-tight" href="#">Lumina Botanicals</a>
+<!-- Navigation: Center links -->
+<nav class="hidden md:flex items-center gap-8 h-full">
+<a class="text-on-surface text-sm font-medium hover:text-primary transition-colors h-full flex items-center border-b-2 border-transparent" href="#">Shop All</a>
+<a class="text-on-surface text-sm font-medium hover:text-primary transition-colors h-full flex items-center border-b-2 border-transparent" href="#">Rare Finds</a>
+<a class="text-on-surface text-sm font-medium hover:text-primary transition-colors h-full flex items-center border-b-2 border-transparent" href="#">Care Guides</a>
+<a class="text-on-surface text-sm font-medium hover:text-primary transition-colors h-full flex items-center border-b-2 border-primary" href="#">Sustainability</a>
+</nav>
+<!-- Utility Zone -->
+<div class="flex items-center gap-5">
+<button class="text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined">search</span></button>
+<button class="text-on-surface hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-primary text-[10px] text-white rounded-full flex items-center justify-center font-bold">2</span>
+</button>
+<button class="text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined">person</span></button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Left Column: Order Summary -->
+<div class="lg:col-span-7 space-y-8">
+<div class="flex items-baseline justify-between border-b border-outline/10 pb-4">
+<h1 class="text-4xl font-medium">Your Collection</h1>
+<span class="text-sm font-medium text-outline uppercase tracking-widest">2 Items</span>
+</div>
+<!-- Cart Items -->
+<div class="space-y-6">
+<!-- Item 1 -->
+<div class="flex gap-6 py-4 border-b border-outline/5 items-center">
+<div class="w-28 h-36 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img alt="Fiddle Leaf Fig" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8N7VJtLxHLVMMXt_ThHoZm4VDiYJKFR5c9HXcu5xvhydWxRtlCDojj1LbfN8vC4djdMwts1nFj6EXuaj16NzP_fMEO2MudFv64MwmDy3uL45roZ5IfA15yOa91IPlkl-kN2tp5CPqhL5DBWWPbrHIkQojCplHI2Lp8iHKG9mX_HGhlTdh2lIlYDbCpMb9jo9cKzQccbIedg3BCGoSwyesvaQ6GBvHZaX4GIKTB0q23bhsa18O9bLO0r8a0bq_twNwoqf4Yw2bxyc"/>
+</div>
+<div class="flex-grow flex flex-col justify-between h-36">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-2xl font-medium">Fiddle Leaf Fig</h3>
+<p class="text-sm text-outline mt-1 italic">Large • 4ft • Ceramic White</p>
+</div>
+<p class="font-semibold text-primary">$185.00</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center border border-outline/20 rounded px-2 py-1 gap-4">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">remove</span></button>
+<span class="text-sm font-semibold w-4 text-center">1</span>
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">add</span></button>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors flex items-center gap-1 text-xs font-medium uppercase tracking-tighter">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+                                Remove
+                            </button>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex gap-6 py-4 border-b border-outline/5 items-center">
+<div class="w-28 h-36 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img alt="Monstera Albo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAduCbiToYRRyJ7cG61rkHZSNOSMiJSxgDAl79eWlvkbB4-LhkvOpNWosjfPIBWM8eCMZ-6SnbZ_I1fcvuoBvFABIyiW5fDT8YtrFVs6KGKZo7hXSLJSsXW_tMOlJ9QbezC3W3rO7Ha054QAsLLRq5D1e_4f9k-_WkMUtZycfABx9nwiU2BK8GI2Z6wcxEgCoCD18BYWDlJ5hxYtLqISh_2bpmJ3bdMh9kdoXoLRpt5jl0KFCaH4icffL-A9nJMe4eZ75KIib8ws8E"/>
+</div>
+<div class="flex-grow flex flex-col justify-between h-36">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-2xl font-medium">Monstera Albo</h3>
+<p class="text-sm text-outline mt-1 italic">Medium • Variegated • Terra Cotta</p>
+</div>
+<p class="font-semibold text-primary">$420.00</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center border border-outline/20 rounded px-2 py-1 gap-4">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">remove</span></button>
+<span class="text-sm font-semibold w-4 text-center">1</span>
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">add</span></button>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors flex items-center gap-1 text-xs font-medium uppercase tracking-tighter">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+                                Remove
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Carbon-Neutral Delivery Info -->
+<div class="bg-primary/5 rounded-xl p-8 border border-primary/20">
+<div class="flex items-start gap-5">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">eco</span>
+</div>
+<div class="space-y-1">
+<h4 class="text-xl font-medium text-primary">Carbon-Neutral Logistics</h4>
+<p class="text-sm text-on-surface/80 leading-relaxed">Every shipment is calculated and offset through our reforestation partnerships, ensuring your botanical journey is as green as your new plants.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Checkout Multi-Step -->
+<div class="lg:col-span-5">
+<div class="bg-white rounded-2xl border border-outline/10 shadow-sm overflow-hidden sticky top-28">
+<!-- Progress Header -->
+<div class="p-8 border-b border-outline/5 bg-surface/50">
+<div class="flex justify-between relative px-4">
+<div class="absolute top-1/2 left-0 w-full h-[1px] bg-outline/10 -translate-y-1/2 z-0"></div>
+<div class="absolute top-1/2 left-0 w-1/3 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500" id="progress-line"></div>
+<!-- Step Icons -->
+<div class="z-10 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-sm" id="step-1-icon">
+<span class="material-symbols-outlined text-sm">local_shipping</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary">Shipping</span>
+</div>
+<div class="z-10 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-white border border-outline/20 text-outline flex items-center justify-center" id="step-2-icon">
+<span class="material-symbols-outlined text-sm">payments</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-outline">Payment</span>
+</div>
+<div class="z-10 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-white border border-outline/20 text-outline flex items-center justify-center" id="step-3-icon">
+<span class="material-symbols-outlined text-sm">verified</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-outline">Review</span>
+</div>
+</div>
+</div>
+<div class="p-8">
+<!-- Step 1: Shipping -->
+<div class="step-transition" id="step-1-content">
+<h2 class="text-2xl font-medium mb-6">Delivery Address</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-1">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1.5">First Name</label>
+<input class="w-full bg-surface border border-outline/20 rounded-md px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 text-sm transition-all" type="text" value="Julian"/>
+</div>
+<div class="col-span-1">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1.5">Last Name</label>
+<input class="w-full bg-surface border border-outline/20 rounded-md px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 text-sm transition-all" type="text" value="Aris"/>
+</div>
+<div class="col-span-2">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1.5">Full Street Address</label>
+<input class="w-full bg-surface border border-outline/20 rounded-md px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 text-sm transition-all" type="text" value="1280 Botanical Ave, Greenhouse District"/>
+</div>
+<div class="col-span-1">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1.5">City</label>
+<input class="w-full bg-surface border border-outline/20 rounded-md px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 text-sm transition-all" type="text" value="Portland"/>
+</div>
+<div class="col-span-1">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1.5">Postal Code</label>
+<input class="w-full bg-surface border border-outline/20 rounded-md px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 text-sm transition-all" type="text" value="97201"/>
+</div>
+</div>
+</div>
+<!-- Step 2: Payment -->
+<div class="step-transition hidden" id="step-2-content">
+<h2 class="text-2xl font-medium mb-6">Payment Secured</h2>
+<div class="space-y-4">
+<div class="border border-primary bg-primary/5 rounded-lg p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">credit_card</span>
+<span class="text-sm font-medium">Credit or Debit Card</span>
+</div>
+<div class="w-4 h-4 rounded-full border-2 border-primary flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+</div>
+</div>
+<div class="pt-2 space-y-4">
+<div class="relative">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1.5">Card Number</label>
+<input class="w-full bg-surface border border-outline/20 rounded-md px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 text-sm transition-all" placeholder="0000 0000 0000 0000" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1.5">Expiration</label>
+<input class="w-full bg-surface border border-outline/20 rounded-md px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 text-sm transition-all" placeholder="MM/YY" type="text"/>
+</div>
+<div>
+<label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1.5">CVC</label>
+<input class="w-full bg-surface border border-outline/20 rounded-md px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 text-sm transition-all" placeholder="123" type="text"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 3: Review -->
+<div class="step-transition hidden" id="step-3-content">
+<h2 class="text-2xl font-medium mb-6">Order Confirmation</h2>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-3 border-b border-outline/10">
+<span class="text-sm text-outline">Delivery</span>
+<span class="text-sm font-medium">1280 Botanical Ave, Portland</span>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-outline/10">
+<span class="text-sm text-outline">Billing</span>
+<span class="text-sm font-medium">Visa ending in 4242</span>
+</div>
+<div class="p-3 bg-surface rounded flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">lock</span>
+<span class="text-[11px] text-outline uppercase tracking-wider font-semibold">SSL Encrypted Checkout</span>
+</div>
+</div>
+</div>
+<!-- Price Summary -->
+<div class="mt-8 pt-8 border-t border-outline/10 space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-outline">Subtotal</span>
+<span class="font-medium">$605.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-outline">Botanical Logistics</span>
+<span class="font-medium">$25.00</span>
+</div>
+<div class="flex justify-between text-sm pb-4">
+<span class="text-outline">Carbon Offset</span>
+<span class="font-medium">$2.50</span>
+</div>
+<div class="flex justify-between pt-4 border-t border-outline/10 items-baseline">
+<span class="text-xl font-medium">Total Due</span>
+<span class="text-3xl font-medium text-primary">$632.50</span>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full mt-8 bg-primary text-white py-4 rounded-full text-xs font-bold uppercase tracking-[0.2em] shadow-md hover:bg-primary/90 transition-all active:scale-[0.98]" id="next-button" onclick="handleNext()">
+                        Continue to Payment
+                    </button>
+<div class="mt-6 flex items-center justify-center gap-8 opacity-25 grayscale">
+<span class="material-symbols-outlined text-2xl">shield_locked</span>
+<span class="material-symbols-outlined text-2xl">eco</span>
+<span class="material-symbols-outlined text-2xl">account_balance</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer: High-contrast surface-container -->
+<footer class="w-full py-24 bg-[#f0eded] border-t border-outline/10">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 px-margin-desktop max-w-container-max mx-auto">
+<!-- Brand Legacy -->
+<div class="space-y-6">
+<a class="brand-font italic text-3xl font-semibold text-primary" href="#">Lumina Botanicals</a>
+<p class="text-sm leading-relaxed text-on-surface/70 pr-8">
+                Curating rare specimens and eco-conscious care for the modern ethical collector. Our legacy is rooted in the preservation of rare flora and the promotion of sustainable botanical living.
+            </p>
+</div>
+<!-- Navigation Columns -->
+<div class="space-y-6">
+<h5 class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface">Collections</h5>
+<nav class="flex flex-col gap-3">
+<a class="text-sm text-on-surface/60 hover:text-primary transition-all" href="#">Indoor Tropicals</a>
+<a class="text-sm text-on-surface/60 hover:text-primary transition-all" href="#">Rare Variegated</a>
+<a class="text-sm text-on-surface/60 hover:text-primary transition-all" href="#">Botanical Art</a>
+</nav>
+</div>
+<div class="space-y-6">
+<h5 class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface">Company</h5>
+<nav class="flex flex-col gap-3">
+<a class="text-sm text-on-surface/60 hover:text-primary transition-all" href="#">Sustainability Charter</a>
+<a class="text-sm text-on-surface/60 hover:text-primary transition-all" href="#">Ethical Sourcing</a>
+<a class="text-sm text-on-surface/60 hover:text-primary transition-all" href="#">Logistics &amp; Care</a>
+</nav>
+</div>
+<!-- Newsletter: The Journal -->
+<div class="space-y-6">
+<h5 class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface">The Journal</h5>
+<p class="text-xs text-on-surface/60 italic">Monthly dispatches on rare species care and conservation.</p>
+<div class="flex gap-0 border-b border-outline/30 pb-2">
+<input class="bg-transparent border-none focus:ring-0 p-0 text-sm w-full placeholder:text-outline/50 italic" placeholder="Your email address" type="email"/>
+<button class="text-primary hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined text-[18px]">east</span>
+</button>
+</div>
+</div>
+</div>
+<div class="mt-24 text-center px-margin-desktop max-w-container-max mx-auto pt-8 border-t border-outline/5">
+<p class="text-[10px] font-bold uppercase tracking-[0.3em] text-outline/60">© 2024 Lumina Botanicals • Curated for the Ethical Collector</p>
+</div>
+</footer>
+<script>
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    function updateUI() {
+        // Update contents
+        document.getElementById('step-1-content').classList.toggle('hidden', currentStep !== 1);
+        document.getElementById('step-2-content').classList.toggle('hidden', currentStep !== 2);
+        document.getElementById('step-3-content').classList.toggle('hidden', currentStep !== 3);
+
+        // Update Progress bar
+        const progressLine = document.getElementById('progress-line');
+        progressLine.style.width = currentStep === 1 ? '33.3%' : currentStep === 2 ? '66.6%' : '100%';
+
+        // Update Step Icons
+        for (let i = 1; i <= totalSteps; i++) {
+            const icon = document.getElementById(`step-${i}-icon`);
+            const label = icon.nextElementSibling;
+            if (i <= currentStep) {
+                icon.classList.remove('bg-white', 'text-outline', 'border');
+                icon.classList.add('bg-primary', 'text-white');
+                label.classList.remove('text-outline');
+                label.classList.add('text-primary');
+            } else {
+                icon.classList.add('bg-white', 'text-outline', 'border', 'border-outline/20');
+                icon.classList.remove('bg-primary', 'text-white');
+                label.classList.add('text-outline');
+                label.classList.remove('text-primary');
+            }
+        }
+
+        // Update Button Text
+        const btn = document.getElementById('next-button');
+        if (currentStep === 1) btn.textContent = 'Continue to Payment';
+        else if (currentStep === 2) btn.textContent = 'Review Your Selection';
+        else btn.textContent = 'Complete Purchase';
+    }
+
+    function handleNext() {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            updateUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            const btn = document.getElementById('next-button');
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">eco</span> SECURING...';
+            btn.disabled = true;
+            setTimeout(() => {
+                alert('Order Secured. Your botanical specimens are entering our carbon-neutral logistics pipeline.');
+                location.reload();
+            }, 2000);
+        }
+    }
+</script>
+</body></html>

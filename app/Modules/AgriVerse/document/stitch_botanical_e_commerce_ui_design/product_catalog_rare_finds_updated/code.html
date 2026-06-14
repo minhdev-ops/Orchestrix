@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#a19f99",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#474742",
+                    "surface-container-highest": "#e4e2e1",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#aed18f",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f6f3f2",
+                    "surface-container": "#f0eded",
+                    "surface-bright": "#fcf9f8",
+                    "on-secondary-container": "#784019",
+                    "on-primary": "#ffffff",
+                    "surface": "#fcf9f8",
+                    "secondary-fixed": "#ffdbc8",
+                    "on-surface": "#1b1c1c",
+                    "surface-container-high": "#eae7e7",
+                    "primary-fixed": "#c9eea9",
+                    "on-error": "#ffffff",
+                    "background": "#fcf9f8",
+                    "tertiary-fixed": "#e5e2db",
+                    "inverse-on-surface": "#f3f0f0",
+                    "inverse-surface": "#303030",
+                    "surface-dim": "#dcd9d9",
+                    "secondary-container": "#fdaf7e",
+                    "surface-variant": "#e4e2e1",
+                    "on-secondary-fixed": "#321300",
+                    "surface-tint": "#486730",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#8b4f27",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-primary-fixed": "#0b2000",
+                    "on-primary-container": "#213d0b",
+                    "on-surface-variant": "#43483d",
+                    "on-secondary-fixed-variant": "#6e3811",
+                    "primary": "#486730",
+                    "inverse-primary": "#aed18f",
+                    "secondary-fixed-dim": "#ffb68a",
+                    "tertiary": "#5f5e59",
+                    "primary-container": "#87a96b",
+                    "error": "#ba1a1a",
+                    "outline": "#74796c",
+                    "outline-variant": "#c4c8ba",
+                    "on-background": "#1b1c1c",
+                    "on-tertiary-container": "#373632",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#314e1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "margin-desktop": "64px",
+                    "base": "8px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "caption": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "label-md": ["Hanken Grotesk"],
+                    "headline-sm": ["EB Garamond"],
+                    "display-lg-mobile": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "display-lg": ["EB Garamond"]
+            },
+            "fontSize": {
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .botanical-card-shadow {
+            box-shadow: 0 10px 30px rgba(72, 103, 48, 0.05);
+        }
+        .text-terracotta { color: #8b4f27; }
+        .bg-terracotta-soft { background-color: rgba(139, 79, 39, 0.1); }
+        .custom-checkbox:checked + label { color: #486730; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-md shadow-sm">
+<div class="max-w-container-max mx-auto px-margin-desktop flex justify-between items-center h-20">
+<div class="flex items-center gap-8">
+<span class="font-headline-sm text-headline-sm text-primary italic cursor-pointer active:scale-95 transition-all">Lumina Botanicals</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md transition-colors" href="#">Shop All</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Rare Finds</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Care Guides</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Sustainability</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center bg-surface-container-low/30 rounded-full px-4 py-2 border border-outline/10 focus-within:border-primary/40 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md px-2 w-48 placeholder:text-outline-variant" placeholder="Search collection..." type="text"/>
+</div>
+<div class="flex gap-4">
+<button class="material-symbols-outlined text-primary hover:bg-primary/5 p-2 rounded-full transition-all duration-300 cursor-pointer active:scale-95">person</button>
+<button class="material-symbols-outlined text-primary hover:bg-primary/5 p-2 rounded-full transition-all duration-300 cursor-pointer active:scale-95">shopping_cart</button>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-20 max-w-container-max mx-auto px-margin-desktop">
+<!-- Header Section -->
+<header class="mb-12">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-4">Rare Botanical Collection</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                A curated assembly of extraordinary specimens sourced from ethical nurseries worldwide. Each plant represents a triumph of natural geometry.
+            </p>
+</header>
+<div class="flex flex-col lg:flex-row gap-10">
+<!-- Smart Botanical Filter Sidebar -->
+<aside class="w-full lg:w-72 flex-shrink-0">
+<div class="sticky top-28 bg-surface-container-low p-6 rounded-2xl border border-outline/5">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Smart Filters</h2>
+<button class="text-caption text-primary hover:underline">Reset</button>
+</div>
+<!-- Sunlight -->
+<div class="mb-8">
+<h3 class="font-label-md text-label-md text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">light_mode</span> Sunlight
+                        </h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary focus:ring-primary h-4 w-4 bg-transparent border-outline/30" type="checkbox"/>
+<span class="text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Low Light</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary focus:ring-primary h-4 w-4 bg-transparent border-outline/30" type="checkbox"/>
+<span class="text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Dappled Light</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary focus:ring-primary h-4 w-4 bg-transparent border-outline/30" type="checkbox"/>
+<span class="text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Direct Sunlight</span>
+</label>
+</div>
+</div>
+<!-- Care Level -->
+<div class="mb-8">
+<h3 class="font-label-md text-label-md text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">psychology</span> Care Level
+                        </h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1 rounded-full border border-outline/20 text-caption bg-surface-container-highest text-on-surface-variant hover:border-primary transition-colors">Easy</button>
+<button class="px-3 py-1 rounded-full border border-outline/20 text-caption bg-surface-container-lowest text-on-surface-variant hover:border-primary transition-colors">Moderate</button>
+<button class="px-3 py-1 rounded-full border border-outline/20 text-caption bg-surface-container-lowest text-on-surface-variant hover:border-primary transition-colors">Expert</button>
+</div>
+</div>
+<!-- Pet Safety -->
+<div class="mb-8">
+<h3 class="font-label-md text-label-md text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">pets</span> Pet Safety
+                        </h3>
+<div class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-xl border border-outline/5">
+<span class="text-body-md text-on-surface-variant">Non-toxic Only</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-10 h-5 bg-outline/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Environment -->
+<div>
+<h3 class="font-label-md text-label-md text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">home</span> Environment
+                        </h3>
+<div class="grid grid-cols-2 gap-2">
+<button class="p-2 text-center rounded-lg border border-outline/10 text-caption hover:bg-primary/5 hover:border-primary transition-all">Office</button>
+<button class="p-2 text-center rounded-lg border border-outline/10 text-caption hover:bg-primary/5 hover:border-primary transition-all">Bathroom</button>
+<button class="p-2 text-center rounded-lg border border-outline/10 text-caption hover:bg-primary/5 hover:border-primary transition-all">Bedroom</button>
+<button class="p-2 text-center rounded-lg border border-outline/10 text-caption hover:bg-primary/5 hover:border-primary transition-all">Living Room</button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Product Grid Area -->
+<div class="flex-1">
+<!-- Sort & Active Filters -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-caption rounded-full">
+                            Variegated <button class="material-symbols-outlined text-[14px]">close</button>
+</span>
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-caption rounded-full">
+                            $100 - $500 <button class="material-symbols-outlined text-[14px]">close</button>
+</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="font-label-md text-label-md whitespace-nowrap">Sort by:</span>
+<button class="flex items-center gap-1 font-label-md text-label-md text-primary bg-surface-container-low px-4 py-2 rounded-lg border border-outline/10">
+                            Rarity Score <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<article class="group relative bg-surface-container-lowest rounded-xl overflow-hidden botanical-card-shadow transition-all duration-500 hover:-translate-y-2 flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden">
+<img alt="Variegated Monstera" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM-oDvci47VmDgk9a0JQyj-RPiwnnaLSKHX0nQyhM3rvLEC50ResexnNzu4ZlKDWUERfu2b_DJnQ2rgrhZa5A1VEYqahGjd0zl3_zGK216b0JtlWeMHphkCFmQFSK9_qbFonhjgyia3nkoQd7jotYg1mzJkcaDG1KTypfse69_iTjzLf4OF91LUST_1CJKa2oih4xQ5-BS6RrRK_gpRanDs_Rgixr5CsjgJyKRbHALYKi9Nqgfgg5rvE3lDxn4ykPTCntnHuh8VMw"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-terracotta-soft text-terracotta px-3 py-1 rounded-full font-caption text-caption uppercase tracking-wider backdrop-blur-sm">Expert Care</span>
+<span class="bg-white/90 text-on-surface px-3 py-1 rounded-full font-caption text-caption flex items-center gap-1 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">diamond</span> Rarity: 9.2
+                                </span>
+</div>
+<!-- Quick Add Floating Button -->
+<button class="absolute bottom-4 right-4 bg-primary text-on-primary w-12 h-12 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 z-10">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-sm text-[20px] text-on-surface leading-tight">Monstera Albo Variegata</h3>
+<span class="font-label-md text-label-md text-primary">$420</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2 italic">Spontaneous and dramatic white sectors.</p>
+<div class="mt-auto flex items-center gap-4 text-primary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">light_mode</span>
+<span class="font-caption text-caption">Indirect</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">pets</span>
+<span class="font-caption text-caption">Toxic</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="group relative bg-surface-container-lowest rounded-xl overflow-hidden botanical-card-shadow transition-all duration-500 hover:-translate-y-2 flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden">
+<img alt="Pink Princess" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUTsBzpOHaj_-GXQcpPdh8talWOFpwX7zL4ZO_9OG0--Mmah42FhW49MWBnHtf56jPF_7x4jZMZ51jZfAxbDuZXw0aq9yNFP8ZnzJFKciBiAN9Nu371WTNzvJjMVSZ4wTwkSLJXSkmWiuNUKEBZR2mzSeWNpOZEGIqP0w02dQeq6-GG7SOzkZk8suXZFVLae765H4Sixz51rMR4KPw96W7xlq8JsX6iLCOnCivMkziwG86UgopwV-HN9QDXvNKM0gvCYtFmPu-KnM"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-terracotta-soft text-terracotta px-3 py-1 rounded-full font-caption text-caption uppercase tracking-wider backdrop-blur-sm">Moderate Care</span>
+<span class="bg-white/90 text-on-surface px-3 py-1 rounded-full font-caption text-caption flex items-center gap-1 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">diamond</span> Rarity: 7.8
+                                </span>
+</div>
+<button class="absolute bottom-4 right-4 bg-primary text-on-primary w-12 h-12 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 z-10">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-sm text-[20px] text-on-surface leading-tight">Philodendron Pink Princess</h3>
+<span class="font-label-md text-label-md text-primary">$185</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2 italic">Vibrant bubblegum pink variegation.</p>
+<div class="mt-auto flex items-center gap-4 text-primary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">light_mode</span>
+<span class="font-caption text-caption">Medium</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">pets</span>
+<span class="font-caption text-caption">Toxic</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="group relative bg-surface-container-lowest rounded-xl overflow-hidden botanical-card-shadow transition-all duration-500 hover:-translate-y-2 flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden">
+<img alt="ZZ Raven" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSlodLgWOoRCpCq6ND08iqUOkoZ5CHYnpK9rhfJnH6SXhp9EhjqFwZFnC9zO32guy3476NpBD5rRfxVglXn-CtDtIIOJpTfyFILghlTlsfYZbEwCgSNaDs_PGh7bvD9rFsOlqpTyup5rDKnXN6DHiKX9xjI_PL2V471XJFMJk6F-KwOfYae0DlpFqx_1J95_GNf81Dyee9nltI75dKxt9WMmQaXE7YIqMv_HJwyIgT-VJ6Iw8Vt0wq8H9YFhFgohLHdrg8QsybmXE"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-terracotta-soft text-terracotta px-3 py-1 rounded-full font-caption text-caption uppercase tracking-wider backdrop-blur-sm">Easy Care</span>
+<span class="bg-white/90 text-on-surface px-3 py-1 rounded-full font-caption text-caption flex items-center gap-1 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">diamond</span> Rarity: 4.5
+                                </span>
+</div>
+<button class="absolute bottom-4 right-4 bg-primary text-on-primary w-12 h-12 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 z-10">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-sm text-[20px] text-on-surface leading-tight">Zamioculcas Raven</h3>
+<span class="font-label-md text-label-md text-primary">$65</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2 italic">Architectural plant with midnight leaves.</p>
+<div class="mt-auto flex items-center gap-4 text-primary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">light_mode</span>
+<span class="font-caption text-caption">Low/Any</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">pets</span>
+<span class="font-caption text-caption">Toxic</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 4 -->
+<article class="group relative bg-surface-container-lowest rounded-xl overflow-hidden botanical-card-shadow transition-all duration-500 hover:-translate-y-2 flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden">
+<img alt="Calathea" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu7aTJ85ahY-LBlyfx4Y5AnTszoYKKLisWF7t1aXPTlhnZlYdOI-khH_LeJ7wWFenSWBoUTYM2PmsQdzFBvj0cn9y3BnF3ZCFATtRKVUpI9sq-Z8OXmVGkwCU_ghOTJgSgNOwb0UpK_zrWVzRLRDaHqxV3pQ68Ck7sOPw6LUCT0xSc4vCLwEu6IMcNl7CWlKoSdB7Dl6k_82EetOw4UvUYwZshMpz00TNQWZqpbOF7FYpx3_PVAUye_JO2hojbkb8MUJ4EJtcgRdg"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-terracotta-soft text-terracotta px-3 py-1 rounded-full font-caption text-caption uppercase tracking-wider backdrop-blur-sm">Expert Care</span>
+<span class="bg-white/90 text-on-surface px-3 py-1 rounded-full font-caption text-caption flex items-center gap-1 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">diamond</span> Rarity: 6.5
+                                </span>
+</div>
+<button class="absolute bottom-4 right-4 bg-primary text-on-primary w-12 h-12 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 z-10">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-sm text-[20px] text-on-surface leading-tight">Calathea Orbifolia</h3>
+<span class="font-label-md text-label-md text-primary">$110</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2 italic">Sophisticated silver-green pinstripes.</p>
+<div class="mt-auto flex items-center gap-4 text-primary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">light_mode</span>
+<span class="font-caption text-caption">Shaded</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">pets</span>
+<span class="font-caption text-caption">Non-toxic</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 5 -->
+<article class="group relative bg-surface-container-lowest rounded-xl overflow-hidden botanical-card-shadow transition-all duration-500 hover:-translate-y-2 flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden">
+<img alt="Whale Fin" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSfamkoKdVwY_DnRy4_5XXS_v-sUv1wNleneJZnLeT733mtbrcs9PNj4-n21AcTHaTDp8SxdwV00zoISc7h9z626zEj-fIBBLTqx_Tqgo5_AMBDKHnX7zTDuPOXPxwm6kIR0MB1ylun-esD4GOiJIBs9SUePqN_O2GSeCLY1dJVu6uH2f-WgP3X7VIaKXkTM_JWWLJE9mIge5hhAMqClMi_JjdqvY79B2xNOfOSqKqtfaJ6ZBTToGcmzhM2kpI0DGynxOz0ldVipk"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-terracotta-soft text-terracotta px-3 py-1 rounded-full font-caption text-caption uppercase tracking-wider backdrop-blur-sm">Easy Care</span>
+<span class="bg-white/90 text-on-surface px-3 py-1 rounded-full font-caption text-caption flex items-center gap-1 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">diamond</span> Rarity: 8.1
+                                </span>
+</div>
+<button class="absolute bottom-4 right-4 bg-primary text-on-primary w-12 h-12 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 z-10">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-sm text-[20px] text-on-surface leading-tight">Sansevieria Masoniana</h3>
+<span class="font-label-md text-label-md text-primary">$95</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2 italic">Bold, sculptural statement 'Whale Fin'.</p>
+<div class="mt-auto flex items-center gap-4 text-primary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">light_mode</span>
+<span class="font-caption text-caption">Any</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">pets</span>
+<span class="font-caption text-caption">Toxic</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 6 -->
+<article class="group relative bg-surface-container-lowest rounded-xl overflow-hidden botanical-card-shadow transition-all duration-500 hover:-translate-y-2 flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden">
+<img alt="Alocasia" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlsRbL2NmkFwp3L7DB4bxpXc3Srnyvlvq7wtzKtaMQvcVpPyR4bcqrrMMI0hEr-7c-uu9Mq1RdgRSHS_7YY0Hw13M7IsfqgsQ6Bfb0liZFmaGlroWntZtfDGE2yBMYh6ME342ZEJF1fI4MIEgL3i8eZJ8al-wK-c_VEFzN9WnX8JzEhOgwTgrPDvinQXdMT9p1n1qrtA969jt5HNN9GEbl2UhoxSyAMzNbmSS9_cxZFJxLS_fRcINtLhRfpU3Prca37wdPuEqS9Jk"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-terracotta-soft text-terracotta px-3 py-1 rounded-full font-caption text-caption uppercase tracking-wider backdrop-blur-sm">Moderate Care</span>
+<span class="bg-white/90 text-on-surface px-3 py-1 rounded-full font-caption text-caption flex items-center gap-1 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">diamond</span> Rarity: 5.4
+                                </span>
+</div>
+<button class="absolute bottom-4 right-4 bg-primary text-on-primary w-12 h-12 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 z-10">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-sm text-[20px] text-on-surface leading-tight">Alocasia Amazonica</h3>
+<span class="font-label-md text-label-md text-primary">$55</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2 italic">Deep green with skeletal white veins.</p>
+<div class="mt-auto flex items-center gap-4 text-primary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">light_mode</span>
+<span class="font-caption text-caption">Dappled</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">pets</span>
+<span class="font-caption text-caption">Toxic</span>
+</div>
+</div>
+</div>
+</article>
+</div>
+<!-- Pagination -->
+<div class="mt-16 flex justify-center items-center gap-4">
+<button class="w-12 h-12 rounded-full border border-outline/20 flex items-center justify-center hover:bg-surface-container transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<span class="px-4 py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md">1</span>
+<button class="w-10 h-10 rounded-lg border border-outline/10 flex items-center justify-center hover:bg-surface-container transition-all text-on-surface-variant font-label-md text-label-md">2</button>
+<button class="w-10 h-10 rounded-lg border border-outline/10 flex items-center justify-center hover:bg-surface-container transition-all text-on-surface-variant font-label-md text-label-md">3</button>
+<span class="text-on-surface-variant font-label-md text-label-md">...</span>
+<button class="w-12 h-12 rounded-full border border-outline/20 flex items-center justify-center hover:bg-surface-container transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-20 mt-20 bg-surface-container dark:bg-inverse-surface">
+<div class="max-w-container-max mx-auto px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="col-span-1 md:col-span-1">
+<span class="font-headline-sm text-headline-sm text-on-surface dark:text-inverse-on-surface block mb-6">Lumina Botanicals</span>
+<p class="font-caption text-caption text-on-surface-variant dark:text-on-tertiary-fixed-variant max-w-xs">
+                    Curating a museum-grade collection of rare botanicals for the discerning collector. We blend horticultural expertise with ethical sourcing.
+                </p>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-primary mb-6">Company</h4>
+<ul class="space-y-4">
+<li><a class="font-caption text-caption text-on-surface-variant dark:text-on-tertiary-fixed-variant hover:text-primary transition-opacity" href="#">Sustainability Report</a></li>
+<li><a class="font-caption text-caption text-on-surface-variant dark:text-on-tertiary-fixed-variant hover:text-primary transition-opacity" href="#">Ethical Sourcing</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-primary mb-6">Services</h4>
+<ul class="space-y-4">
+<li><a class="font-caption text-caption text-on-surface-variant dark:text-on-tertiary-fixed-variant hover:text-primary transition-opacity" href="#">Care Concierge</a></li>
+<li><a class="font-caption text-caption text-on-surface-variant dark:text-on-tertiary-fixed-variant hover:text-primary transition-opacity" href="#">Shipping &amp; Returns</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-primary mb-6">Newsletter</h4>
+<div class="flex flex-col gap-4">
+<p class="font-caption text-caption text-on-surface-variant">Join our circle for first access to rare restocks.</p>
+<div class="flex gap-2">
+<input class="bg-surface-container-lowest border border-outline/20 rounded-lg px-4 py-2 w-full text-caption focus:ring-primary focus:border-primary" placeholder="Email address" type="email"/>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg material-symbols-outlined">arrow_forward</button>
+</div>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-margin-desktop mt-16 pt-8 border-t border-outline/10 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="font-caption text-caption text-on-surface-variant dark:text-on-tertiary-fixed-variant">© 2024 Lumina Botanicals. Cultivating a Greener Future.</span>
+<div class="flex gap-8">
+<a class="font-caption text-caption text-on-surface-variant dark:text-on-tertiary-fixed-variant hover:text-primary" href="#">Privacy Policy</a>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">language</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">share</span>
+</div>
+</div>
+</div>
+</footer>
+<!-- Cart Toast Simulation -->
+<div class="fixed bottom-8 right-8 bg-inverse-surface text-inverse-on-surface px-6 py-4 rounded-xl shadow-xl flex items-center gap-4 translate-y-32 opacity-0 transition-all duration-500 z-[100]" id="toast">
+<span class="material-symbols-outlined text-primary-fixed-dim">check_circle</span>
+<span class="font-label-md text-label-md">Added to collection</span>
+</div>
+<script>
+        // Micro-interaction for Quick Add
+        const quickAddBtns = document.querySelectorAll('article button');
+        const toast = document.getElementById('toast');
+
+        quickAddBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Show toast
+                toast.classList.remove('translate-y-32', 'opacity-0');
+                
+                setTimeout(() => {
+                    toast.classList.add('translate-y-32', 'opacity-0');
+                }, 3000);
+
+                // Simple feedback animation
+                const originalIcon = btn.innerHTML;
+                btn.innerHTML = '<span class="material-symbols-outlined">done</span>';
+                btn.classList.replace('bg-primary', 'bg-tertiary');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalIcon;
+                    btn.classList.replace('bg-tertiary', 'bg-primary');
+                }, 2000);
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "proto";
+option java_outer_classname = "ChatProto";
+
+message ChatMessage {
+  string type = 1;          // "public", "private", "system"
+  string from = 2;          // Sender username
+  string to = 3;            // Receiver username (for private)
+  string content = 4;
+  int64 timestamp = 5;
+}
+
+message UserStatus {
+  string username = 1;
+  bool online = 2;
+  int64 timestamp = 3;
+}

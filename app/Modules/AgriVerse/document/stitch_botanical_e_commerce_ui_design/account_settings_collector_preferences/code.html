@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#fdaf7e",
+                    "outline": "#74796c",
+                    "on-primary-fixed-variant": "#314e1b",
+                    "surface-container-low": "#f6f3f2",
+                    "tertiary-container": "#a19f99",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#1b1c1c",
+                    "on-primary-container": "#213d0b",
+                    "on-tertiary-fixed-variant": "#474742",
+                    "surface-container": "#f0eded",
+                    "on-background": "#1b1c1c",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "primary-fixed-dim": "#aed18f",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#0b2000",
+                    "on-tertiary": "#ffffff",
+                    "background": "#fcf9f8",
+                    "secondary-fixed-dim": "#ffb68a",
+                    "outline-variant": "#c4c8ba",
+                    "on-secondary-fixed": "#321300",
+                    "surface-tint": "#486730",
+                    "surface": "#fcf9f8",
+                    "on-tertiary-container": "#373632",
+                    "inverse-surface": "#303030",
+                    "error-container": "#ffdad6",
+                    "surface-container-highest": "#e4e2e1",
+                    "inverse-primary": "#aed18f",
+                    "surface-dim": "#dcd9d9",
+                    "tertiary": "#5f5e59",
+                    "primary-fixed": "#c9eea9",
+                    "on-secondary-container": "#784019",
+                    "surface-container-high": "#eae7e7",
+                    "secondary-fixed": "#ffdbc8",
+                    "error": "#ba1a1a",
+                    "secondary": "#8b4f27",
+                    "tertiary-fixed": "#e5e2db",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#f3f0f0",
+                    "surface-variant": "#e4e2e1",
+                    "primary": "#486730",
+                    "surface-bright": "#fcf9f8",
+                    "primary-container": "#87a96b",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#43483d",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-secondary-fixed-variant": "#6e3811"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "gutter": "24px",
+                    "base": "8px",
+                    "margin-desktop": "64px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Hanken Grotesk"],
+                    "caption": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "display-lg-mobile": ["EB Garamond"],
+                    "display-lg": ["EB Garamond"],
+                    "headline-sm": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "label-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .nav-active { border-right: 3px solid #486730; background: linear-gradient(90deg, rgba(72, 103, 48, 0) 0%, rgba(72, 103, 48, 0.05) 100%); }
+        .toggle-checkbox:checked { right: 0; background-color: #486730; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #c9eea9; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c4c8ba; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm fixed top-0 left-0 right-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="font-display-lg text-display-lg italic text-on-surface dark:text-inverse-on-surface">
+                Lumina Botanicals
+            </div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Shop All</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Rare Finds</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Care Guides</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Sustainability</a>
+</nav>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-all" data-icon="search">search</button>
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-all" data-icon="shopping_bag">shopping_bag</button>
+<button class="material-symbols-outlined text-primary font-bold border-b-2 border-primary pb-1" data-icon="person">person</button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-20 px-margin-desktop max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row gap-gutter">
+<!-- Sidebar Navigation -->
+<aside class="w-full md:w-64 flex-shrink-0">
+<div class="sticky top-32 space-y-2">
+<h1 class="font-headline-md text-headline-md mb-8">Account</h1>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Personal Info</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+<span class="font-label-md text-label-md">Security</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-md text-label-md">Payment Methods</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary bg-primary-container/10 font-bold border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined" data-icon="notifications" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<span class="font-label-md text-label-md">Garden Notifications</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- Settings Content -->
+<div class="flex-grow space-y-12">
+<!-- Section: Garden Notifications -->
+<section class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/30">
+<div class="mb-8">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Garden Notifications</h2>
+<p class="text-on-surface-variant mt-2 font-body-md">Configure how you receive botanical care alerts and seasonal nursery updates.</p>
+</div>
+<div class="space-y-6">
+<!-- Watering Alert Synchronization -->
+<div class="p-6 bg-surface-container-low rounded-lg border border-outline-variant/20">
+<div class="flex items-center justify-between mb-4">
+<div>
+<h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Watering Alert Synchronization</h3>
+<p class="text-caption text-on-surface-variant">Real-time alerts for your specific plant varieties.</p>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="water_drop">water_drop</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div class="flex items-center justify-between p-4 bg-white rounded shadow-sm">
+<span class="font-body-md">Push Notifications</span>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer outline-none transition-all duration-300 right-6 checked:right-0 border-outline-variant checked:border-primary" id="push" name="push" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-container-highest cursor-pointer transition-colors duration-300" for="push"></label>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-white rounded shadow-sm">
+<span class="font-body-md">Email Reports</span>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer outline-none transition-all duration-300 right-6 checked:right-0 border-outline-variant checked:border-primary" id="email" name="email" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-container-highest cursor-pointer transition-colors duration-300" for="email"></label>
+</div>
+</div>
+</div>
+</div>
+<!-- Growth Specimen Specifics -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-outline-variant/10 group hover:border-primary/30 transition-all">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-tertiary" data-icon="eco">eco</span>
+</div>
+<h4 class="font-label-md text-label-md mb-2">Nutrient Schedule</h4>
+<p class="text-caption text-on-surface-variant">Monthly reminders for organic fertilization cycles.</p>
+<button class="mt-4 text-primary font-label-md text-label-md hover:underline">Manage</button>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm border border-outline-variant/10 group hover:border-primary/30 transition-all">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-secondary" data-icon="light_mode">light_mode</span>
+</div>
+<h4 class="font-label-md text-label-md mb-2">Seasonal Shifts</h4>
+<p class="text-caption text-on-surface-variant">Proactive alerts for moving sensitive species indoors.</p>
+<button class="mt-4 text-primary font-label-md text-label-md hover:underline">Manage</button>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm border border-outline-variant/10 group hover:border-primary/30 transition-all">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="nest_cam_indoor">nest_cam_indoor</span>
+</div>
+<h4 class="font-label-md text-label-md mb-2">Pest Surveillance</h4>
+<p class="text-caption text-on-surface-variant">Weekly health check-in reminders for your garden.</p>
+<button class="mt-4 text-primary font-label-md text-label-md hover:underline">Manage</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Specimens Preview (Visual Context) -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="relative overflow-hidden rounded-2xl h-64 shadow-lg group">
+<img alt="Monstera Specimen" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A lush, vibrant Monstera Deliciosa plant in a high-end minimalist ceramic pot. The lighting is soft and natural, emphasizing the deep green textures and organic patterns of the leaves. The setting is a bright, airy modern living space with clean lines and a sand-toned background palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAUcWX1YhD0UW3Lw87Lbk-Onv65n4fyiWUI_A2_R5jnzEuGGTKz_YtqI3DFTTZ2EqIfe-jx4IBsbn-KlhwmRycKClY_JnADBA_LwCW_yJsaLQGv9Q72ZSyq3VZvTGsoKQdGFQQYDC6u1JLpKTnVqlwKyjs_n65ys0Nr8CbSHND72neTitWOLJEQdHCgamxWxYZmWFPwaNGKbWWxHi0f4WSFUHeZ5dblP6gO43DXRVFu3Y6bJ_YS6IWR6q2ziMqkm6rH5aPjIJX7K8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+<div>
+<span class="bg-primary/90 text-white text-[10px] px-2 py-1 rounded-full uppercase tracking-widest font-bold mb-2 inline-block">Sync Active</span>
+<h3 class="text-white font-headline-sm text-headline-sm">Monstera Deliciosa</h3>
+<p class="text-white/80 font-caption text-caption">Last Watered: 2 days ago</p>
+</div>
+</div>
+</div>
+<div class="relative overflow-hidden rounded-2xl h-64 shadow-lg group">
+<img alt="Succulent Collection" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A collection of diverse succulents and rare cacti arranged beautifully in a terracotta-accented minimalist nursery. Warm golden-hour light filters through large glass windows, highlighting the sage and olive greens of the plants. The overall atmosphere is tranquil and high-end botanical chic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDez1g5kyRmEMxILlKXZ__RMtcUEF2lt7jNLg_0Gj4nLz7hxRjPkR6toaH54JzmzJ-JQDZFHtfV414YV_2xWfcBF6pXjzB5Zo9Cqp_xrH9fUlDkGtQMIIUz7QHVu8U4cgjN3UGbrPfhEooCuZfxF2SvHIWmCp5JsPoy18IRC5p3RRmvxsEdVCCHaQ5L30xtxPsvDyc5V8kr1xl19NiG0koFFDkW9ZEA-Gp5bPm1rG8UxlvLqoxrwWeC9t2dfZiCHlEdxlk_uo3n3Bs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+<div>
+<span class="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-1 rounded-full uppercase tracking-widest font-bold mb-2 inline-block">Seasonal Mode</span>
+<h3 class="text-white font-headline-sm text-headline-sm">Terracotta Collection</h3>
+<p class="text-white/80 font-caption text-caption">8 Specimens tracked</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Form Controls -->
+<div class="flex justify-end gap-4 pt-8">
+<button class="px-8 py-3 rounded-full border border-on-surface-variant/30 font-label-md text-label-md hover:bg-surface-container-high transition-all">Reset to Defaults</button>
+<button class="px-8 py-3 rounded-full bg-primary text-white font-label-md text-label-md shadow-md hover:shadow-lg hover:bg-on-primary-fixed-variant transition-all active:scale-95">Save Preferences</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-inverse-surface dark:bg-surface-container-highest">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-20 max-w-container-max mx-auto">
+<div class="md:col-span-1">
+<div class="font-display-lg text-display-lg italic text-surface dark:text-on-surface mb-6">Lumina Botanicals</div>
+<p class="text-surface-variant dark:text-on-surface-variant font-body-md">
+                    © 2024 Lumina Botanicals. Cultivating a greener future through precise horticulture.
+                </p>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-sm text-headline-sm text-surface dark:text-on-surface">Company</h4>
+<nav class="flex flex-col gap-2">
+<a class="text-surface-variant dark:text-on-surface-variant font-body-md hover:text-primary-fixed transition-colors" href="#">About Us</a>
+<a class="text-surface-variant dark:text-on-surface-variant font-body-md hover:text-primary-fixed transition-colors" href="#">Sustainability Report</a>
+<a class="text-surface-variant dark:text-on-surface-variant font-body-md hover:text-primary-fixed transition-colors" href="#">Wholesale</a>
+</nav>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-sm text-headline-sm text-surface dark:text-on-surface">Support</h4>
+<nav class="flex flex-col gap-2">
+<a class="text-surface-variant dark:text-on-surface-variant font-body-md hover:text-primary-fixed transition-colors" href="#">Shipping &amp; Returns</a>
+<a class="text-surface-variant dark:text-on-surface-variant font-body-md hover:text-primary-fixed transition-colors" href="#">Contact</a>
+<a class="text-surface-variant dark:text-on-surface-variant font-body-md hover:text-primary-fixed transition-colors" href="#">Privacy Policy</a>
+</nav>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-sm text-headline-sm text-surface dark:text-on-surface">Join the Nursery</h4>
+<p class="text-surface-variant dark:text-on-surface-variant font-body-md">Subscribe for curated care guides and exclusive specimen releases.</p>
+<div class="flex items-center mt-2">
+<input class="bg-surface/10 border-surface/20 text-surface placeholder:text-surface/50 rounded-l-lg px-4 py-2 w-full focus:ring-1 focus:ring-primary-fixed outline-none" placeholder="Email Address" type="email"/>
+<button class="bg-primary-fixed text-on-primary-fixed px-4 py-2 rounded-r-lg font-label-md text-label-md">Join</button>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions for toggles
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const parent = this.closest('div.bg-white');
+                if (this.checked) {
+                    parent.classList.add('ring-2', 'ring-primary/20');
+                } else {
+                    parent.classList.remove('ring-2', 'ring-primary/20');
+                }
+            });
+        });
+
+        // Sticky Header effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md', 'py-2');
+                header.classList.remove('py-4');
+            } else {
+                header.classList.remove('shadow-md', 'py-2');
+                header.classList.add('py-4');
+            }
+        });
+    </script>
+</body></html>

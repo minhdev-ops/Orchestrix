@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Botanicals | Specimen Finder</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#eae7e7",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed": "#c9eea9",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "tertiary-container": "#a19f99",
+                    "surface-container": "#f0eded",
+                    "secondary-container": "#fdaf7e",
+                    "inverse-surface": "#303030",
+                    "surface-dim": "#dcd9d9",
+                    "on-background": "#1b1c1c",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-container": "#784019",
+                    "on-primary-fixed": "#0b2000",
+                    "surface-bright": "#fcf9f8",
+                    "surface-container-low": "#f6f3f2",
+                    "primary-fixed-dim": "#aed18f",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#6e3811",
+                    "background": "#fcf9f8",
+                    "on-secondary-fixed": "#321300",
+                    "primary-container": "#87a96b",
+                    "on-tertiary-container": "#373632",
+                    "on-surface": "#1b1c1c",
+                    "on-primary-container": "#213d0b",
+                    "surface-variant": "#e4e2e1",
+                    "inverse-on-surface": "#f3f0f0",
+                    "inverse-primary": "#aed18f",
+                    "tertiary-fixed": "#e5e2db",
+                    "secondary-fixed-dim": "#ffb68a",
+                    "on-primary": "#ffffff",
+                    "surface": "#fcf9f8",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#314e1b",
+                    "surface-tint": "#486730",
+                    "surface-container-highest": "#e4e2e1",
+                    "outline": "#74796c",
+                    "secondary-fixed": "#ffdbc8",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-surface-variant": "#43483d",
+                    "error-container": "#ffdad6",
+                    "primary": "#486730",
+                    "tertiary": "#5f5e59",
+                    "secondary": "#8b4f27",
+                    "outline-variant": "#c4c8ba",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-tertiary-fixed-variant": "#474742"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "margin-mobile": "20px",
+                    "base": "8px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Hanken Grotesk"],
+                    "display-lg": ["EB Garamond"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "headline-sm": ["EB Garamond"],
+                    "display-lg-mobile": ["EB Garamond"],
+                    "caption": ["Hanken Grotesk"],
+                    "headline-md": ["EB Garamond"],
+                    "body-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Hanken Grotesk', sans-serif; background-color: #fcf9f8; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .step-transition { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hidden-step { opacity: 0; transform: translateY(20px); pointer-events: none; position: absolute; }
+        .active-step { opacity: 1; transform: translateY(0); position: relative; }
+        .glass-card { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.8); }
+    </style>
+</head>
+<body class="bg-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Bar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm dark:shadow-none docked full-width top-0 sticky z-50">
+<nav class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="font-display-lg text-headline-md text-primary dark:text-primary-fixed-dim">Lumina Botanicals</div>
+<div class="hidden md:flex gap-8">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300" href="#">Shop All</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300" href="#">Rare Finds</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300" href="#">Care Guides</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300" href="#">Sustainability</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-primary text-2xl cursor-pointer">shopping_cart</span>
+<span class="material-symbols-outlined text-primary text-2xl cursor-pointer">person</span>
+</div>
+</nav>
+</header>
+<main class="min-h-screen pt-12 pb-24 px-margin-mobile md:px-0">
+<div class="max-w-3xl mx-auto">
+<!-- Quiz Progress Header -->
+<div class="mb-12 text-center">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-2 block">Specimen Finder</span>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-8" id="quiz-title">Tell us about your sanctuary.</h1>
+<!-- Progress Bar Container -->
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="h-full bg-primary transition-all duration-700 ease-in-out" id="progress-bar" style="width: 25%;"></div>
+</div>
+<div class="flex justify-between mt-3">
+<span class="font-label-md text-label-md text-outline" id="step-counter">Step 1 of 4</span>
+</div>
+</div>
+<!-- Quiz Steps Container -->
+<div class="relative" id="quiz-container">
+<!-- Step 1: Light Levels -->
+<div class="step-transition active-step space-y-6" id="step-1">
+<h2 class="font-headline-md text-headline-md text-on-surface-variant text-center mb-10">What are the light conditions?</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<button class="group flex flex-col items-center p-8 bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary/20 text-center" onclick="nextStep(2)">
+<div class="w-20 h-20 mb-6 flex items-center justify-center bg-primary-fixed rounded-full text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl" data-weight="fill">wb_sunny</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface mb-2">Direct Sunlight</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Bright, south-facing windows with 6+ hours of sun.</p>
+</button>
+<button class="group flex flex-col items-center p-8 bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary/20 text-center" onclick="nextStep(2)">
+<div class="w-20 h-20 mb-6 flex items-center justify-center bg-primary-fixed rounded-full text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl" data-weight="fill">light_mode</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface mb-2">Filtered Light</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Bright indirect light or sheer curtains.</p>
+</button>
+<button class="group flex flex-col items-center p-8 bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary/20 text-center" onclick="nextStep(2)">
+<div class="w-20 h-20 mb-6 flex items-center justify-center bg-primary-fixed rounded-full text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl" data-weight="fill">filter_drama</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface mb-2">Low Light</span>
+<p class="font-body-md text-body-md text-on-surface-variant">North-facing windows or shaded corners.</p>
+</button>
+</div>
+</div>
+<!-- Step 2: Humidity -->
+<div class="step-transition hidden-step space-y-6" id="step-2">
+<h2 class="font-headline-md text-headline-md text-on-surface-variant text-center mb-10">Describe your environment's humidity.</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<button class="group relative overflow-hidden aspect-[4/3] rounded-2xl bg-surface-container shadow-sm" onclick="nextStep(3)">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A macro photograph of water droplets resting on a lush dark green tropical leaf. The lighting is soft and misty, suggesting a humid rainforest atmosphere. The composition is artistic and minimalist, emphasizing the organic texture and saturated green tones characteristic of a high-end botanical gallery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQDqI4eWo4KI5OSD_wHo3XjGeQQYTFTvVZDo5GDSE5O43oT6hacAeyyESfr1ikbQWmSxljVl7jlY0PVnzvFJRqfk_0o94Bg443Aod1Pp6ojglqnDpX4r6FfHJpCX8Ym8_NuQH49Ge0D-UwopGdoJxPIF_wrJbqsrofxSRz5qTFZjn112eV7OGm_TBVouNxZRFbSbWDXVu63U0g-y9rI8Ow9VlwEYXTxJqhz7_n2xacTmqqRYh2TdbNRewePH4uQaDYoVMUBHzv-CE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 to-transparent flex flex-col justify-end p-8 text-left">
+<span class="font-headline-sm text-headline-sm text-surface-container-lowest">High Humidity</span>
+<span class="font-label-md text-label-md text-surface-variant">Mist-loving tropical climates</span>
+</div>
+</button>
+<button class="group relative overflow-hidden aspect-[4/3] rounded-2xl bg-surface-container shadow-sm" onclick="nextStep(3)">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A serene indoor scene featuring a minimalist terracotta pot on a sand-colored surface under warm, dry afternoon light. The atmosphere is crisp and clean, highlighting a desert-like aesthetic with soft shadows and a warm color palette of earthy oranges and muted neutrals." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVSI8871NzeDrO7ulEKK7j0kvXaCY3rBQAjxMtpiEdT81AhH3KxMA1lsPYA3Lw44Ho04cjsuDX0HFkLkOELi4CuBNandVZ0iIQEXb1EiI8XPYIiWkF0isTATBOW1findRk7ue7t-jEQlRQZlHJjR3FF1o4na_6ofPqnPIcBzOLqCLmsObfC2idL3-lVqIWAnRsIQ89ZeP-fxK4dbixQROcUBX0q4kmfkP0fKJdzz4HyF35gsSrHLKg6jbDp5H_NxOG9hOKWPBK2hA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 to-transparent flex flex-col justify-end p-8 text-left">
+<span class="font-headline-sm text-headline-sm text-surface-container-lowest">Dry Air</span>
+<span class="font-label-md text-label-md text-surface-variant">Standard home or office heat</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Step 3: Collector Experience -->
+<div class="step-transition hidden-step space-y-6" id="step-3">
+<h2 class="font-headline-md text-headline-md text-on-surface-variant text-center mb-10">What is your collector level?</h2>
+<div class="space-y-4 max-w-xl mx-auto">
+<button class="w-full flex items-center justify-between p-6 bg-surface-container-lowest border border-outline-variant rounded-xl hover:border-primary transition-colors text-left group" onclick="nextStep(4)">
+<div>
+<span class="block font-headline-sm text-headline-sm text-on-surface">The Enthusiast</span>
+<span class="block font-body-md text-body-md text-on-surface-variant">Easy-care, resilient species for new plant parents.</span>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</button>
+<button class="w-full flex items-center justify-between p-6 bg-surface-container-lowest border border-outline-variant rounded-xl hover:border-primary transition-colors text-left group" onclick="nextStep(4)">
+<div>
+<span class="block font-headline-sm text-headline-sm text-on-surface">The Horticulturalist</span>
+<span class="block font-body-md text-body-md text-on-surface-variant">Intermediate care for those ready for a schedule.</span>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</button>
+<button class="w-full flex items-center justify-between p-6 bg-surface-container-lowest border border-outline-variant rounded-xl hover:border-primary transition-colors text-left group" onclick="nextStep(4)">
+<div>
+<span class="block font-headline-sm text-headline-sm text-on-surface">The Specimen Hunter</span>
+<span class="block font-body-md text-body-md text-on-surface-variant">Rare, temperamental beauties for the dedicated expert.</span>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Step 4: Loading / Processing -->
+<div class="step-transition hidden-step text-center space-y-8 py-12" id="step-4">
+<div class="relative w-24 h-24 mx-auto">
+<div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+<div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
+<span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-primary text-4xl">psychology</span>
+</div>
+<div class="space-y-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Analyzing botanical compatibility...</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Curating a selection from our rare archives.</p>
+</div>
+</div>
+<!-- Results Screen -->
+<div class="step-transition hidden-step space-y-12" id="results">
+<div class="text-center">
+<h2 class="font-display-lg text-headline-md text-on-surface">Your Curated Specimens</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Based on your environment and expertise, we recommend these three pairings.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Result 1 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+<div class="h-64 bg-surface-container relative">
+<img class="w-full h-full object-cover" data-alt="A portrait of a Monstera Deliciosa with large, fenestrated leaves. The lighting is bright and airy, with soft shadows cast against a clean white wall. The plant is housed in a modern minimalist ceramic pot, reflecting a high-end digital showroom aesthetic for luxury botanicals." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABGtJCKgfOuTbHbgmDNq5_Nb9u0VNsBBQBjDinZfNrzrb-mRswSw146yp9xbdaCjxiAdq6me9o2nnVgc-pjw4IIpPRN5YKxk8N5Vo9HaKJgyC9pRwWyV9qjj-RpPU31F32FBSTQltGkbUa6TzWWrSzWrx4IWUE8Bpj9g_eywOVpJZ8yz0XdAf2fxcl4C4K1EQNxkgK2ETcBbZ_1M1DZ1SehOjWBonqHadRdal_D7C2dQRCOfkjrG_GwBziqIFQw2C-5I9W-EmvAzg"/>
+<div class="absolute top-4 left-4">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full font-label-md text-caption uppercase">Rare Find</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Monstera Thai Constellation</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">A stunning variegated specimen that thrives in bright filtered light.</p>
+<button class="w-full py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors active:scale-95 duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> Quick Add — $185
+                                </button>
+</div>
+</div>
+<!-- Result 2 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+<div class="h-64 bg-surface-container relative">
+<img class="w-full h-full object-cover" data-alt="A close-up of an Alocasia Polly with its dramatic dark green leaves and silver-white veins. The plant is positioned in a misty, high-humidity setting with soft backlighting that makes the leaf textures pop. The mood is sophisticated and mysterious, characteristic of an elite botanical collection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSexPZOkUWHWYFqf2P-_uSCk7739VQl6RRkQsBRERkgzvvr1R2taEa_e1wwEpc55ysxXwbiB0__xVpd5TMFhnC7T4UPpNgyqJ2kjVcbUBertVsr2kqekwAHlbk52vI3Qm5FY2U_TnOVEZtp5qzbV1ezXauZYPWGYNpGe_GrocT10928Iucx2sz4Q8h9_ehfheZKTW3fJKesKqRv8KNv8end_NxYDU_H8aq4IXPZdLTUNmfELXzhptOl84fxvx0zli6PRQKZ8VzzEo"/>
+<div class="absolute top-4 left-4">
+<span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full font-label-md text-caption uppercase">Humidity Lover</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Alocasia 'Polly'</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">Dramatic African Mask plant for high-humidity environments.</p>
+<button class="w-full py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors active:scale-95 duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> Quick Add — $45
+                                </button>
+</div>
+</div>
+<!-- Result 3 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+<div class="h-64 bg-surface-container relative">
+<img class="w-full h-full object-cover" data-alt="A sculptural Sansevieria Masoniana 'Whale Fin' in a tall, dark charcoal pot. The lighting is low and dramatic, highlighting the singular, wide leaf's unique mottled pattern. The aesthetic is extremely minimalist and modern, perfect for a luxury urban interior." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV_r9DKtkRr4Mvft4ZdaZmaUEikXI4GO8JoYQaG-jzHO2FRYm6OZYUMeCpLWKtLPZlVaGNsP0Hw8e5sY7o5oHfHs-AkLQRwo8_XhaCAv2ya8aEi2JBUs1GnaCdDKcNXXSk5RK8ZjZYCJRtxRuZWKXeOmBiBocQv-52ePSACYdTJ9-5UO8J1znl89ytaPJwKPKSfr72Qx89MnOZsljNjpZTvxOWb5t7cj0LoEeMJ22Yzb0lnujLNa28IOnVeVQ9s-r1_3W9tIfvK28"/>
+<div class="absolute top-4 left-4">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full font-label-md text-caption uppercase">Hardy</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Whale Fin Sansevieria</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">A slow-growing architectural gem that tolerates low light conditions.</p>
+<button class="w-full py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors active:scale-95 duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> Quick Add — $62
+                                </button>
+</div>
+</div>
+</div>
+<div class="text-center pt-8">
+<button class="font-label-md text-label-md text-outline hover:text-primary transition-colors flex items-center justify-center mx-auto gap-2" onclick="location.reload()">
+<span class="material-symbols-outlined">restart_alt</span> Retake Quiz
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-inverse-surface dark:bg-surface-container-lowest full-width">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-20 max-w-container-max mx-auto">
+<div class="md:col-span-2 space-y-6">
+<div class="font-display-lg text-headline-md text-inverse-on-surface dark:text-on-surface">Lumina Botanicals</div>
+<p class="font-body-md text-body-md text-surface-variant opacity-80 max-w-sm">© 2024 Lumina Botanicals. Cultivating a greener future through precision horticulture.</p>
+</div>
+<div class="space-y-4">
+<h4 class="font-headline-sm text-headline-sm text-inverse-on-surface dark:text-on-surface">Quick Links</h4>
+<div class="flex flex-col gap-2">
+<a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Our Story</a>
+<a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Shipping &amp; Returns</a>
+<a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Wholesale</a>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="font-headline-sm text-headline-sm text-inverse-on-surface dark:text-on-surface">Resources</h4>
+<div class="flex flex-col gap-2">
+<a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Contact Us</a>
+<a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Sustainability Report</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        function nextStep(step) {
+            const currentEl = document.getElementById(`step-${currentStep}`);
+            const nextEl = document.getElementById(step === 'results' ? 'results' : `step-${step}`);
+            
+            // Fade out current
+            currentEl.classList.remove('active-step');
+            currentEl.classList.add('hidden-step');
+
+            setTimeout(() => {
+                currentStep = step;
+                
+                if (step === 4) {
+                    // Logic for the loading step
+                    nextEl.classList.remove('hidden-step');
+                    nextEl.classList.add('active-step');
+                    updateProgress(100);
+                    document.getElementById('step-counter').innerText = `Finalizing...`;
+                    
+                    setTimeout(() => {
+                        nextStep('results');
+                    }, 2500);
+                } else if (step === 'results') {
+                    const resultsEl = document.getElementById('results');
+                    const step4 = document.getElementById('step-4');
+                    step4.classList.add('hidden-step');
+                    step4.classList.remove('active-step');
+                    
+                    resultsEl.classList.remove('hidden-step');
+                    resultsEl.classList.add('active-step');
+                    document.getElementById('quiz-title').innerText = "We've found your match.";
+                    document.getElementById('step-counter').innerText = `Matches Found`;
+                } else {
+                    nextEl.classList.remove('hidden-step');
+                    nextEl.classList.add('active-step');
+                    updateProgress((step / totalSteps) * 100);
+                    document.getElementById('step-counter').innerText = `Step ${step} of ${totalSteps}`;
+                }
+            }, 500);
+        }
+
+        function updateProgress(percent) {
+            const bar = document.getElementById('progress-bar');
+            bar.style.width = `${percent}%`;
+        }
+    </script>
+</body></html>

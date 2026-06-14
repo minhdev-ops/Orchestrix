@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wishlist | Lumina Botanicals</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#fdaf7e",
+                        "outline": "#74796c",
+                        "on-primary-fixed-variant": "#314e1b",
+                        "surface-container-low": "#f6f3f2",
+                        "tertiary-container": "#a19f99",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-container": "#213d0b",
+                        "on-tertiary-fixed-variant": "#474742",
+                        "surface-container": "#f0eded",
+                        "on-background": "#1b1c1c",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "primary-fixed-dim": "#aed18f",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#0b2000",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fcf9f8",
+                        "secondary-fixed-dim": "#ffb68a",
+                        "outline-variant": "#c4c8ba",
+                        "on-secondary-fixed": "#321300",
+                        "surface-tint": "#486730",
+                        "surface": "#fcf9f8",
+                        "on-tertiary-container": "#373632",
+                        "inverse-surface": "#303030",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e4e2e1",
+                        "inverse-primary": "#aed18f",
+                        "surface-dim": "#dcd9d9",
+                        "tertiary": "#5f5e59",
+                        "primary-fixed": "#c9eea9",
+                        "on-secondary-container": "#784019",
+                        "surface-container-high": "#eae7e7",
+                        "secondary-fixed": "#ffdbc8",
+                        "error": "#ba1a1a",
+                        "secondary": "#8b4f27",
+                        "tertiary-fixed": "#e5e2db",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f3f0f0",
+                        "surface-variant": "#e4e2e1",
+                        "primary": "#486730",
+                        "surface-bright": "#fcf9f8",
+                        "primary-container": "#87a96b",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#43483d",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "on-secondary-fixed-variant": "#6e3811"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "base": "8px",
+                        "margin-desktop": "64px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "caption": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "display-lg-mobile": ["EB Garamond"],
+                        "display-lg": ["EB Garamond"],
+                        "headline-sm": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "label-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .bento-item {
+            transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.4s ease;
+        }
+        .bento-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(72, 103, 48, 0.08);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c4c8ba;
+            border-radius: 10px;
+        }
+        .glass-nav {
+            background: rgba(252, 249, 248, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary/20 selection:text-primary min-h-screen">
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 left-0 right-0 z-50 glass-nav shadow-sm">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-base">
+<h1 class="font-display-lg text-display-lg italic text-on-surface tracking-tight">Lumina Botanicals</h1>
+</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Shop All</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Rare Finds</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Care Guides</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Sustainability</a>
+</nav>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center border-b border-outline/20 pb-1">
+<span class="material-symbols-outlined text-outline text-[20px] mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md w-32" placeholder="Search cultivars..." type="text"/>
+</div>
+<button class="relative hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+<span class="absolute -top-1 -right-1 bg-secondary text-on-secondary text-[10px] w-4 h-4 rounded-full flex items-center justify-center">2</span>
+</button>
+<button class="hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-24 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<!-- Page Header -->
+<header class="mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="max-w-2xl">
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest mb-4 block">Personal Archive</span>
+<h2 class="font-display-lg text-display-lg md:text-[64px] leading-tight mb-4">Your Wishlist</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                    A curated selection of your most desired botanical specimens. From resilient everyday companions to the rarest tropical anomalies, your future greenhouse starts here.
+                </p>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 border border-outline/20 px-6 py-3 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">share</span>
+<span class="font-label-md text-label-md">Share Collection</span>
+</button>
+</div>
+</header>
+<!-- Wishlist Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Item 1: Large Featured In-Stock -->
+<div class="md:col-span-8 group bento-item bg-white rounded-xl overflow-hidden border border-outline/5">
+<div class="flex flex-col md:flex-row h-full">
+<div class="md:w-3/5 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A large, architectural Monstera Thai Constellation plant with cream-colored variegation in a minimalist matte ceramic pot. The lighting is soft and natural, emphasizing the organic texture of the leaves against a neutral, high-key studio background that matches a luxury botanical brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEHI2Aow3vby4us94MgdlcCkiH_C_TRug_eWAl-gRlCiU9u52svhUlMsA5oQPu8uH5a6OkGKd5z718BH2-EDaPZXv9hWl14sJ2YNdAO13gr_63Ogcwu7dto2zmv4c2CsbkZKM7vPSX8FCOwwXxBiWlH3Yf6rqkItqw2zvdYw69DcwWH94fdfDHrp5nvqFcc-yh4qW0V62pCPYnf8GvMpBYAyJbJ8VbaMiJejgpIE7-5XfPeAdLmlUeLevlNKIdX8l9QwnzBDB8E7E"/>
+</div>
+<div class="md:w-2/5 p-8 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-secondary-container/10 text-secondary px-3 py-1 rounded-full font-label-md text-[12px]">Tropical Rare</span>
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-[12px]">4.9</span>
+</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2">Monstera Thai Constellation</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">A cosmic masterpiece of mutation, each leaf a unique galaxy of cream and sage.</p>
+<div class="flex flex-wrap gap-2 mb-8">
+<span class="flex items-center gap-1 text-on-surface-variant text-[12px]"><span class="material-symbols-outlined text-[16px]">wb_sunny</span> High Light</span>
+<span class="flex items-center gap-1 text-on-surface-variant text-[12px]"><span class="material-symbols-outlined text-[16px]">water_drop</span> Bi-weekly</span>
+</div>
+</div>
+<div class="mt-auto">
+<span class="font-headline-sm text-headline-sm block mb-4">$240.00</span>
+<button class="w-full bg-primary text-white font-label-md text-label-md py-4 rounded-lg hover:bg-primary-container transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+                                Add to Collection
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 2: Out of Stock Rare -->
+<div class="md:col-span-4 group bento-item bg-white rounded-xl overflow-hidden border border-outline/5 p-6 flex flex-col">
+<div class="relative overflow-hidden rounded-lg mb-6 aspect-square">
+<div class="absolute inset-0 bg-black/5 z-10"></div>
+<span class="absolute top-4 right-4 z-20 bg-inverse-surface/80 backdrop-blur-md text-inverse-on-surface px-4 py-1.5 rounded-full font-label-md text-[10px] uppercase tracking-tighter">Unavailable</span>
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A macro shot of a rare, luminous succulent with translucent, pink-tinged edges resembling crystalline structures. The lighting is ethereal and soft, highlighting the botanical's delicate, science-meets-nature aesthetic. The background is a muted, warm sand color consistent with elevated minimalist branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcgi3CVbPf4fIKHi4O9aD3WDq9AENwZKSdfr-bMFmaNuopZmCDdSv4IiXKCu77qnf2lnm4Aizz1RRHnCrlK2NjQLHvvkJfJmogGHb1liwiswg_Zkh2TxLrtbffsNeikSU-LWdbpuYKxHml6E7bel9qxaFqRltj4QfwxzLlvlLHTee_UKqcDngPkFbQ3ZAquCWfSFgUYWWgs6Cf6EMM0dA9iQ8oW96cEljv9MgMU6OSYvcFKDa6Cd_nnPzu_Z1f8fEbD_gzlD4mo4E"/>
+</div>
+<div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-headline-sm text-headline-sm">Haworthia Cooperi</h3>
+<span class="text-secondary font-label-md text-[12px] uppercase tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">diamond</span> Rarity: Ultra
+                            </span>
+</div>
+<button class="text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mb-6 overflow-hidden">
+<div class="w-[85%] h-full bg-secondary-container"></div>
+</div>
+<button class="w-full border-2 border-primary text-primary font-label-md text-label-md py-4 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-center gap-2 group/btn">
+<span class="material-symbols-outlined text-[20px] transition-transform group-hover/btn:scale-110">notifications</span>
+                        Notify When Restocked
+                    </button>
+</div>
+</div>
+<!-- Item 3: Regular In-Stock -->
+<div class="md:col-span-4 group bento-item bg-white rounded-xl overflow-hidden border border-outline/5 p-6 flex flex-col">
+<div class="relative overflow-hidden rounded-lg mb-6 aspect-video">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A tall, sculptural Sansevieria snake plant in a textured charcoal ceramic pot. The lighting casts sharp, elegant shadows against a warm beige wall, emphasizing the architectural form of the plant. The style is professional, high-end, and minimalist, with a focus on interior design integration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDtbi7SHPPrdtF_YEMz2hCSsXncDslbXF2M-22AQ1qhUZOn7aK-pZGdAAMOPyKpaTxKQJ1d4wNhCaEHM-prJ2OaR0ntEHHAnFES6Q14WHWxP_49fyEbzeTV8Y6lEKXFO_SEchiYgsHf5Y-_YxVZDw4At_lCQpEzZvpaJ7rVC4wydizlotXRBG3ICz1rpCRi9wBRGjV3wjmxQuQivwzkhMnsi0NchFYZ5DNjNB5__4yPQHJmyYLSma5b5kWu0yMNbH_nlgimbmWAwk"/>
+</div>
+<div class="flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-sm text-headline-sm">Sansevieria Laurentii</h3>
+<span class="font-headline-sm text-headline-sm">$45.00</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">The ultimate structural air purifier for low-light corners.</p>
+<div class="mt-auto">
+<button class="w-full bg-surface-container-highest text-on-surface-variant font-label-md text-label-md py-3 rounded-lg hover:bg-primary hover:text-white transition-all">
+                            Quick Add to Collection
+                        </button>
+</div>
+</div>
+</div>
+<!-- Item 4: Wide Out of Stock Restock Soon -->
+<div class="md:col-span-8 group bento-item bg-surface-container-low rounded-xl overflow-hidden border border-outline/5 relative">
+<div class="flex flex-col md:flex-row h-full">
+<div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+<div class="inline-flex items-center gap-2 mb-6 text-secondary">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span class="font-label-md text-label-md">Last seen 3 months ago</span>
+</div>
+<h3 class="font-display-lg text-[32px] md:text-[40px] leading-tight mb-4">Variegated Philodendron Billietiae</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8">One of the most sought-after hybrids in the Lumina catalog. Orange stems meet marbled variegation.</p>
+<div class="flex items-center gap-6">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-white bg-tertiary-fixed flex items-center justify-center text-[10px] font-bold">12k+</div>
+<div class="text-caption text-on-surface-variant self-center ml-4">Waiting for restock</div>
+</div>
+</div>
+<button class="mt-8 bg-inverse-surface text-inverse-on-surface font-label-md text-label-md py-4 px-8 rounded-lg hover:opacity-90 transition-all w-fit">
+                            Join Waitlist
+                        </button>
+</div>
+<div class="md:w-1/2 relative min-h-[300px]">
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-low to-transparent z-10 hidden md:block"></div>
+<img class="w-full h-full object-cover" data-alt="A breathtaking Variegated Philodendron Billietiae with prominent orange petioles and deep green leaves splashed with white and cream. Captured in a high-fashion botanical style with moody lighting and deep organic shadows, creating a sense of luxury and exclusivity for a top-tier greenhouse shop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt2M-ZsdMMWS31nyCbUJnLJjGBOgjwvvR0AV-BjVXCqQ2XRdpHbnbcCn0ZJ4V6r5mL6v2chkSpec-do86pY1ySYwvkzo1qRI1ACJgQjmliiiHJNGYEDCJliYwB0X7BSdRB2srnX_rnR42fxr_ag2r-gaPfSUmwFPOjTWEpAbQ8yVEWBBeFQD2cY11OFRPtLpgVP8B-E3u4hANBLdHgBlvCvlX5Zqzaazb3cF-s3t46t3t3KQcXJC8JtjIE2BmkK2Vd3nd8CKLhtb8"/>
+</div>
+</div>
+</div>
+<!-- Item 5: Compact Restock Alert -->
+<div class="md:col-span-4 group bento-item bg-white rounded-xl overflow-hidden border border-outline/5 p-6 flex flex-col">
+<div class="relative overflow-hidden rounded-lg mb-6 flex-grow flex items-center justify-center bg-surface-container">
+<span class="material-symbols-outlined text-outline/30 text-[64px] absolute">potted_plant</span>
+<img class="w-full h-full object-cover z-10 transition-transform duration-700 group-hover:scale-110" data-alt="A lush Calathea Orbifolia with its distinctive wide, silver-striped leaves. The photo is taken from a top-down perspective, emphasizing the hypnotic pattern of the foliage. Lighting is bright but diffused, creating a serene, high-quality digital catalog feel that emphasizes the plant's health and beauty." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDxIhBaGL4zA-z2CEblv92qxI6ood4meTG6VcFSN6k42kcimxG725XW9tsiu0sI01J8AlVz2ryQi1YFHK9HJqedTgybZwkHNE56mwwPCWCHmHYz8ka6M42XOKWiiKWaTrp8uQ8xctOKU-RkhV6yHDn56XRsBdf1zKzzzZ0Romcvy5eLDWBR8kp4p1jMSHICKAQtqyBBTZTWtwVdMxHrPWBLJsGfgc5cOA2OJYf5c66j-dasIHmtQf7t3NIv2SuXvZWjMCS_PD89so"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm mb-1">Calathea Orbifolia</h3>
+<div class="flex items-center justify-between mb-4">
+<span class="text-primary font-label-md text-[12px]">Restocking Tomorrow</span>
+<span class="font-headline-sm text-headline-sm">$58.00</span>
+</div>
+<button class="w-full border border-primary text-primary font-label-md text-label-md py-3 rounded-lg hover:bg-primary/5 transition-all">
+                        Set Alert
+                    </button>
+</div>
+</div>
+<!-- Empty State / Add More -->
+<div class="md:col-span-4 border-2 border-dashed border-outline/20 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-surface-container transition-colors cursor-pointer min-h-[300px]">
+<div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary text-[32px]">add</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm mb-2">Grow Your Wishlist</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Browse our latest collection of rare specimens and find your next favorite.</p>
+<button class="mt-6 text-primary font-label-md text-label-md underline underline-offset-4 decoration-2">Browse the Collection</button>
+</div>
+</div>
+<!-- Recommendations Section -->
+<section class="mt-32">
+<div class="flex items-center justify-between mb-12">
+<h2 class="font-display-lg text-display-lg">Recommended for You</h2>
+<a class="text-primary font-label-md text-label-md flex items-center gap-1 group" href="#">
+                    Explore New Arrivals 
+                    <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<!-- Recommended 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] overflow-hidden rounded-xl mb-4 bg-surface-container">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A Begonia Maculata with its striking white polka dots on dark green leaves and a deep crimson underside. The shot is high-contrast and theatrical, highlighting the plant's unique 'fashion-forward' aesthetic against a clean minimalist studio backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnl6sk-bhJIS8U-I00qWusKylCUIw9LYgi5VroglXOGDu6Yqch17eSNVY84uwG0NEyTT36fQiHx5VZB97l3Tasa88BXSlO1nFFdcjAKoC0ipmbiy_pRekPWD4hVyQwdWnttidqV-q1DpI8ONqgHsmCxdBM3T8lhB8HSxGtV2NlZ70RScV6pk66MDIvF7vhXKcF0f7YlFM3_a2j-VlzFj60KynDbjY0hCFXhasvUuHDiFuOZxHzjdMifot4DD21D30yp0mnZSxDI-Y"/>
+</div>
+<h4 class="font-headline-sm text-[18px] mb-1">Begonia Maculata</h4>
+<span class="font-body-md text-body-md text-on-surface-variant">$32.00</span>
+</div>
+<!-- Recommended 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] overflow-hidden rounded-xl mb-4 bg-surface-container">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A lush, trailing Pothos N-Joy in a modern hanging planter. The leaves show crisp white and green variegation. The lighting is bright and cheerful, suggesting a well-lit home environment, presented with professional interior photography standards." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOyjaxtXigCaaFG8QKJ_-4lnjocYEVakrDnQko0TTqc_8rqxFX_wPsatFd-ksJN4haRKdE02VoC-6F-PASWLmtTZpxbMvtbQn49yFKkbgGFB-eEFmbDl5gbMdbTODAHDlXeEjCj9eUbLJXCAFBC0mGVbPEfXg8rC74Qm3FATSsFM2e3w_eLHEHTqIFKQUSGw0dGrsBjkTY6PiMx3PZjz-ktDV-th1WMLIr4OVRaE7sybkRk2BCG24E8E81l_7qc1JAFvDkg1Hdy9E"/>
+</div>
+<h4 class="font-headline-sm text-[18px] mb-1">Pothos N-Joy</h4>
+<span class="font-body-md text-body-md text-on-surface-variant">$24.00</span>
+</div>
+<!-- Recommended 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] overflow-hidden rounded-xl mb-4 bg-surface-container">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A mature Ficus Audrey with its characteristic velvety green leaves and pale trunk. The plant is positioned in a sun-drenched corner of a minimalist room, emphasizing a high-end architectural and luxury botanical aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV8EW8sef6Kk9nH1J7ADux7knNVMU6_eP7Dpzh7UUswdEWXdIH0OaJCtwKRNU1YgyoebG7Q7nHyPq7lOFY3bWFKoBEggJ6MjkETOwZJJGrTdvQE-bmWaQ41S5XXImZv1bQbLXn7PPFs2LSldq7NE0McKXvi4gPrho02xBiXRc0x3VyHFTZPUzqW2oawpLFaNbo6lRQ1NUdBzDUVkO8Bu9KIZkU9ISbcEiZ4f-1iLZ18jaqBFX6QFHFSSdPBsInr1KhevoktMbknuM"/>
+</div>
+<h4 class="font-headline-sm text-[18px] mb-1">Ficus Audrey</h4>
+<span class="font-body-md text-body-md text-on-surface-variant">$85.00</span>
+</div>
+<!-- Recommended 4 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] overflow-hidden rounded-xl mb-4 bg-surface-container">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="An Alocasia Polly with its dramatic dark shield-shaped leaves and bright white veins. The close-up photography highlights the sculptural and high-tech organic look of the plant, set against a soft bokeh background of a greenhouse." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgv6_8zuof5ScLTCoZNCr6RYPnsVjEfkuvJoY9WzhQ1iicDmXvkpAWjAVRL75kA0jH6L_6q21chNqtYTYcJ4O8kudYJS-nIOKzOZ7YA3MufzrEwicxNiIh4dnEkb_erzBPuOWdp54Y1PCx41Qlz5TYKMa4mm65RBixpLzIUIsxrta8EfVY9WLFVW1jS9Oz2mRBoieSg1q_dCj8m69vKQLY-0at1i8fnUO7SgWPuZMpCP_SzZ4LmEztD-nlZOXxd6Dp84fhVVLxc_A"/>
+</div>
+<h4 class="font-headline-sm text-[18px] mb-1">Alocasia Polly</h4>
+<span class="font-body-md text-body-md text-on-surface-variant">$38.00</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-inverse-surface dark:bg-surface-container-highest mt-24">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-20 max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1">
+<h2 class="font-display-lg text-display-lg italic text-surface mb-6">Lumina Botanicals</h2>
+<p class="font-body-md text-body-md text-surface-variant max-w-xs">
+                    © 2024 Lumina Botanicals. Cultivating a greener future through precise horticulture.
+                </p>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-surface mb-6">Explore</h3>
+<ul class="space-y-4">
+<li><a class="text-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">About Us</a></li>
+<li><a class="text-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Shipping &amp; Returns</a></li>
+<li><a class="text-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Wholesale</a></li>
+</ul>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-surface mb-6">Impact</h3>
+<ul class="space-y-4">
+<li><a class="text-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Sustainability Report</a></li>
+<li><a class="text-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Carbon Neutral Shipping</a></li>
+<li><a class="text-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Privacy Policy</a></li>
+</ul>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-surface mb-6">Connect</h3>
+<div class="flex space-x-4 mb-8">
+<a class="w-10 h-10 rounded-full border border-surface-variant/30 flex items-center justify-center text-surface hover:border-primary-fixed transition-all" href="#">
+<span class="material-symbols-outlined">public</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-surface-variant/30 flex items-center justify-center text-surface hover:border-primary-fixed transition-all" href="#">
+<span class="material-symbols-outlined">mail</span>
+</a>
+</div>
+<div class="p-1 bg-surface/5 rounded-lg border border-surface-variant/10">
+<input class="bg-transparent border-none text-surface focus:ring-0 text-label-md w-full px-4" placeholder="Cultivation news..." type="email"/>
+</div>
+</div>
+</div>
+</footer>
+<!-- Micro-interactions Script -->
+<script>
+        // Smooth hover states for bento items already handled by CSS
+        // Simple click interaction for 'Notify' buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if(this.innerText.includes('Notify')) {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Processing...';
+                    this.classList.add('opacity-70');
+                    setTimeout(() => {
+                        this.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Alert Active';
+                        this.classList.remove('opacity-70');
+                        this.classList.replace('text-primary', 'text-secondary');
+                        this.classList.replace('border-primary', 'border-secondary');
+                    }, 1500);
+                }
+            });
+        });
+
+        // Sticky Nav logic - change opacity on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('header');
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-md');
+            } else {
+                nav.classList.remove('shadow-md');
+            }
+        });
+    </script>
+</body></html>

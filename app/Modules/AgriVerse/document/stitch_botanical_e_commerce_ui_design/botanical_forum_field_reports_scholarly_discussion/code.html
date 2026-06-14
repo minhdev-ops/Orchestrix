@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Botanicals | Community &amp; Field Reports</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #fcf9f8; /* background from config */
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-nav {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .bento-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(72, 103, 48, 0.08);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#eae7e7",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#c9eea9",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "tertiary-container": "#a19f99",
+                      "surface-container": "#f0eded",
+                      "secondary-container": "#fdaf7e",
+                      "inverse-surface": "#303030",
+                      "surface-dim": "#dcd9d9",
+                      "on-background": "#1b1c1c",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-container": "#784019",
+                      "on-primary-fixed": "#0b2000",
+                      "surface-bright": "#fcf9f8",
+                      "surface-container-low": "#f6f3f2",
+                      "primary-fixed-dim": "#aed18f",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#6e3811",
+                      "background": "#fcf9f8",
+                      "on-secondary-fixed": "#321300",
+                      "primary-container": "#87a96b",
+                      "on-tertiary-container": "#373632",
+                      "on-surface": "#1b1c1c",
+                      "on-primary-container": "#213d0b",
+                      "surface-variant": "#e4e2e1",
+                      "inverse-on-surface": "#f3f0f0",
+                      "inverse-primary": "#aed18f",
+                      "tertiary-fixed": "#e5e2db",
+                      "secondary-fixed-dim": "#ffb68a",
+                      "on-primary": "#ffffff",
+                      "surface": "#fcf9f8",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed-variant": "#314e1b",
+                      "surface-tint": "#486730",
+                      "surface-container-highest": "#e4e2e1",
+                      "outline": "#74796c",
+                      "secondary-fixed": "#ffdbc8",
+                      "on-tertiary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "on-surface-variant": "#43483d",
+                      "error-container": "#ffdad6",
+                      "primary": "#486730",
+                      "tertiary": "#5f5e59",
+                      "secondary": "#8b4f27",
+                      "outline-variant": "#c4c8ba",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "on-tertiary-fixed-variant": "#474742"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max": "1280px",
+                      "margin-mobile": "20px",
+                      "base": "8px",
+                      "margin-desktop": "64px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "label-md": ["Hanken Grotesk"],
+                      "display-lg": ["EB Garamond"],
+                      "body-lg": ["Hanken Grotesk"],
+                      "headline-sm": ["EB Garamond"],
+                      "display-lg-mobile": ["EB Garamond"],
+                      "caption": ["Hanken Grotesk"],
+                      "headline-md": ["EB Garamond"],
+                      "body-md": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                      "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="text-on-surface">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm dark:shadow-none docked full-width top-0 sticky z-50">
+<nav class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="font-display-lg text-headline-md text-primary dark:text-primary-fixed-dim">
+                Lumina Botanicals
+            </div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300 font-body-md text-body-md" href="#">Shop All</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300 font-body-md text-body-md" href="#">Rare Finds</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300 font-body-md text-body-md" href="#">Care Guides</a>
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1 font-bold font-body-md text-body-md" href="#">Community</a>
+</div>
+<div class="flex items-center space-x-4">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:opacity-80 transition-opacity">search</span>
+<span class="material-symbols-outlined text-primary cursor-pointer hover:opacity-80 transition-opacity">shopping_cart</span>
+<span class="material-symbols-outlined text-primary cursor-pointer hover:opacity-80 transition-opacity">person</span>
+</div>
+</nav>
+</header>
+<main class="max-w-container-max mx-auto px-margin-desktop py-12">
+<!-- Hero Section -->
+<section class="mb-20 text-center max-w-3xl mx-auto">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-6">The Expert Collective</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant italic mb-10">
+                A scholarly sanctuary for the cultivation of rare botanical knowledge and the preservation of heirloom species.
+            </p>
+<div class="flex justify-center gap-4">
+<button class="bg-primary text-on-primary px-8 py-3 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-all flex items-center gap-2">
+                    Submit Field Report
+                    <span class="material-symbols-outlined text-[18px]">publish</span>
+</button>
+<button class="border border-outline text-on-surface px-8 py-3 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-all">
+                    Browse Archives
+                </button>
+</div>
+</section>
+<!-- Field Reports Bento Grid -->
+<section class="mb-24">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Field Reports</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Live observations from our global network of stewards.</p>
+</div>
+<a class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline" href="#">
+                    View Gallery <span class="material-symbols-outlined">arrow_right_alt</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-[700px]">
+<!-- Main Featured Report -->
+<div class="md:col-span-2 md:row-span-2 relative overflow-hidden rounded-xl bg-surface-container group cursor-pointer bento-card shadow-sm">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A macro photography shot of a rare Monstera Deliciosa Albo Variegata leaf showcasing high-contrast white and deep emerald green patterns. The lighting is soft and natural, emphasizing the organic texture of the plant's surface. The background is a blurred, warm studio setting that maintains a premium, scholarly botanical feel with earthy tones and soft shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJBICNwBtyxjn9zdqWfzpOfGO_-ktmCExxnbxNJDXf6OG2a4nfr6TE17WdLcEJ57V0Txz1tOMTDr4VvieTwzfgR4A7I8S065omfYAw9NM2CAWfvP1CtRwA_pSY7mALR--V7YKaz56KdJLRt2MKzi2FM1HnQ4j5Ezguu2zHjJRoh_wUJcwO54y1k7A5FCMXRmNiMHKeOszIRQga8ddlSkhjvyL1juTK2vYqBfWHoG_FAIQK7e8F7oLcLFkuAAyRks8j7Nnstrah0fw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+<div class="absolute bottom-0 p-8 w-full">
+<div class="flex items-center gap-2 mb-3">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-[10px] uppercase tracking-wider">Verified Specimen</span>
+<span class="text-white/80 font-caption text-caption">2 hours ago</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-white mb-2">Monstera Albo: Sectoral Chimera Stability</h3>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold text-[10px]">EL</div>
+<span class="text-white font-label-md text-label-md">Dr. Elena Thorne</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim text-[16px]" style="font-variation-settings: 'FILL' 1;" title="Verified Steward">verified</span>
+</div>
+</div>
+</div>
+<!-- Secondary Report 1 -->
+<div class="md:col-span-2 md:row-span-1 relative overflow-hidden rounded-xl bg-surface-container group cursor-pointer bento-card shadow-sm">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Detailed macro shot of a rare forest fern showing the intricate spore patterns on the underside of a frond. The color palette is composed of rich forest greens and earthy terracottas. The lighting mimics a dappled forest floor, creating a serene and scientific mood consistent with a high-end botanical journal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-Vs-LI1J8EG4F8K3ioSUmeGCPm05JIp9gaqTgqik3gC6xkrg8AWwc-DudfcR6SBUuDROcN0pvpDCP3afyB3bSiM_LqAbbe0tTbwh7iyUpDas3OCDFSFGsjSB5SsVv5PSmDQ4mE_h4gdTmFp_xCnvRtRU1WxJViC6EdfKPYIKR2_tISoyjOTO0WFNYEUGqeQN-a3_OIVCAFQBxDVz7yE3WSvFJT7VC7XFbYu3e2sWMECwZ_ZO978hGGUeq3XFIOL3ctugU8TtqRvc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<div class="absolute bottom-0 p-6">
+<h3 class="font-headline-sm text-[20px] text-white">Spores and Symbiosis in Cyathea</h3>
+<span class="text-white/70 font-label-md text-label-md">By Marcus Vane</span>
+</div>
+</div>
+<!-- Secondary Report 2 -->
+<div class="md:col-span-1 md:row-span-1 relative overflow-hidden rounded-xl bg-surface-container group cursor-pointer bento-card shadow-sm">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A close-up of a rare desert cactus flower blooming at night, illuminated by a soft, cool artificial light that highlights the translucent white petals. The aesthetic is clean and minimal, focusing on the architectural beauty of the desert flora. Deep shadows provide a sense of mystery and scientific discovery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANfNTx8fg_T6OhhpW_F3j6L_7Bufhn0EoV03YnZueTu8bXDCUK9W4euSW52IQUR6E-AuspLRrPZF8KwoogG3m6ScmM1jKyVHB6ifyLApR9oBVPSBf5n_vW9UdVoe4qkLrTu79bESs0egMSatGRUCva_ryTL1he-yWimwp0TWYHGUyNPkbNFUavuOPDbWeSn_eWWN8BhEYDTqUfpe4VxK1IFJgnvVIfUBNtlpyFtFMPaBEXFI3MG4LKi9DW1SijJSeipKQFdvQgYmg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<div class="absolute bottom-0 p-4">
+<h3 class="font-headline-sm text-[16px] text-white">Nocturnal Anthesis Observations</h3>
+</div>
+</div>
+<!-- Secondary Report 3 -->
+<div class="md:col-span-1 md:row-span-1 relative overflow-hidden rounded-xl bg-surface-container group cursor-pointer bento-card shadow-sm">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A clean, scientific top-down view of soil samples and laboratory tools on a pale stone surface. Glass vials, a minimalist PH tester, and small sprigs of herbs are arranged in a precise, grid-like fashion. The lighting is high-key and bright, reflecting a professional laboratory setting within a botanical context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCONKXgidXi3hNcClksz1ALuBe8r4-n_nmYzF02owDM9hxvTEWEiYwHMJ6f3I8_kVSg0qP90iTUHMLXHGRC-fnVa-ecaEzp8CHc_LB3k7BVbfoCq-0rxq4EMn-e03oUH4D6fv5ZZToRoHWB_bRA1cHBb_HLdCOY991g4oFENhnuaxHvaknNbNewGjXgQc7bqb6_fvLbdNlxcI-pdRRkPgcJpZnPLyPxfxJsov8l8p-sxh2I7kLsy_wNmDuJYrFUQpYsJeGv_3UVEL0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<div class="absolute bottom-0 p-4">
+<h3 class="font-headline-sm text-[16px] text-white">Substrate Acidification Analysis</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- Scholarly Discussions & Sidebar -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+<!-- Discussions List -->
+<div class="lg:col-span-2">
+<div class="flex items-center gap-4 mb-8">
+<h2 class="font-headline-md text-headline-md text-on-surface">Scholarly Discussions</h2>
+<div class="h-px flex-grow bg-outline-variant"></div>
+</div>
+<div class="space-y-6">
+<!-- Discussion Item 1 -->
+<div class="p-6 bg-surface-container-lowest border border-outline/10 rounded-xl hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A professional headshot of an elderly botanist with a warm smile, wearing a canvas apron. The background is a blurred greenhouse filled with lush greenery. The lighting is natural and bright, conveying authority and approachability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCboW9d4L7MbSE9qCo6x2JhgsFtV7_pMi1UG47nXjch6GFIfAxENuDPCeNiKeitq0FCK6IKOxKYGqyiitGJ3_ZP_Ek-RVbuNtpjPOpSzqZVo2KcMg7i2tDm7nq42_gcIhiaV_STbqsnxv4pY4HZh-mQxfEI8WafDFbm_H8yXKc34fw-XqxJUxnVzW5o9OardqfxYTHAGk8MCEacN2cRKX6fRsaO8EQFPRHxog9zO3SCGukUiCxURxIeUtlQy7eKPNGvIUWVvgDnHLo"/>
+<div>
+<div class="flex items-center gap-1">
+<p class="font-label-md text-label-md text-on-surface">Prof. Julian Aris</p>
+<span class="material-symbols-outlined text-primary text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<p class="font-caption text-caption text-on-surface-variant">4 hours ago in <span class="text-secondary font-semibold">Technical Horticulture</span></p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full font-label-md text-[11px]">#SoilChemistry</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full font-label-md text-[11px]">#Mycorrhizae</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 group-hover:text-primary transition-colors">The role of Glomus mossae in orchid root respiration</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4">
+                            Recent longitudinal studies suggest that specific fungal symbionts may drastically alter the nitrogen uptake efficiency in epiphytic orchids under fluctuating humidity...
+                        </p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">forum</span> 42 replies
+                            </div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">thumb_up</span> 128 citations
+                            </div>
+</div>
+</div>
+<!-- Discussion Item 2 -->
+<div class="p-6 bg-surface-container-lowest border border-outline/10 rounded-xl hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed font-bold">SO</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Sarah O'Connell</p>
+<p class="font-caption text-caption text-on-surface-variant">10 hours ago in <span class="text-secondary font-semibold">Morphology</span></p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full font-label-md text-[11px]">#Variegation</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 group-hover:text-primary transition-colors">Spontaneous Reversion in Monstera Thai Constellation?</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4">
+                            I've noticed a significant reduction in speckled variegation on my 5-year-old specimen. Could lighting lux levels below 2000 be triggering a genetic safeguard?
+                        </p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">forum</span> 18 replies
+                            </div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">thumb_up</span> 54 citations
+                            </div>
+</div>
+</div>
+<!-- Discussion Item 3 -->
+<div class="p-6 bg-surface-container-lowest border border-outline/10 rounded-xl hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A portrait of a young woman with a focused expression, surrounded by rare botanical books and antique scientific instruments. The scene is lit by a soft desk lamp, creating a studious and intellectual atmosphere. The color palette emphasizes warm mahogany wood and deep sage green." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDF8LzRUYet43GWJ-bb80pCBmWOwGy4GFAzuDSuAiUF_DW9-byF2Cx7O6jrPviysDWpjPg_5B5vcRe2Wp60TwzY6jWDJK7JzJJxPuqoFFz_Kk3LdHMtB6b-h9ut-qGW-yDpYoPryhI0w26jN10pDu3aQHk7GkY80XPaQit7yyTKCy-hUIZ31uSq_0b6xCy-FqRSzeB_HwUa2IVIp4ma5InUxKt7aPNHIyKkPsNtBlTL4UVRsQZcc0o1BSCxxC0I99EAJnITUa2zhxk"/>
+<div>
+<div class="flex items-center gap-1">
+<p class="font-label-md text-label-md text-on-surface">Isabella Chen</p>
+<span class="material-symbols-outlined text-primary text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<p class="font-caption text-caption text-on-surface-variant">Yesterday in <span class="text-secondary font-semibold">Conservation</span></p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full font-label-md text-[11px]">#HeirloomSeeds</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full font-label-md text-[11px]">#Ethics</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 group-hover:text-primary transition-colors">The ethics of poaching in the rare houseplant trade</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4">
+                            As demand for rare Philodendrons surges, we must address the provenance of 'mother plants' appearing in domestic nurseries...
+                        </p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">forum</span> 89 replies
+                            </div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">thumb_up</span> 312 citations
+                            </div>
+</div>
+</div>
+</div>
+<div class="mt-12 text-center">
+<button class="font-label-md text-label-md text-primary border-b border-primary pb-1 hover:opacity-70 transition-opacity">Load More Discussions</button>
+</div>
+</div>
+<!-- Sidebar -->
+<aside class="space-y-10">
+<!-- Stewardship Board -->
+<div class="bg-surface-container-low p-8 rounded-xl border border-outline-variant">
+<h4 class="font-headline-sm text-[20px] text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">military_tech</span>
+                        Stewardship Council
+                    </h4>
+<div class="space-y-4">
+<div class="flex items-center gap-3 p-2 hover:bg-white/50 rounded-lg transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center font-bold">AT</div>
+<div class="flex-grow">
+<p class="font-label-md text-label-md">Arthur Thorne</p>
+<p class="text-[11px] font-caption text-on-surface-variant">Arborist Extraordinary</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div class="flex items-center gap-3 p-2 hover:bg-white/50 rounded-lg transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-white flex items-center justify-center font-bold">ML</div>
+<div class="flex-grow">
+<p class="font-label-md text-label-md">Maya Lin</p>
+<p class="text-[11px] font-caption text-on-surface-variant">Taxonomy Specialist</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div class="flex items-center gap-3 p-2 hover:bg-white/50 rounded-lg transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-tertiary-container text-white flex items-center justify-center font-bold">RK</div>
+<div class="flex-grow">
+<p class="font-label-md text-label-md">Robert Kim</p>
+<p class="text-[11px] font-caption text-on-surface-variant">Soil Micro-biologist</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<button class="w-full mt-6 py-3 border border-outline/30 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-white transition-all">Apply for Badge</button>
+</div>
+<!-- Technical Categories -->
+<div>
+<h4 class="font-headline-sm text-[20px] text-on-surface mb-6">Taxonomy Tags</h4>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed text-[12px] font-label-md rounded-full cursor-pointer hover:bg-secondary-fixed-dim transition-colors">#Aroids</span>
+<span class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed text-[12px] font-label-md rounded-full cursor-pointer hover:bg-secondary-fixed-dim transition-colors">#Lithophytes</span>
+<span class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed text-[12px] font-label-md rounded-full cursor-pointer hover:bg-secondary-fixed-dim transition-colors">#Speciation</span>
+<span class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed text-[12px] font-label-md rounded-full cursor-pointer hover:bg-secondary-fixed-dim transition-colors">#LED-Spectrums</span>
+<span class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed text-[12px] font-label-md rounded-full cursor-pointer hover:bg-secondary-fixed-dim transition-colors">#Hydroponics</span>
+<span class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed text-[12px] font-label-md rounded-full cursor-pointer hover:bg-secondary-fixed-dim transition-colors">#RareSeeds</span>
+</div>
+</div>
+<!-- Scholarly Resources -->
+<div class="p-8 rounded-xl bg-primary/5 border border-primary/20">
+<h4 class="font-headline-sm text-[20px] text-primary mb-4">Steward Resources</h4>
+<ul class="space-y-4">
+<li class="flex items-start gap-3 group cursor-pointer">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Whitepaper: Nitrogen fixation in urban climates</span>
+</li>
+<li class="flex items-start gap-3 group cursor-pointer">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Growth Rate Dataset 2024 (CSV)</span>
+</li>
+<li class="flex items-start gap-3 group cursor-pointer">
+<span class="material-symbols-outlined text-primary">library_books</span>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">The Digital Herbarium Guide</span>
+</li>
+</ul>
+</div>
+</aside>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-inverse-surface dark:bg-surface-container-lowest mt-20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-20 max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="font-display-lg text-headline-md text-inverse-on-surface dark:text-on-surface mb-6">
+                    Lumina Botanicals
+                </div>
+<p class="font-body-md text-body-md text-surface-variant opacity-80 mb-8">
+                    © 2024 Lumina Botanicals. Cultivating a greener future through precision horticulture.
+                </p>
+</div>
+<div>
+<h5 class="font-headline-sm text-headline-sm text-inverse-on-surface dark:text-on-surface mb-6">The Collective</h5>
+<ul class="space-y-3">
+<li><a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Our Story</a></li>
+<li><a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Scholarly Council</a></li>
+<li><a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Wholesale</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-headline-sm text-headline-sm text-inverse-on-surface dark:text-on-surface mb-6">Support</h5>
+<ul class="space-y-3">
+<li><a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Shipping &amp; Returns</a></li>
+<li><a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Privacy Policy</a></li>
+<li><a class="font-label-md text-label-md text-surface-variant opacity-80 hover:text-primary-fixed hover:opacity-100 transition-opacity" href="#">Contact Us</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-headline-sm text-headline-sm text-inverse-on-surface dark:text-on-surface mb-6">Journal</h5>
+<p class="font-body-md text-body-md text-surface-variant opacity-80 mb-4">Subscribe to our monthly botanical intelligence report.</p>
+<div class="flex">
+<input class="bg-white/10 border-none text-white rounded-l-lg focus:ring-1 focus:ring-primary-fixed w-full" placeholder="Email address" type="email"/>
+<button class="bg-primary-container text-on-primary-container px-4 rounded-r-lg font-bold">Join</button>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions for hovering and visual interest
+        document.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const img = card.querySelector('img');
+                if(img) img.style.transform = 'scale(1.08)';
+            });
+            card.addEventListener('mouseleave', () => {
+                const img = card.querySelector('img');
+                if(img) img.style.transform = 'scale(1)';
+            });
+        });
+
+        // Sticky Header transparency logic
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-md');
+                header.classList.replace('bg-surface/80', 'bg-surface/95');
+            } else {
+                header.classList.remove('shadow-md');
+                header.classList.replace('bg-surface/95', 'bg-surface/80');
+            }
+        });
+    </script>
+</body></html>

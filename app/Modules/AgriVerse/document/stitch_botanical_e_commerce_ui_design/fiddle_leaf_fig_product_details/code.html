@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fiddle Leaf Fig | Lumina Botanicals</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#a19f99",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#474742",
+                    "surface-container-highest": "#e4e2e1",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#aed18f",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f6f3f2",
+                    "surface-container": "#f0eded",
+                    "surface-bright": "#fcf9f8",
+                    "on-secondary-container": "#784019",
+                    "on-primary": "#ffffff",
+                    "surface": "#fcf9f8",
+                    "secondary-fixed": "#ffdbc8",
+                    "on-surface": "#1b1c1c",
+                    "surface-container-high": "#eae7e7",
+                    "primary-fixed": "#c9eea9",
+                    "on-error": "#ffffff",
+                    "background": "#fcf9f8",
+                    "tertiary-fixed": "#e5e2db",
+                    "inverse-on-surface": "#f3f0f0",
+                    "inverse-surface": "#303030",
+                    "surface-dim": "#dcd9d9",
+                    "secondary-container": "#fdaf7e",
+                    "surface-variant": "#e4e2e1",
+                    "on-secondary-fixed": "#321300",
+                    "surface-tint": "#486730",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#8b4f27",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-primary-fixed": "#0b2000",
+                    "on-primary-container": "#213d0b",
+                    "on-surface-variant": "#43483d",
+                    "on-secondary-fixed-variant": "#6e3811",
+                    "primary": "#486730",
+                    "inverse-primary": "#aed18f",
+                    "secondary-fixed-dim": "#ffb68a",
+                    "tertiary": "#5f5e59",
+                    "primary-container": "#87a96b",
+                    "error": "#ba1a1a",
+                    "outline": "#74796c",
+                    "outline-variant": "#c4c8ba",
+                    "on-background": "#1b1c1c",
+                    "on-tertiary-container": "#373632",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#314e1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "margin-desktop": "64px",
+                    "base": "8px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "caption": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "label-md": ["Hanken Grotesk"],
+                    "headline-sm": ["EB Garamond"],
+                    "display-lg-mobile": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "display-lg": ["EB Garamond"]
+            },
+            "fontSize": {
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fcf9f8; /* Surface/Background */
+        }
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(252, 249, 248, 0) 0%, rgba(252, 249, 248, 1) 100%);
+        }
+        /* Custom scrollbar for eco-aesthetic */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0eded; }
+        ::-webkit-scrollbar-thumb { background: #486730; border-radius: 10px; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex justify-between items-center h-20">
+<div class="font-headline-sm text-headline-sm text-primary italic">Lumina Botanicals</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1" href="#">Shop All</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Rare Finds</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Care Guides</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Sustainability</a>
+</nav>
+<div class="flex gap-4 items-center">
+<div class="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/30">
+<span class="material-symbols-outlined text-outline">search</span>
+<span class="ml-2 text-caption text-outline">Search species...</span>
+</div>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-primary/5 rounded-full transition-all cursor-pointer active:scale-95">shopping_cart</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-primary/5 rounded-full transition-all cursor-pointer active:scale-95">person</button>
+</div>
+</div>
+</header>
+<main class="pt-20">
+<!-- Hero Section: Immersive Imagery -->
+<section class="relative w-full h-[716px] md:h-[870px] overflow-hidden">
+<img alt="Fiddle Leaf Fig" class="w-full h-full object-cover object-center" data-alt="A grand, architectural Fiddle Leaf Fig plant stands majestically in a sun-drenched, minimalist living room. The large, sculptural green leaves have a rich, waxy texture and catch the soft, golden afternoon light coming through a nearby window. The setting is clean and high-end, with neutral sand-colored walls and polished light wood floors, reflecting a sophisticated, tranquil botanical gallery aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsMcRfEBjKFensD1T4JK2YASMA2nMcBqxbYbKcCDFovjuE2YQxSwQWsjRAEq3ziANWWIr-f2HKO9IzLxcKomuMW5qeCdKQNBKkXRlVxmCuo-xJVnzjTz4zpWD7bLvr0hv-RchvFPAuIxB3NdgcmB4IuWuGRPqmis4bf2Cj2gPqEEUn2QID-PDFF09ZUzwHE0eBsqPM2bln8R5pscTCbjc_g-yc9VUXAo9IhE-LW27UMgjeeDCwQxmf82iDDGTaYMJP_xBFNeyCf64"/>
+<div class="absolute inset-0 hero-gradient"></div>
+<div class="absolute bottom-0 left-0 w-full px-margin-mobile md:px-margin-desktop pb-12">
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-end gap-6">
+<div class="flex-1">
+<div class="flex gap-2 mb-4">
+<span class="px-3 py-1 bg-secondary-container/10 text-secondary text-caption rounded-full font-label-md">Rare Variety</span>
+<span class="px-3 py-1 bg-primary-container/10 text-primary text-caption rounded-full font-label-md">Ethically Sourced</span>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-2">Ficus Lyrata</h1>
+<p class="font-headline-sm text-headline-sm text-primary opacity-80 italic italic">The Fiddle Leaf Fig</p>
+</div>
+<div class="bg-surface-container-lowest/80 backdrop-blur-xl p-6 rounded-xl border border-white/50 shadow-sm md:w-80 w-full">
+<div class="flex justify-between items-center mb-4">
+<span class="text-caption font-label-md text-on-surface-variant uppercase tracking-widest">Pricing</span>
+<span class="font-headline-md text-headline-md text-primary">$185.00</span>
+</div>
+<p class="text-caption text-on-surface-variant mb-6">Carbon-neutral shipping included within the continental US.</p>
+<button class="w-full py-4 bg-primary text-on-primary rounded-lg font-label-md hover:bg-on-primary-fixed-variant transition-all cursor-pointer active:scale-95">Reserve Specimen</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Narrative & Details -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-20 grid grid-cols-1 md:grid-cols-12 gap-16">
+<div class="md:col-span-7">
+<h2 class="font-headline-md text-headline-md mb-8 text-on-surface">A Living Sculpture</h2>
+<div class="space-y-6 text-body-lg font-body-lg text-on-surface-variant leading-relaxed">
+<p>Celebrated for its dramatic, violin-shaped foliage, the Fiddle Leaf Fig is the quintessential statement piece for the modern interior. Our specimens are cultivated over 18 months in high-intensity natural light to ensure robust trunk development and deep, emerald pigmentation.</p>
+<p>Each plant is hand-selected by our master horticulturalists and shipped in our proprietary breathable Eco-Crate, ensuring your botanical arrives in pristine condition with zero plastic waste.</p>
+</div>
+<!-- Plant Care Bento Grid -->
+<div class="mt-16 grid grid-cols-2 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low p-8 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-all border border-transparent hover:border-outline-variant/30 hover:shadow-sm">
+<span class="material-symbols-outlined text-primary mb-4 text-4xl" style="font-variation-settings: 'FILL' 0;">light_mode</span>
+<h4 class="font-label-md text-label-md text-on-surface mb-2">Brightness</h4>
+<p class="text-caption text-on-surface-variant">Bright, indirect sunlight. Avoid direct afternoon sun.</p>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-all border border-transparent hover:border-outline-variant/30 hover:shadow-sm">
+<span class="material-symbols-outlined text-primary mb-4 text-4xl" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+<h4 class="font-label-md text-label-md text-on-surface mb-2">Hydration</h4>
+<p class="text-caption text-on-surface-variant">Water weekly. Allow top 2 inches of soil to dry.</p>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-all border border-transparent hover:border-outline-variant/30 hover:shadow-sm">
+<span class="material-symbols-outlined text-primary mb-4 text-4xl" style="font-variation-settings: 'FILL' 0;">humidity_mid</span>
+<h4 class="font-label-md text-label-md text-on-surface mb-2">Humidity</h4>
+<p class="text-caption text-on-surface-variant">Moderate to high. Mist leaves twice weekly.</p>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-all border border-transparent hover:border-outline-variant/30 hover:shadow-sm">
+<span class="material-symbols-outlined text-primary mb-4 text-4xl" style="font-variation-settings: 'FILL' 0;">pets</span>
+<h4 class="font-label-md text-label-md text-on-surface mb-2">Pet Safety</h4>
+<p class="text-caption text-on-surface-variant">Mildly toxic. Keep away from curious companions.</p>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-all border border-transparent hover:border-outline-variant/30 hover:shadow-sm">
+<span class="material-symbols-outlined text-primary mb-4 text-4xl" style="font-variation-settings: 'FILL' 0;">thermostat</span>
+<h4 class="font-label-md text-label-md text-on-surface mb-2">Temperature</h4>
+<p class="text-caption text-on-surface-variant">Stable 65°F–75°F. Keep away from drafts.</p>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-all border border-transparent hover:border-outline-variant/30 hover:shadow-sm">
+<span class="material-symbols-outlined text-primary mb-4 text-4xl" style="font-variation-settings: 'FILL' 0;">eco</span>
+<h4 class="font-label-md text-label-md text-on-surface mb-2">Pot Size</h4>
+<p class="text-caption text-on-surface-variant">Comes in a 10" sustainable terra-cotta vessel.</p>
+</div>
+</div>
+</div>
+<!-- Technical Specs & Side Info -->
+<div class="md:col-span-5 space-y-12">
+<div class="bg-white p-10 rounded-2xl border border-surface-container-high shadow-sm">
+<h3 class="font-headline-sm text-headline-sm mb-6">Growth Statistics</h3>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-on-surface">Hardiness</span>
+<span class="text-caption text-primary">High</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 85%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-on-surface">Growth Rate</span>
+<span class="text-caption text-primary">Moderate</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 55%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-on-surface">Air Purification</span>
+<span class="text-caption text-primary">Excellent</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 95%;"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-start gap-4 p-6 bg-secondary-container/5 rounded-xl border border-secondary/10">
+<span class="material-symbols-outlined text-secondary text-3xl">verified</span>
+<div>
+<h5 class="font-label-md text-secondary">Care Concierge Included</h5>
+<p class="text-caption text-on-secondary-fixed-variant mt-1">Unlock 24/7 access to our plant experts via text for the first 90 days. We're here to ensure your Lyrata thrives.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Customer Reviews -->
+<section class="bg-surface-container-low py-32">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+<div>
+<h2 class="font-display-lg-mobile md:font-headline-md text-display-lg-mobile md:text-headline-md mb-2">The Collector's Voice</h2>
+<div class="flex items-center gap-2">
+<div class="flex text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+<span class="font-label-md text-on-surface-variant">4.8 Average (124 Reviews)</span>
+</div>
+</div>
+<button class="px-8 py-3 border border-outline text-on-surface-variant rounded-lg font-label-md hover:bg-primary/5 transition-all">Write a Review</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap- gutter">
+<div class="bg-white p-8 rounded-2xl shadow-sm space-y-4">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-on-surface">Julian R.</span>
+<span class="text-caption text-outline">Verified Collector</span>
+</div>
+<p class="font-headline-sm text-headline-sm italic text-primary">"The centerpiece of my loft."</p>
+<p class="text-body-md text-on-surface-variant">The quality of the foliage was unlike anything I've seen in big-box stores. It arrived perfectly hydrated and has already sprouted two new leaves in a month.</p>
+</div>
+<div class="bg-white p-8 rounded-2xl shadow-sm space-y-4">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-on-surface">Elena M.</span>
+<span class="text-caption text-outline">Verified Collector</span>
+</div>
+<p class="font-headline-sm text-headline-sm italic text-primary">"Packaging was exceptional."</p>
+<p class="text-body-md text-on-surface-variant">I was nervous about shipping a plant of this size, but the Eco-Crate is a game changer. Zero soil spill and zero plastic waste to dispose of.</p>
+</div>
+<div class="bg-white p-8 rounded-2xl shadow-sm space-y-4">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-on-surface">Marcus T.</span>
+<span class="text-caption text-outline">Verified Collector</span>
+</div>
+<p class="font-headline-sm text-headline-sm italic text-primary">"Truly premium service."</p>
+<p class="text-body-md text-on-surface-variant">The care guide and concierge service have made taking care of this beauty so much easier. Worth every penny for the peace of mind.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Sticky Buy Bar (Desktop Only) -->
+<div class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl py-4 border-t border-outline-variant/30 transform translate-y-full transition-transform duration-300 z-40 hidden md:block" id="sticky-buy">
+<div class="max-w-container-max mx-auto px-margin-desktop flex justify-between items-center">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A close up thumbnail image of the vibrant green, violin-shaped leaves of a Fiddle Leaf Fig, showing its detailed veins and glossy surface in a bright, modern studio light setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLncUO__TKESWyhVpgoDKcw4P0hu5D-VfgDCraldLXy5gHjH2eU74d159Kc56YJynKA25R8XJcWwK916xO5MLcOnNt0S_ahz4LChWit3fnpgzrzdIeDhekpF-jCOu2mjWQv8W0OCeeOzmDSneikaEiPo8SZ3WGVw2lJYQPu4uP_wuD5Lb_1HkSOxE8-fILutu2hcQjDP9oWnG85y3hTF05Htw4glXV3AnQnB7lHb4dblAQ0yI3pkdiEEK8rdEIay8jorIzzMHo93Q"/>
+<div>
+<h4 class="font-label-md text-on-surface">Ficus Lyrata</h4>
+<p class="text-caption text-primary">$185.00</p>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-3 border border-primary text-primary rounded-lg font-label-md hover:bg-primary/5 transition-all">Add to Cart</button>
+<button class="px-12 py-3 bg-primary text-on-primary rounded-lg font-label-md hover:shadow-lg transition-all active:scale-95">Buy Now</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Shell -->
+<footer class="w-full py-20 mt-20 bg-surface-container dark:bg-inverse-surface">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="col-span-1 md:col-span-1">
+<div class="font-headline-sm text-headline-sm text-on-surface mb-6">Lumina Botanicals</div>
+<p class="font-caption text-caption text-on-surface-variant/80 leading-relaxed">© 2024 Lumina Botanicals. Cultivating a Greener Future. We believe in the restorative power of nature in the modern home.</p>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="font-label-md text-label-md text-primary">Legacy</h5>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-opacity" href="#">Sustainability Report</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-opacity" href="#">Ethical Sourcing</a>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="font-label-md text-label-md text-primary">Support</h5>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-opacity" href="#">Care Concierge</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-opacity" href="#">Shipping &amp; Returns</a>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="font-label-md text-label-md text-primary">Legal</h5>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-opacity" href="#">Privacy Policy</a>
+<div class="mt-4 flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">language</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">diversity_1</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for Sticky Buy Bar
+        window.onscroll = function() {
+            const buyBar = document.getElementById('sticky-buy');
+            if (window.scrollY > 800) {
+                buyBar.classList.remove('translate-y-full');
+            } else {
+                buyBar.classList.add('translate-y-full');
+            }
+        };
+
+        // Scroll Reveal Effect
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+            observer.observe(section);
+        });
+    </script>
+</body></html>

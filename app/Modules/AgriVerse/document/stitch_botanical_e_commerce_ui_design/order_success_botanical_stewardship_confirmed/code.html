@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Confirmed | Lumina Botanicals</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#fdaf7e",
+                      "outline": "#74796c",
+                      "on-primary-fixed-variant": "#314e1b",
+                      "surface-container-low": "#f6f3f2",
+                      "tertiary-container": "#a19f99",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-surface": "#1b1c1c",
+                      "on-primary-container": "#213d0b",
+                      "on-tertiary-fixed-variant": "#474742",
+                      "surface-container": "#f0eded",
+                      "on-background": "#1b1c1c",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "primary-fixed-dim": "#aed18f",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#0b2000",
+                      "on-tertiary": "#ffffff",
+                      "background": "#fcf9f8",
+                      "secondary-fixed-dim": "#ffb68a",
+                      "outline-variant": "#c4c8ba",
+                      "on-secondary-fixed": "#321300",
+                      "surface-tint": "#486730",
+                      "surface": "#fcf9f8",
+                      "on-tertiary-container": "#373632",
+                      "inverse-surface": "#303030",
+                      "error-container": "#ffdad6",
+                      "surface-container-highest": "#e4e2e1",
+                      "inverse-primary": "#aed18f",
+                      "surface-dim": "#dcd9d9",
+                      "tertiary": "#5f5e59",
+                      "primary-fixed": "#c9eea9",
+                      "on-secondary-container": "#784019",
+                      "surface-container-high": "#eae7e7",
+                      "secondary-fixed": "#ffdbc8",
+                      "error": "#ba1a1a",
+                      "secondary": "#8b4f27",
+                      "tertiary-fixed": "#e5e2db",
+                      "on-error": "#ffffff",
+                      "inverse-on-surface": "#f3f0f0",
+                      "surface-variant": "#e4e2e1",
+                      "primary": "#486730",
+                      "surface-bright": "#fcf9f8",
+                      "primary-container": "#87a96b",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#43483d",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "on-secondary-fixed-variant": "#6e3811"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "gutter": "24px",
+                      "base": "8px",
+                      "margin-desktop": "64px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Hanken Grotesk"],
+                      "caption": ["Hanken Grotesk"],
+                      "body-md": ["Hanken Grotesk"],
+                      "display-lg-mobile": ["EB Garamond"],
+                      "display-lg": ["EB Garamond"],
+                      "headline-sm": ["EB Garamond"],
+                      "headline-md": ["EB Garamond"],
+                      "label-md": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                      "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                      "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fcf9f8;
+            color: #1b1c1c;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .hero-gradient {
+            background: linear-gradient(180deg, rgba(252, 249, 248, 0) 0%, rgba(252, 249, 248, 1) 100%);
+        }
+    </style>
+</head>
+<body class="font-body-md antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md docked full-width top-0 sticky z-50 shadow-sm">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="font-display-lg text-display-lg italic text-on-surface dark:text-inverse-on-surface">Lumina Botanicals</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Shop All</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Rare Finds</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Care Guides</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Sustainability</a>
+</div>
+<div class="flex gap-6 items-center">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-all">shopping_bag</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-all">person</span>
+</div>
+</div>
+</nav>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12">
+<!-- Success Header -->
+<section class="text-center mb-20 animate-fade-in">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-container text-on-primary-container mb-6">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h1 class="font-display-lg text-display-lg mb-4">Your Botanical Journey Begins</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                Thank you for choosing Lumina Botanicals. We are currently preparing your specimens for transit from our climate-controlled conservatory.
+            </p>
+<div class="mt-8 flex flex-wrap justify-center gap-4">
+<div class="bg-white p-6 rounded-xl shadow-sm border border-outline-variant/30 text-left min-w-[240px]">
+<span class="font-label-md text-label-md text-outline block mb-1">ORDER NUMBER</span>
+<span class="font-headline-sm text-headline-sm text-primary">#LB-88201</span>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-outline-variant/30 text-left min-w-[240px]">
+<span class="font-label-md text-label-md text-outline block mb-1">TRACKING ID</span>
+<span class="font-headline-sm text-headline-sm text-secondary">LUM-77392011</span>
+</div>
+</div>
+</section>
+<!-- Bento Layout: Order Summary & Green Tech -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left: Order Summary (Card Style) -->
+<div class="lg:col-span-5 space-y-gutter">
+<div class="bg-white rounded-xl p-8 shadow-sm border border-outline-variant/20">
+<h2 class="font-headline-md text-headline-md mb-8">Order Summary</h2>
+<div class="space-y-6">
+<!-- Item 1 -->
+<div class="flex gap-6 items-center">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A lush, vibrant Fiddle Leaf Fig plant with broad, waxy green leaves standing elegantly in a minimalist white ceramic pot. The lighting is soft and natural, emphasizing the organic textures and rich verdant tones of the foliage. The aesthetic is high-end botanical photography, staged in a bright, airy modern interior with clean lines and a peaceful atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARt-zUmko311JQDRJfLnAdHxYfM8vCoZ7jdY_vTtYQXmJH58lbCyIjbJQZpZby3TKI_GO0c_MASnRhV56cpvHePpqLgpqbgP8aK3LwTLz3M7ybYwk5Sj0LXTRQHZyk-wkbMhyp7r-KA_Mm8BBfQ-c7pa9G9U0FuaOPFfM2R5xS7bFFsMzqKQauygtSzxTsWl84Tb2nbn25d7OrtpPJsRliKkBnhidIgy9dCe9nO3rloB5FxaEa2q7JGRZ_NROrkF35R5f9EpRuzAo"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline-sm text-headline-sm">Fiddle Leaf Fig</h3>
+<p class="font-body-md text-on-surface-variant italic">Ficus lyrata • Large</p>
+<p class="font-label-md text-label-md text-primary mt-1">$145.00</p>
+</div>
+</div>
+<div class="h-px bg-outline-variant/20"></div>
+<!-- Item 2 -->
+<div class="flex gap-6 items-center">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A rare Monstera Albo plant showing striking white and green variegated leaves with iconic fenestrations. The plant is meticulously groomed and presented against a soft sand-colored background that reflects a luxury greenhouse setting. The composition is balanced and scholarly, highlighting the scientific beauty of the rare mutation and the plant's healthy, vital condition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKYU3nmI4i5oTpf1_z0nrcxWL5hU0OfPKYiVc1bldICB6932PK3ZYPPdMvZ0SSMT4kW8mOrdNS7a-QcD-Hoj1s6ppB3u5J8GJ9STgKmwkSU5pgr4_8NGd_nLleew4nCCCY4DbF-mtOGFD2BkqalIvPBMYJ2u7khI2HZjA6g2BBINVBAlcov5c2ywJq8nY9uexIzs_coEwCvsDA9WtlwwCgTRFuCfMlfOF4oE-Pzh__aGaKXjbcsUGPd_naw93y1UYG10wa5GYW19A"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline-sm text-headline-sm">Monstera Albo</h3>
+<p class="font-body-md text-on-surface-variant italic">Variegata • Collector's Edition</p>
+<p class="font-label-md text-label-md text-primary mt-1">$320.00</p>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/40 space-y-2">
+<div class="flex justify-between font-body-md text-on-surface-variant">
+<span>Subtotal</span>
+<span>$465.00</span>
+</div>
+<div class="flex justify-between font-body-md text-on-surface-variant">
+<span>Boutique Shipping</span>
+<span>$25.00</span>
+</div>
+<div class="flex justify-between font-headline-sm text-headline-sm text-on-surface pt-4">
+<span>Total</span>
+<span>$490.00</span>
+</div>
+</div>
+</div>
+<!-- Shipping Details -->
+<div class="bg-surface-container rounded-xl p-8 border border-outline-variant/10">
+<h3 class="font-label-md text-label-md text-outline mb-4">DELIVERY DESTINATION</h3>
+<p class="font-body-lg text-body-lg">1280 Botanical Ave, Suite 400<br/>San Francisco, CA 94107</p>
+<div class="mt-6 flex gap-4">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+<p class="font-caption text-caption text-on-surface-variant">Estimated arrival: Oct 24 - Oct 26</p>
+</div>
+</div>
+</div>
+<!-- Right: Green Tech "Preparing Your Sanctuary" -->
+<div class="lg:col-span-7 bg-white rounded-xl shadow-sm border border-outline-variant/20 overflow-hidden relative">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="An expansive, high-tech glass greenhouse interior filled with a dense collection of tropical plants. The structure features precise architectural lines and automated climate control systems, bathed in soft, diffused morning sunlight. The color palette consists of deep forest greens, crisp whites, and warm terracotta tones, conveying a sense of scientific expertise and environmental stewardship." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx325fIzeIv9SmUIOYrLmzJcAjkH2iJXKYI3WYOa_LIWuZXZrr17SCEYv8Brfod-LVX_ve9Aoam1fgAhIxiT9BslLpaBpLx0saCHouRtGMkM5ZNyTJPHS4GzQxfSlBvw2t8FVBT6O3NOC2iuZyZfIz9sy0Nm2ozIk-nIVqq_1czhWlUxKbJEON1Se5edAhiIg6DDbATFb2SkmO93cPbne8TnUxf2Qb9ePsMndWaDBs8mXqEoydRUJMMKSZmCrVHpmy-VqLz1Gqagw"/>
+<div class="absolute inset-0 hero-gradient"></div>
+</div>
+<div class="p-8 md:p-12 -mt-12 relative z-10">
+<div class="flex items-center gap-3 mb-4">
+<div class="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-md text-label-md">GREEN TECH</div>
+<h2 class="font-headline-md text-headline-md">Preparing Your Sanctuary</h2>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 leading-relaxed">
+                        To ensure your new specimens thrive immediately upon arrival, we recommend following these precise technical acclimation protocols.
+                    </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Tech Step 1 -->
+<div class="group">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full border border-primary flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">light_mode</span>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface">LIGHT ACCLIMATION</h4>
+</div>
+<p class="font-body-md text-on-surface-variant">
+                                Prepare a space with 200-400 foot-candles (indirect bright light). Avoid direct South-facing exposure for the first 72 hours to prevent photosynthetic shock.
+                            </p>
+</div>
+<!-- Tech Step 2 -->
+<div class="group">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full border border-primary flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">thermostat</span>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface">THERMAL STABILITY</h4>
+</div>
+<p class="font-body-md text-on-surface-variant">
+                                Calibrate your room temperature between 65°F and 78°F. Ensure relative humidity is at least 50% for the Monstera Albo to prevent leaf-tip browning.
+                            </p>
+</div>
+<!-- Tech Step 3 -->
+<div class="group">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full border border-primary flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">water_drop</span>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface">SOIL PREPARATION</h4>
+</div>
+<p class="font-body-md text-on-surface-variant">
+                                Prepare a moisture-wicking substrate. We recommend a 3:1 ratio of orchid bark to perlite for optimal root aeration and scientific drainage.
+                            </p>
+</div>
+<!-- Tech Step 4 -->
+<div class="group">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full border border-primary flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">monitoring</span>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface">VITALITY MONITORING</h4>
+</div>
+<p class="font-body-md text-on-surface-variant">
+                                Download our digital care app. Use the provided tracking number to sync your plant's specific growth profile for automated care alerts.
+                            </p>
+</div>
+</div>
+<div class="mt-12 p-6 bg-surface-container-low rounded-lg border-l-4 border-primary">
+<p class="font-body-md text-on-surface-variant italic">
+                            "A plant's long-term health is determined in the first 48 hours of placement. Precision in preparation is the key to longevity." 
+                        </p>
+<p class="mt-2 font-label-md text-label-md text-primary">— Dr. Elena Vance, Lead Horticulturist</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Section -->
+<section class="mt-20 text-center pb-20">
+<h3 class="font-headline-sm text-headline-sm mb-6">Need assistance with your setup?</h3>
+<div class="flex flex-col md:flex-row gap-4 justify-center">
+<button class="bg-primary text-white px-8 py-4 rounded-full font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-all transform active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">menu_book</span>
+                    VIEW CARE GUIDES
+                </button>
+<button class="border border-on-surface text-on-surface px-8 py-4 rounded-full font-label-md text-label-md hover:bg-on-surface hover:text-white transition-all transform active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">support_agent</span>
+                    TALK TO A BOTANIST
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-inverse-surface dark:bg-surface-container-highest full-width">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-20 max-w-container-max mx-auto">
+<div class="md:col-span-1">
+<div class="font-display-lg text-display-lg italic text-surface dark:text-on-surface mb-6">Lumina</div>
+<p class="font-body-md text-surface-variant dark:text-on-surface-variant">
+                    Cultivating a greener future through precise horticulture and sustainable stewardship.
+                </p>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md text-label-md text-surface mb-2">COLLECTIONS</h4>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Rare Finds</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Shop All</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Sustainability Report</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md text-label-md text-surface mb-2">SUPPORT</h4>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Shipping &amp; Returns</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Contact</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Wholesale</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md text-label-md text-surface mb-2">LEGAL</h4>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Privacy Policy</a>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-primary-fixed transition-colors" href="#">Terms of Service</a>
+<div class="mt-4 flex gap-4">
+<span class="material-symbols-outlined text-surface-variant">language</span>
+<span class="material-symbols-outlined text-surface-variant">eco</span>
+</div>
+</div>
+</div>
+<div class="border-t border-surface-variant/10 max-w-container-max mx-auto py-8 px-margin-desktop">
+<p class="font-caption text-caption text-surface-variant dark:text-on-surface-variant text-center opacity-60">
+                © 2024 Lumina Botanicals. Cultivating a greener future through precise horticulture.
+            </p>
+</div>
+</footer>
+<script>
+        // Simple entrance animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.animate-fade-in');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.8s ease-out';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
+</body></html>
