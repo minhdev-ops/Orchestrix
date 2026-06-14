@@ -23,6 +23,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        if (auth()->user()->hasRole('admin')) {
+            return redirect()->route('admin.agriverse.dashboard');
+        }
+        return redirect()->route('agriverse.shop.home');
     }
 }

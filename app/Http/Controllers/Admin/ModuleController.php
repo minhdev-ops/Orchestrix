@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Store;
-use App\Models\Product;
 use App\Models\User;
-use App\Models\Order;
+use App\Modules\AgriVerse\Models\Store;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\Transaction;
+use App\Modules\AgriVerse\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
@@ -29,8 +31,16 @@ class ModuleController extends Controller
         $productsCount = Product::count();
         $usersCount = User::count();
         $ordersCount = Order::count();
+        $totalRevenue = Transaction::where('status', 'completed')->sum('amount');
+        $commissionEarned = Order::where('status', 'completed')->sum('commission_fee');
+        $pendingOrders = Order::where('status', 'pending')->count();
+        $reviewsCount = Review::count();
 
-        return view('admin.dashboard', compact('modules', 'storesCount', 'productsCount', 'usersCount', 'ordersCount'));
+        return view('admin.dashboard', compact(
+            'modules', 'storesCount', 'productsCount', 'usersCount',
+            'ordersCount', 'totalRevenue', 'commissionEarned',
+            'pendingOrders', 'reviewsCount'
+        ));
     }
 
     /**

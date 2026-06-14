@@ -16,6 +16,14 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $manager = app(ModuleManagerService::class);
+
+        $manager->registerModule('agriverse', [
+            'name' => 'AgriVerse',
+            'description' => 'AgriVerse Hub — quản lý cây cảnh bonsai, mô hình 3D, cửa hàng, đơn hàng, hợp đồng và AI scanning.',
+            'icon' => 'eco',
+        ]);
+
         if (class_exists(\Dedoc\Scramble\Scramble::class)) {
             \Dedoc\Scramble\Scramble::routes(function (\Illuminate\Routing\Route $route) {
                 $uri = $route->uri();

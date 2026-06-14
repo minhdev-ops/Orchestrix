@@ -264,5 +264,29 @@
 
         }
 
+        public function updateProfile(Request $request)
+        {
+            $user = $request->user();
+
+            $v = Validator::make($request->all(), [
+                'name' => 'sometimes|string|max:255',
+                'phone' => 'nullable|string|max:20',
+                'avatar' => 'nullable|string|max:255',
+                'bio' => 'nullable|string|max:1000',
+                'birthday' => 'nullable|date',
+                'gender' => 'nullable|string|in:male,female,other',
+            ]);
+
+            if ($v->fails()) {
+                return response(['error' => $v->errors()], 400);
+            }
+
+            $user->update($request->only([
+                'name', 'phone', 'avatar', 'bio', 'birthday', 'gender',
+            ]));
+
+            return response(['mes' => 'Profile updated successfully.', 'user' => $user]);
+        }
+
 
     }

@@ -62,14 +62,8 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'permissions' => $request->permissions,
+            'user_permissions' => $request->permissions,
+            'is_active' => true,
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'Nhân viên đã được tạo thành công.');
@@ -114,7 +108,7 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role = $request->role;
-        $user->permissions = $request->permissions;
+        $user->user_permissions = $request->permissions;
 
         if ($request->password) {
             $user->password = Hash::make($request->password);

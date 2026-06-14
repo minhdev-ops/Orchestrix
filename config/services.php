@@ -35,4 +35,37 @@ return [
         ],
     ],
 
+    'waqi' => [
+        'token' => env('WAQI'),
+        'base_url' => 'https://api.waqi.info',
+    ],
+
+    'ghn' => [
+        'token' => env('GHN_TOKEN'),
+        'shop_id' => env('GHN_SHOP_ID'),
+        'base_url' => env('GHN_BASE_URL', 'https://dev-online-gateway.ghn.vn/api/v2'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+    ],
+
+    'facebook' => [
+        'app_id' => env('FACEBOOK_APP_ID'),
+        'app_secret' => env('FACEBOOK_APP_SECRET'),
+    ],
+
+    'captcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
+    'ai_plant_doctor' => [
+        'provider' => env('AI_PLANT_DOCTOR_PROVIDER', 'gemini'),
+        'gemini_api_key' => env('AI_PLANT_DOCTOR_GEMINI_API_KEY'),
+        'gemini_model' => env('AI_PLANT_DOCTOR_GEMINI_MODEL', 'gemini-2.0-flash'),
+        'openai_api_key' => env('AI_PLANT_DOCTOR_OPENAI_API_KEY'),
+        'openai_model' => env('AI_PLANT_DOCTOR_OPENAI_MODEL', 'gpt-4o'),
+    ],
 ];

@@ -2,14 +2,16 @@
 
 use App\Http\Controllers\api\auth\SocialAuthController;
 use App\Http\Controllers\api\AuthController;
-use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\ThreeDAssetController;
-use App\Http\Controllers\Api\SubscriptionController;
-use App\Http\Controllers\Api\StoreController;
-use App\Http\Controllers\Api\SubscriptionPlanController;
+use App\Http\Controllers\Api\AdminPermissionController;
+
+use App\Modules\AgriVerse\Http\Controllers\Api\AuthBridgeController;
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+
+// Auth Bridge for JakartaEE token validation
+Route::post('auth/validate-token', [AuthBridgeController::class, 'validateToken']);
+Route::get('auth/public-key', [AuthBridgeController::class, 'publicKey']);
 Route::get('active/{email}/{key}', [AuthController::class, 'activeMail'])->name('active.mail');
 Route::get('re-active', [AuthController::class, 'reActive'])->name('reactive.mail');
 Route::post('forget-pass', [AuthController::class, 'forgetPass']);
@@ -19,39 +21,17 @@ Route::put('login/facebook', [SocialAuthController::class, 'checkFacebook'])->na
 
 Route::middleware('auth:api')->group(function () {
     Route::get('user/detail', [AuthController::class, 'show']);
+    Route::post('user/update', [AuthController::class, 'updateProfile']);
     Route::post('/change-pass', [AuthController::class, 'changePass']);
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::middleware('permission:product.view')->group(function () {
-        Route::get('products', [ProductController::class, 'index']);
-        Route::get('products/{product}', [ProductController::class, 'show']);
-    });
-    Route::post('products', [ProductController::class, 'store'])->middleware('permission:product.create');
-    Route::match(['put', 'patch'], 'products/{product}', [ProductController::class, 'update'])->middleware('permission:product.edit');
-    Route::delete('products/{product}', [ProductController::class, 'destroy'])->middleware('permission:product.delete');
-    Route::get('products/{product}/assets', [ThreeDAssetController::class, 'index']);
-
-    Route::middleware('permission:asset.view')->group(function () {
-        Route::get('assets', [ThreeDAssetController::class, 'index']);
-        Route::get('assets/{asset}', [ThreeDAssetController::class, 'show']);
-    });
-    Route::post('assets', [ThreeDAssetController::class, 'store'])->middleware('permission:asset.upload');
-    Route::match(['put', 'patch'], 'assets/{asset}', [ThreeDAssetController::class, 'update'])->middleware('permission:asset.edit');
-    Route::delete('assets/{asset}', [ThreeDAssetController::class, 'destroy'])->middleware('permission:asset.delete');
-    Route::post('assets/{asset}/compress', [ThreeDAssetController::class, 'compress'])->middleware('permission:asset.compress');
-
-    Route::get('subscriptions', [SubscriptionController::class, 'index'])->middleware('permission:subscription.view');
-    Route::get('subscriptions/{subscription}', [SubscriptionController::class, 'show'])->middleware('permission:subscription.view');
-    Route::post('subscriptions', [SubscriptionController::class, 'store'])->middleware('permission:subscription.create');
-    Route::post('subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->middleware('permission:subscription.edit');
-
-    Route::middleware('permission:store.view')->group(function () {
-        Route::get('stores', [StoreController::class, 'index']);
-        Route::get('stores/{store}', [StoreController::class, 'show']);
-    });
-
-    Route::middleware('permission:plan.view')->group(function () {
-        Route::get('subscription-plans', [SubscriptionPlanController::class, 'index']);
-        Route::get('subscription-plans/{plan}', [SubscriptionPlanController::class, 'show']);
+    // Admin Permission Management
+    Route::middleware('permission:admin.access')->prefix('admin')->group(function () {
+        Route::get('roles', [AdminPermissionController::class, 'roles']);
+        Route::get('permissions', [AdminPermissionController::class, 'permissions']);
+        Route::post('roles/assign', [AdminPermissionController::class, 'assignRoleToUser']);
+        Route::post('roles/remove', [AdminPermissionController::class, 'removeRoleFromUser']);
+        Route::post('permissions/sync', [AdminPermissionController::class, 'assignPermissionToRole']);
+        Route::get('users/{user}/permissions', [AdminPermissionController::class, 'userPermissions']);
     });
 });

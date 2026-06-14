@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bảng quản trị | Orchestrix</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
@@ -78,6 +78,26 @@
                     <span class="material-symbols-outlined icon">dashboard</span>
                     <span>Bảng điều khiển</span>
                 </a>
+                <a href="{{ route('admin.stores.index') }}"
+                    class="sidebar-link {{ Request::routeIs('admin.stores.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined icon">store</span>
+                    <span>Cửa hàng</span>
+                </a>
+                <a href="{{ route('admin.products.index') }}"
+                    class="sidebar-link {{ Request::routeIs('admin.products.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined icon">inventory_2</span>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="{{ route('admin.orders.index') }}"
+                    class="sidebar-link {{ Request::routeIs('admin.orders.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined icon">receipt_long</span>
+                    <span>Đơn hàng</span>
+                </a>
+                <a href="{{ route('admin.coupons.index') }}"
+                    class="sidebar-link {{ Request::routeIs('admin.coupons.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined icon">confirmation_number</span>
+                    <span>Mã giảm giá</span>
+                </a>
                 <a href="{{ route('admin.users.index') }}"
                     class="sidebar-link {{ Request::routeIs('admin.users.*') ? 'active' : '' }}">
                     <span class="material-symbols-outlined icon">group</span>
@@ -88,26 +108,21 @@
                     <span class="material-symbols-outlined icon">settings</span>
                     <span>Cài đặt</span>
                 </a>
+                <a href="{{ route('admin.reports.revenue') }}"
+                    class="sidebar-link {{ Request::routeIs('admin.reports.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined icon">bar_chart</span>
+                    <span>Báo cáo</span>
+                </a>
+                <a href="{{ route('admin.modules.index') }}"
+                    class="sidebar-link {{ Request::routeIs('admin.modules.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined icon">extension</span>
+                    <span>Module</span>
+                </a>
 
-                <div class="px-3 py-2 pt-6">
-                    <span class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider opacity-50">AgriVerse</span>
-                </div>
-
-                <a href="#" class="sidebar-link">
-                    <span class="material-symbols-outlined icon">store</span>
-                    <span>Cửa hàng</span>
-                </a>
-                <a href="#" class="sidebar-link">
-                    <span class="material-symbols-outlined icon">inventory_2</span>
-                    <span>Sản phẩm</span>
-                </a>
-                <a href="#" class="sidebar-link">
-                    <span class="material-symbols-outlined icon">view_in_ar</span>
-                    <span>3D Assets</span>
-                </a>
-                <a href="#" class="sidebar-link">
-                    <span class="material-symbols-outlined icon">subscriptions</span>
-                    <span>Gói thuê bao</span>
+                <a href="{{ route('admin.agriverse.dashboard') }}"
+                    class="sidebar-link {{ Request::routeIs('admin.agriverse.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined icon">eco</span>
+                    <span>AgriVerse</span>
                 </a>
             </nav>
 

@@ -8,9 +8,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\ThreeDAsset;
+use App\Modules\AgriVerse\Models\Subscription;
+use App\Modules\AgriVerse\Models\Store;
+use App\Modules\AgriVerse\Models\Order;
 
 class User extends Authenticatable
 {
@@ -58,8 +62,12 @@ class User extends Authenticatable
         'profile_info',
         'key',
         'keyTime',
+        'user_permissions',
         'last_login_at',
         'ip_address',
+        'seller_type',
+        'seller_verified_at',
+        'notification_preferences',
     ];
 
     /**
@@ -95,6 +103,7 @@ class User extends Authenticatable
             'settings' => 'array',
             'metadata' => 'array',
             'profile_info' => 'array',
+            'notification_preferences' => 'array',
             'keyTime' => 'datetime',
         ];
     }
@@ -119,29 +128,48 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        // Default implementation - override in child classes
-        // or use a trait/spatie-laravel-permission for complex roles
         return $this->role === 'admin';
     }
 
     /**
-     * Check if the user has a specific role.
+     * Check if the user has a specific role, checking both the Spatie roles
+     * relationship and the legacy string role column.
      *
-     * This method provides a flexible role-checking mechanism
-     * that can be adapted to different role storage strategies.
-     *
-     * @param string|array $role
+     * @param string|array|\Spatie\Permission\Models\Role|\Illuminate\Support\Collection $role
+     * @param string|null $guard
      * @return bool
      */
-    public function hasRole($role): bool
+    public function hasRole($role, ?string $guard = null): bool
     {
+        $this->loadMissing('roles');
+
+        // Check Spatie roles relationship
+        if ($role instanceof \Spatie\Permission\Models\Role) {
+            return $this->roles->contains($role->getKeyName(), $role->getKey());
+        }
+
+        if ($role instanceof \Illuminate\Support\Collection) {
+            return $role->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        }
+
+        if (is_string($role)) {
+            $hasSpatieRole = $guard
+                ? $this->roles->where('guard_name', $guard)->contains('name', $role)
+                : $this->roles->contains('name', $role);
+
+            if ($hasSpatieRole) {
+                return true;
+            }
+
+            return $this->role === $role;
+        }
+
         if (is_array($role)) {
-            // Convert string to array for comparison if needed
             $userRoles = is_array($this->role) ? $this->role : [$this->role];
             return !! array_intersect($userRoles, $role);
         }
-        
-        return $this->role === $role;
+
+        return false;
     }
 
     /**
@@ -255,7 +283,7 @@ class User extends Authenticatable
      */
     public function getRouteKeyName()
     {
-        return 'uuid';
+        return 'id';
     }
 
     public function products()

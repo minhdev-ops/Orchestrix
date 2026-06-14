@@ -18,8 +18,7 @@ class CheckAdminRole
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || !Auth::user()->hasRole('admin')) {
-            // If not admin, redirect to home with error message
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
             return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập trang quản trị.');
         }
 

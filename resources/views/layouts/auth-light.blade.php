@@ -13,7 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @routes
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         :root {
@@ -101,7 +102,7 @@
 <body class="antialiased min-h-screen flex items-center justify-center p-6 bg-[#FDFDFF]">
     <div class="tech-grid"></div>
     
-    {{-- High-quality React background mount --}}
+    {{-- Auth Atmosphere Vue background --}}
     <div id="auth-atmosphere-root" class="fixed inset-0 pointer-events-none z-[-1]"></div>
 
     <main class="w-full max-w-[420px] relative">

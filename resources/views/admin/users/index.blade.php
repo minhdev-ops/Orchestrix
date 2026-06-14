@@ -55,8 +55,8 @@
                     </td>
                     <td class="px-8 py-6">
                         <div class="flex flex-wrap gap-2">
-                            @if($user->permissions)
-                                @foreach($user->permissions as $perm)
+                            @if($user->user_permissions)
+                                @foreach($user->user_permissions as $perm)
                                 <span class="px-2 py-0.5 bg-primary/5 text-primary text-[9px] font-bold uppercase rounded border border-primary/10">
                                     {{ $perm }}
                                 </span>

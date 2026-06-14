@@ -3,45 +3,93 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Modules\AgriVerse\Models\Cart;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
     use AuthenticatesUsers;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
     protected function redirectTo()
     {
-        // Check if user is admin
-        if (Auth::check() && Auth::user()->hasRole('admin')) {
-            return '/admin'; // Admin dashboard
+        if (Auth::check()) {
+            $user = Auth::user();
+            return match ($user->role) {
+                'admin' => '/admin/agriverse',
+                'seller' => '/admin/agriverse',
+                'employee' => '/admin/agriverse',
+                default => '/agriverse',
+            };
         }
-
-        // For regular users (tenants), redirect to public dashboard or home
-        return '/home';
+        return '/agriverse';
     }
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
+    protected function authenticated(Request $request, $user)
+    {
+        $sessionId = session()->getId();
+
+        DB::transaction(function () use ($user, $sessionId) {
+            $guestItems = Cart::where('session_id', $sessionId)->whereNull('user_id')->get();
+
+            foreach ($guestItems as $guestItem) {
+                $existing = Cart::withTrashed()
+                    ->where('user_id', $user->id)
+                    ->where('product_id', $guestItem->product_id)
+                    ->first();
+
+                if ($existing) {
+                    if ($existing->trashed()) {
+                        $existing->restore();
+                        $existing->increment('quantity', $guestItem->quantity);
+                    } else {
+                        $existing->increment('quantity', $guestItem->quantity);
+                    }
+                    $guestItem->delete();
+                } else {
+                    $guestItem->update(['user_id' => $user->id, 'session_id' => null]);
+                }
+            }
+        });
+
+        try {
+            $token = $user->createToken('web')->accessToken;
+            session()->flash('api_token', $token);
+        } catch (\Exception $e) {
+            // Passport may not be configured for this user
+        }
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            $error = 'Tài khoản hoặc mật khẩu chưa đúng';
+        } elseif (!$user->is_active) {
+            $error = 'Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email.';
+        } else {
+            $error = 'Thông tin đăng nhập không đúng';
+        }
+
+        if ($request->header('X-Inertia')) {
+            return Inertia::render('Auth/Login', [
+                'errors' => [
+                    'email' => [$error],
+                ],
+            ]);
+        }
+
+        throw ValidationException::withMessages([
+            $this->username() => [$error],
+        ]);
+    }
+
     public function __construct()
     {
         $this->middleware('guest')->except('logout');

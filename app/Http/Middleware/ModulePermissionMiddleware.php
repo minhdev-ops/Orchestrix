@@ -18,7 +18,7 @@ class ModulePermissionMiddleware
         }
 
         // Kiểm tra quyền cụ thể trong JSON permissions
-        $permissions = $user->permissions ?? [];
+        $permissions = $user->user_permissions ?? [];
         $requiredPermission = $module . '.manage';
 
         if (in_array($requiredPermission, $permissions)) {

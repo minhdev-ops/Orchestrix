@@ -8,19 +8,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Simple Admin Check Placeholder
-        // In a real application, you would check for:
-        // if (!auth()->check() || !auth()->user()->is_admin) { ... }
-
-        // For this modular demonstration, we allow access but log it.
-        // You can add a password check or full Laravel Breeze/Jetstream here.
+        if (!auth()->check() || !auth()->user()->hasRole('admin')) {
+            abort(403, 'Unauthorized.');
+        }
 
         return $next($request);
     }

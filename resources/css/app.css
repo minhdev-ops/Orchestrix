@@ -1,54 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
 @import 'tailwindcss';
 
+@import '../../app/Modules/AgriVerse/Resources/css/index.css';
+
 @source '../../resources/js/**/*.jsx';
 @source '../../resources/js/**/*.js';
+@source '../../resources/js/**/*.vue';
+@source '../../Modules/**/*.vue';
 
 @theme {
-    /* Material 3 Design Tokens (Extended) - Sapphire Harmony Light */
-    --color-primary: #0052ff;
+    --color-primary-50: #ecfdf5;
+    --color-primary-100: #d1fae5;
+    --color-primary-200: #a7f3d0;
+    --color-primary-300: #6ee7b7;
+    --color-primary-400: #34d399;
+    --color-primary-500: #0D7C5E;
+    --color-primary-600: #0A654C;
+    --color-primary-700: #07503B;
+    --color-primary-800: #053C2B;
+    --color-primary-900: #03281D;
+    --color-primary: #0D7C5E;
     --color-on-primary: #ffffff;
-    --color-primary-container: #dee1ff;
-    --color-on-primary-container: #001452;
 
-    --color-secondary: #006d3e;
+    --color-secondary-50: #FFF7ED;
+    --color-secondary-100: #FFEDD5;
+    --color-secondary-200: #FED7AA;
+    --color-secondary-300: #FDBA74;
+    --color-secondary-400: #FB923C;
+    --color-secondary-500: #C8674A;
+    --color-secondary-600: #A6523B;
+    --color-secondary-700: #853F2D;
+    --color-secondary-800: #642D20;
+    --color-secondary-900: #431D14;
+    --color-secondary: #C8674A;
     --color-on-secondary: #ffffff;
-    --color-secondary-container: #6ff9a9;
-    --color-on-secondary-container: #00210f;
 
-    --primary: #0052ff;
-    --on-primary: #ffffff;
-    --secondary: #4f46e5;
-    --tertiary: #10b981;
-    --error: #ef4444;
+    --color-accent: #C8923E;
 
-    /* Surface Philosophy: Tonal Layering */
-    --surface: #fbf9fb;
-    --surface-container-lowest: #ffffff;
-    --surface-container-low: #f5f3f6;
-    --surface-container: #efedf0;
-    --surface-container-high: #e9e7ea;
-    --surface-container-highest: #e3e2e5;
+    --color-success: #0D7C5E;
+    --color-warning: #C8923E;
+    --color-danger: #BE123C;
+    --color-info: #0E7490;
 
-    --color-surface: var(--surface);
-    --color-surface-container-lowest: var(--surface-container-lowest);
-    --color-surface-container-low: var(--surface-container-low);
-    --color-surface-container: var(--surface-container);
-    --color-surface-container-high: var(--surface-container-high);
-    --color-surface-container-highest: var(--surface-container-highest);
+    --primary: #0D7C5E;
+    --secondary: #C8674A;
+    --accent: #C8923E;
+    --error: #BE123C;
 
-    --on-surface: #1b1c1e;
-    --on-surface-variant: #434656;
-    --color-on-surface: var(--on-surface);
-    --color-on-surface-variant: var(--on-surface-variant);
+    --color-surface: #FAF8F5;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #F5F2ED;
+    --color-surface-container: #F0EDE8;
+    --color-surface-container-high: #EBE7E1;
+    --color-surface-container-highest: #E5E0DA;
+    --color-on-surface: #1C1917;
+    --color-on-surface-variant: #5C5855;
 
-    --outline: #c3c5d9;
-    --outline-variant: #e3e2e5;
-    --color-outline: var(--outline);
-    --color-outline-variant: var(--outline-variant);
+    --color-outline: #D4CFC9;
+    --color-outline-variant: #E7E2DC;
 
-    --color-error: #ba1a1a;
+    --color-error: #BE123C;
     --color-on-error: #ffffff;
 
     /* Typography */
@@ -58,11 +70,11 @@
     --font-sans: 'Inter', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-    /* Shadows & Effects */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.03), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(28 25 23 / 0.04);
+    --shadow-md: 0 4px 12px -2px rgb(28 25 23 / 0.06);
+    --shadow-lg: 0 12px 32px -8px rgb(28 25 23 / 0.08);
+    --shadow-xl: 0 24px 48px -12px rgb(28 25 23 / 0.12);
 }
 
 h1,
