@@ -22,6 +22,7 @@ use App\Modules\AgriVerse\Http\Controllers\Api\PlantDoctorController;
 use App\Modules\AgriVerse\Http\Controllers\Api\SellerDashboardController;
 use App\Modules\AgriVerse\Http\Controllers\Api\ChatController;
 use App\Modules\AgriVerse\Http\Controllers\Api\ForumController;
+use App\Modules\AgriVerse\Http\Controllers\Api\AnalyticsController;
 
 Route::middleware(['api', 'auth:api'])->prefix('api')->group(function () {
     // Products
@@ -172,6 +173,13 @@ Route::middleware(['api', 'auth:api'])->prefix('api')->group(function () {
         Route::get('groups/{group}/messages', [ChatController::class, 'groupMessages']);
         Route::post('groups/{group}/messages', [ChatController::class, 'sendGroupMessage']);
     });
+
+    // Analytics
+    Route::post('analytics/track', [AnalyticsController::class, 'track']);
+    Route::post('analytics/page-view', [AnalyticsController::class, 'pageView']);
+    Route::post('analytics/product-view/{product}', [AnalyticsController::class, 'productView']);
+    Route::post('analytics/add-to-cart', [AnalyticsController::class, 'addToCart']);
+    Route::get('analytics/recently-viewed', [AnalyticsController::class, 'recentlyViewed']);
 
     // Forum
     Route::prefix('forum')->group(function () {

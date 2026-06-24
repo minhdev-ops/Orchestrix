@@ -1,0 +1,19 @@
+{
+  "name": "orchestrix-3d-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "3D Asset Optimization Pipeline for Orchestrix - Draco compression and GLB/GLTF processing",
+  "scripts": {
+    "optimize": "node optimize-3d.js",
+    "batch": "node batch-optimize.js",
+    "watch": "node watch-assets.js"
+  },
+  "dependencies": {
+    "@gltf-transform/core": "^4.1.0",
+    "@gltf-transform/functions": "^4.1.0",
+    "draco3d": "^1.5.7",
+    "globby": "^14.1.0",
+    "chokidar": "^4.0.3"
+  }
+}

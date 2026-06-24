@@ -43,6 +43,15 @@ Route::post('/register', [WebAuthController::class, 'register']);
 Route::post('/auth/google', [\App\Http\Controllers\Auth\SocialAuthController::class, 'google'])->name('social.google');
 Route::post('/auth/facebook', [\App\Http\Controllers\Auth\SocialAuthController::class, 'facebook'])->name('social.facebook');
 
+// Email Verification
+require __DIR__ . '/verification.php';
+
+// SEO (sitemap, robots.txt)
+require __DIR__ . '/seo.php';
+
+// Push Notifications
+require __DIR__ . '/push_notifications.php';
+
 // Home Route — role-based redirect
 Route::get('/', function () {
     if (auth()->check()) {

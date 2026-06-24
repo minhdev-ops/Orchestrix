@@ -16,7 +16,7 @@ class Product extends Model
         'price', 'compare_price', 'category', 'tags',
         'status', 'is_featured', 'technical_specs', 'metadata', 'stock',
         'model_3d_path', 'manufacturer_id', 'product_type_id',
-        'reject_reason',
+        'reject_reason', 'seo_title', 'seo_description', 'seo_keywords',
     ];
 
     protected $appends = ['model_3d_url'];
@@ -111,6 +111,11 @@ class Product extends Model
         return $this->belongsToMany(Category::class, 'category_product');
     }
 
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
     public function reviews()
     {
         return $this->hasMany(Review::class);
@@ -134,6 +139,23 @@ class Product extends Model
     public function scopeInStock($query)
     {
         return $query->where('stock', '>', 0);
+    }
+
+    public function getHasVariantsAttribute(): bool
+    {
+        return $this->variants()->active()->exists();
+    }
+
+    public function getMinPriceAttribute(): float
+    {
+        $minVariant = $this->variants()->active()->min('price');
+        return $minVariant ?? $this->price;
+    }
+
+    public function getMaxPriceAttribute(): float
+    {
+        $maxVariant = $this->variants()->active()->max('price');
+        return $maxVariant ?? $this->price;
     }
 
     public function getModel3dUrlAttribute()

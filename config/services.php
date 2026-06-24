@@ -68,4 +68,9 @@ return [
         'openai_api_key' => env('AI_PLANT_DOCTOR_OPENAI_API_KEY'),
         'openai_model' => env('AI_PLANT_DOCTOR_OPENAI_MODEL', 'gpt-4o'),
     ],
+
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'credentials' => env('FIREBASE_CREDENTIALS', ''),
+    ],
 ];

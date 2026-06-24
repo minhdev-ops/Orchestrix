@@ -20,6 +20,7 @@ use App\Modules\AgriVerse\Http\Controllers\Admin\ForumCategoryController;
 use App\Modules\AgriVerse\Http\Controllers\Admin\FileController;
 use App\Modules\AgriVerse\Http\Controllers\Admin\SellerController;
 use App\Modules\AgriVerse\Http\Controllers\Admin\ChatGroupController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\BackupController;
 
 Route::middleware(['auth', 'checkAdmin'])->prefix('admin/agriverse')->name('admin.agriverse.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -143,4 +144,10 @@ Route::middleware(['auth', 'checkAdmin'])->prefix('admin/agriverse')->name('admi
     Route::post('chat-groups/{group}/approve-member/{user}', [ChatGroupController::class, 'approveMember'])->name('chat-groups.approve-member');
     Route::post('chat-groups/{group}/reject-member/{user}', [ChatGroupController::class, 'rejectMember'])->name('chat-groups.reject-member');
     Route::delete('chat-groups/{group}', [ChatGroupController::class, 'destroy'])->name('chat-groups.destroy');
+
+    // Backups
+    Route::get('backups', [BackupController::class, 'index'])->name('backups.index');
+    Route::post('backups', [BackupController::class, 'store'])->name('backups.store');
+    Route::delete('backups', [BackupController::class, 'destroy'])->name('backups.destroy');
+    Route::get('backups/stats', [BackupController::class, 'stats'])->name('backups.stats');
 });

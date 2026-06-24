@@ -68,6 +68,7 @@ class User extends Authenticatable
         'seller_type',
         'seller_verified_at',
         'notification_preferences',
+        'two_factor_enabled_at',
     ];
 
     /**
@@ -94,6 +95,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_secret' => 'string',
             'two_factor_recovery_codes' => 'array',
+            'two_factor_enabled_at' => 'datetime',
             'is_active' => 'boolean',
             'role' => 'string',
             'last_login_at' => 'datetime',

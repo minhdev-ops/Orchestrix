@@ -1,0 +1,267 @@
+openapi: 3.0.3
+info:
+  title: AgriVerse API
+  description: |
+    AgriVerse - Sàn thương mại điện tử nông nghiệp
+    
+    ## Authentication
+    Tất cả requests đều cần header: `Authorization: Bearer {token}`
+    
+    ## Rate Limiting
+    - API: 60 requests/phút
+    - Login: 5 attempts/15 phút
+    
+    ## Response Format
+    ```json
+    {
+        "success": true,
+        "message": "...",
+        "data": {}
+    }
+    ```
+  version: 1.0.0
+  contact:
+    name: AgriVerse Support
+    email: support@agriverse.vn
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local Development
+  - url: https://api.agriverse.vn/api/v1
+    description: Production
+
+tags:
+  - name: Products
+    description: Quản lý sản phẩm
+  - name: Orders
+    description: Quản lý đơn hàng
+  - name: Cart
+    description: Giỏ hàng
+  - name: Categories
+    description: Danh mục
+  - name: Auth
+    description: Xác thực
+
+paths:
+  /products:
+    get:
+      tags: [Products]
+      summary: Danh sách sản phẩm
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Tìm kiếm theo tên
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Lọc theo danh mục
+        - name: min_price
+          in: query
+          schema:
+            type: number
+        - name: max_price
+          in: query
+          schema:
+            type: number
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [price_asc, price_desc, newest, popular]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductList'
+
+    post:
+      tags: [Products]
+      summary: Tạo sản phẩm mới
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreate'
+      responses:
+        '201':
+          description: Created
+        '422':
+          description: Validation error
+
+  /products/{id}:
+    get:
+      tags: [Products]
+      summary: Chi tiết sản phẩm
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Not found
+
+  /orders:
+    get:
+      tags: [Orders]
+      summary: Danh sách đơn hàng
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, delivered, completed, cancelled]
+      responses:
+        '200':
+          description: Success
+
+    post:
+      tags: [Orders]
+      summary: Tạo đơn hàng
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+                shipping_address:
+                  type: string
+                notes:
+                  type: string
+              required: [product_id, quantity, shipping_address]
+      responses:
+        '201':
+          description: Created
+
+  /orders/{id}/cancel:
+    post:
+      tags: [Orders]
+      summary: Hủy đơn hàng
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+
+  /cart:
+    get:
+      tags: [Cart]
+      summary: Xem giỏ hàng
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+
+    post:
+      tags: [Cart]
+      summary: Thêm vào giỏ hàng
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+                  default: 1
+              required: [product_id]
+      responses:
+        '200':
+          description: Added
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+        stock:
+          type: integer
+        image:
+          type: string
+        description:
+          type: string
+
+    ProductList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        meta:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            last_page:
+              type: integer
+            per_page:
+              type: integer
+            total:
+              type: integer
+
+    ProductCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stock:
+          type: integer
+        category_ids:
+          type: array
+          items:
+            type: integer
+      required: [name, price]

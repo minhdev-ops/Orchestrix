@@ -21,6 +21,9 @@ use App\Modules\AgriVerse\Http\Controllers\Shop\SellerReviewController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\ChatController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\ForumController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\AirQualityController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\PaymentController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\TwoFactorController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\AffiliateController;
 
 Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
     // Home
@@ -108,6 +111,30 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
 
         // Seller reviews
         Route::get('seller/reviews', [SellerReviewController::class, 'index'])->name('seller.reviews.index');
+
+        // Payment
+        Route::get('thanh-toan/{order}', [PaymentController::class, 'index'])->name('payment.index');
+        Route::post('thanh-toan/{order}/process', [PaymentController::class, 'process'])->name('payment.process');
+        Route::get('thanh-toan/{order}/vnpay-callback', [PaymentController::class, 'vnpayCallback'])->name('payment.vnpay-callback');
+        Route::post('thanh-toan/{order}/vnpay-ipn', [PaymentController::class, 'vnpayIpn'])->name('payment.vnpay-ipn');
+        Route::get('thanh-toan/{order}/momo-callback', [PaymentController::class, 'momoCallback'])->name('payment.momo-callback');
+        Route::post('thanh-toan/{order}/momo-ipn', [PaymentController::class, 'momoIpn'])->name('payment.momo-ipn');
+        Route::get('thanh-toan/{order}/chuyen-khoan', [PaymentController::class, 'banking'])->name('payment.banking');
+        Route::post('thanh-toan/{order}/upload-proof', [PaymentController::class, 'uploadProof'])->name('payment.upload-proof');
+
+        // Affiliate
+        Route::get('affiliate', [AffiliateController::class, 'index'])->name('affiliate.index');
+        Route::post('affiliate/register', [AffiliateController::class, 'register'])->name('affiliate.register');
+        Route::get('affiliate/link', [AffiliateController::class, 'getLink'])->name('affiliate.link');
+        Route::get('affiliate/stats', [AffiliateController::class, 'stats'])->name('affiliate.stats');
+
+        // Two-Factor Authentication
+        Route::get('cai-dat/2fa', [TwoFactorController::class, 'index'])->name('2fa.index');
+        Route::post('cai-dat/2fa/setup', [TwoFactorController::class, 'setup'])->name('2fa.setup');
+        Route::post('cai-dat/2fa/enable', [TwoFactorController::class, 'enable'])->name('2fa.enable');
+        Route::post('cai-dat/2fa/disable', [TwoFactorController::class, 'disable'])->name('2fa.disable');
+        Route::post('cai-dat/2fa/regenerate-recovery', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('2fa.regenerate-recovery');
+        Route::post('cai-dat/2fa/verify-login', [TwoFactorController::class, 'verifyLogin'])->name('2fa.verify-login');
 
         // Seller orders
         Route::get('seller/orders', [SellerOrderController::class, 'index'])->name('seller.orders.index');

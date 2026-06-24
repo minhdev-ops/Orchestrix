@@ -10,10 +10,10 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'transaction_id', 'order_id', 'user_id',
+        'transaction_id', 'gateway_transaction_id', 'order_id', 'user_id',
         'amount', 'commission_fee', 'seller_amount',
         'payment_method', 'payment_status',
-        'payment_proof', 'notes', 'paid_at',
+        'payment_proof', 'gateway_response', 'notes', 'failure_reason', 'paid_at',
     ];
 
     protected function casts(): array
@@ -22,6 +22,7 @@ class Transaction extends Model
             'amount' => 'decimal:2',
             'commission_fee' => 'decimal:2',
             'seller_amount' => 'decimal:2',
+            'gateway_response' => 'array',
             'paid_at' => 'datetime',
         ];
     }

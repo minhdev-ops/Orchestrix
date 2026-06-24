@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             HandleInertiaRequests::class,
+            \App\Modules\AgriVerse\Http\Middleware\SeoMiddleware::class,
         ]);
         $middleware->alias([
             'admin' => AdminMiddleware::class,
@@ -31,6 +32,8 @@ return Application::configure(basePath: dirname(__DIR__))
         'permission' => \App\Http\Middleware\CheckPermission::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'ckfinder.auth' => \App\Http\Middleware\CustomCKFinderAuth::class,
+        'api.rate_limit' => \App\Modules\AgriVerse\Http\Middleware\ApiRateLimit::class,
+        'seo' => \App\Modules\AgriVerse\Http\Middleware\SeoMiddleware::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'ckfinder/*',
