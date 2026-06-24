@@ -1,4 +1,4 @@
-name: Deploy Orchestrix
+name: Orchestrix
 
 on:
   push:
