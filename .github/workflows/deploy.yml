@@ -13,6 +13,11 @@ jobs:
      name: VPS
 
     steps:
+      - name: Debug Secrets
+        run: |
+          echo "HOST=${{ secrets.VPS_HOST }}"
+          echo "USER=${{ secrets.VPS_USER }}"
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
 
