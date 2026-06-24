@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-     name: Configure VPS
+     name: VPS
 
     steps:
       - name: Deploy to VPS
