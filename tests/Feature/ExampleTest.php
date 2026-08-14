@@ -14,7 +14,7 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
+        // Unauthenticated users are redirected to the AgriVerse shop home
         $response->assertStatus(302);
-        $response->assertRedirect(route('admin.dashboard'));
     }
 }

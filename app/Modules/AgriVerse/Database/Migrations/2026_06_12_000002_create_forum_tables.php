@@ -35,6 +35,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('post_id')->constrained('forum_posts')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('parent_id')->nullable()->constrained('forum_comments')->cascadeOnDelete();
             $table->text('content');
             $table->timestamps();
         });

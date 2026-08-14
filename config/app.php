@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://localhost'),
 
     /*
     |--------------------------------------------------------------------------
@@ -94,6 +94,8 @@ return [
     | are secure. You should do this prior to deploying the application.
     |
     */
+
+    'admin_ip_whitelist' => env('ADMIN_IP_WHITELIST', ''),
 
     'cipher' => 'AES-256-CBC',
 

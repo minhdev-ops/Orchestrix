@@ -2,11 +2,12 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Category;
 use App\Modules\AgriVerse\Models\DigitalPassportLog;
+use App\Modules\AgriVerse\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ProductController
 {
@@ -38,6 +39,7 @@ class ProductController
     public function create()
     {
         $categories = Category::active()->get();
+
         return Inertia::render('Admin/Products/Form', [
             'product' => null,
             'categories' => $categories,
@@ -57,7 +59,7 @@ class ProductController
             'stock' => 'required|integer|min:0',
         ]);
 
-        $validated['user_id'] = auth()->id();
+        $validated['user_id'] = $request->input('user_id', auth()->id());
 
         Product::create($validated);
 
@@ -65,8 +67,9 @@ class ProductController
             ->with('success', 'Sản phẩm đã được tạo.');
     }
 
-    public function show(Product $product)
+    public function show($id)
     {
+        $product = Product::findOrFail($id);
         $product->load(['store', 'user', 'categories', 'images', 'reviews.user']);
 
         return Inertia::render('Admin/Products/Show', [
@@ -74,17 +77,20 @@ class ProductController
         ]);
     }
 
-    public function edit(Product $product)
+    public function edit($id)
     {
+        $product = Product::findOrFail($id);
         $categories = Category::active()->get();
+
         return Inertia::render('Admin/Products/Form', [
             'product' => $product,
             'categories' => $categories,
         ]);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
+        $product = Product::findOrFail($id);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -102,24 +108,28 @@ class ProductController
             ->with('success', 'Sản phẩm đã được cập nhật.');
     }
 
-    public function destroy(Product $product)
+    public function destroy($id)
     {
+        $product = Product::findOrFail($id);
         $product->delete();
 
         return redirect()->route('admin.agriverse.products.index')
             ->with('success', 'Sản phẩm đã được xóa.');
     }
 
-    public function upload3dModel(Request $request, Product $product)
+    public function upload3dModel(Request $request, $id)
     {
+        $product = Product::findOrFail($id);
         $request->validate([
             'model' => 'required|file|mimes:glb,gltf,zip|max:51200',
         ]);
 
-        $path = $request->file('model')->store('3d-models', 'public');
+        $userId = auth()->id();
+        $filename = uniqid().'_'.$request->file('model')->getClientOriginalName();
+        $path = $request->file('model')->storeAs("users/{$userId}/products/{$product->id}", $filename, 'public');
 
         if ($product->model_3d_path) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->model_3d_path);
+            Storage::disk('public')->delete($product->model_3d_path);
         }
 
         $product->update(['model_3d_path' => $path]);
@@ -128,10 +138,11 @@ class ProductController
             ->with('success', 'Mô hình 3D đã được tải lên.');
     }
 
-    public function delete3dModel(Product $product)
+    public function delete3dModel($id)
     {
+        $product = Product::findOrFail($id);
         if ($product->model_3d_path) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->model_3d_path);
+            Storage::disk('public')->delete($product->model_3d_path);
             $product->update(['model_3d_path' => null]);
         }
 
@@ -139,8 +150,9 @@ class ProductController
             ->with('success', 'Mô hình 3D đã được xóa.');
     }
 
-    public function approve(Product $product)
+    public function approve($id)
     {
+        $product = Product::findOrFail($id);
         $product->update([
             'status' => 'published',
             'reject_reason' => null,
@@ -160,8 +172,9 @@ class ProductController
             ->with('success', 'Sản phẩm đã được duyệt.');
     }
 
-    public function reject(Request $request, Product $product)
+    public function reject(Request $request, $id)
     {
+        $product = Product::findOrFail($id);
         $validated = $request->validate([
             'reject_reason' => 'required|string|max:1000',
         ]);

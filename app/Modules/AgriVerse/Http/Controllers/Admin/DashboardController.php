@@ -2,14 +2,13 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
+use App\Models\User;
+use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\Store;
+use App\Modules\AgriVerse\Models\Transaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Store;
-use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Models\Order;
-use App\Modules\AgriVerse\Models\Transaction;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController
 {

@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Modules\AgriVerse\Models\District;
+use App\Modules\AgriVerse\Models\Province;
+use App\Modules\AgriVerse\Models\Ward;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Http;
-use App\Modules\AgriVerse\Models\Province;
-use App\Modules\AgriVerse\Models\District;
-use App\Modules\AgriVerse\Models\Ward;
 
 class GhnAddressSeeder extends Seeder
 {
@@ -15,9 +15,10 @@ class GhnAddressSeeder extends Seeder
         $this->command?->info('Seeding provinces, districts, wards from open API...');
 
         $response = Http::get('https://provinces.open-api.vn/api/p/');
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             $this->command?->warn('Failed to fetch provinces from API, using fallback data.');
             $this->seedFallbackProvinces();
+
             return;
         }
 
@@ -141,10 +142,10 @@ class GhnAddressSeeder extends Seeder
         foreach ($fallback as $p) {
             Province::updateOrCreate(
                 ['province_id' => $p['code']],
-                ['province_name' => $p['name'], 'code' => 'province_' . $p['code']]
+                ['province_name' => $p['name'], 'code' => 'province_'.$p['code']]
             );
         }
 
-        $this->command?->info('Seeded ' . count($fallback) . ' provinces (fallback). Districts and wards not seeded in fallback mode — run with API access for full data.');
+        $this->command?->info('Seeded '.count($fallback).' provinces (fallback). Districts and wards not seeded in fallback mode — run with API access for full data.');
     }
 }

@@ -32,7 +32,7 @@ class AIPlantDoctorService
         $apiKey = config('services.ai_plant_doctor.gemini_api_key');
         $model = config('services.ai_plant_doctor.gemini_model', 'gemini-2.0-flash');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             throw new \RuntimeException('Gemini API key not configured (AI_PLANT_DOCTOR_GEMINI_API_KEY)');
         }
 
@@ -60,9 +60,9 @@ class AIPlantDoctorService
             ]
         );
 
-        if (!$response->successful()) {
-            Log::error('Gemini API error: ' . $response->body());
-            throw new \RuntimeException('Gemini API request failed: ' . $response->status());
+        if (! $response->successful()) {
+            Log::error('Gemini API error: '.$response->body());
+            throw new \RuntimeException('Gemini API request failed: '.$response->status());
         }
 
         $body = $response->json();
@@ -76,7 +76,7 @@ class AIPlantDoctorService
         $apiKey = config('services.ai_plant_doctor.openai_api_key');
         $model = config('services.ai_plant_doctor.openai_model', 'gpt-4o');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             throw new \RuntimeException('OpenAI API key not configured (AI_PLANT_DOCTOR_OPENAI_API_KEY)');
         }
 
@@ -105,9 +105,9 @@ class AIPlantDoctorService
             ]
         );
 
-        if (!$response->successful()) {
-            Log::error('OpenAI API error: ' . $response->body());
-            throw new \RuntimeException('OpenAI API request failed: ' . $response->status());
+        if (! $response->successful()) {
+            Log::error('OpenAI API error: '.$response->body());
+            throw new \RuntimeException('OpenAI API request failed: '.$response->status());
         }
 
         $body = $response->json();
@@ -151,8 +151,9 @@ PROMPT;
     {
         $parsed = json_decode($text, true);
 
-        if (!$parsed || !isset($parsed['disease_name'])) {
+        if (! $parsed || ! isset($parsed['disease_name'])) {
             Log::warning("AI Plant Doctor: Failed to parse {$provider} response", ['text' => $text]);
+
             return [
                 'plant_name' => null,
                 'disease_name' => 'Không thể phân tích',

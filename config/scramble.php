@@ -21,15 +21,31 @@ return [
     'export_path' => 'api.json',
 
     'info' => [
-        /*
-         * API version.
-         */
-        'version' => env('API_VERSION', '0.0.1'),
+        'version' => env('API_VERSION', '1.0.0'),
+        'description' => 'Orchestrix/AgriVerse API — Nen tang thuong mai dien tu, cong dong va AI cho cay canh bonsai.
 
-        /*
-         * Description rendered on the home page of the API documentation (`/docs/api`).
-         */
-        'description' => '',
+## Endpoints chinh:
+- **Authentication** — `/api/auth/*` (Login, Register, Social)
+- **Products** — `/api/products/*` (CRUD, tim kiem, loc)
+- **Cart/Checkout** — `/api/cart/*`, `/api/checkout/*`
+- **Orders** — `/api/orders/*` (Order management)
+- **Forum** — `/api/forum/*` (Bai viet, binh luan)
+- **Chat** — `/api/chat/*` (Real-time messaging)
+- **AI** — `/api/plant-doctor/*`, `/api/scans/*` (Plant diagnosis, AI scanning)
+- **Digital Passport** — `/api/passport/*` (Product provenance)
+- **3D/AR** — `/api/3d-assets/*` (3D model management)
+- **Notifications** — `/api/notifications/*` (Push notifications)
+- **Subscriptions** — `/api/subscriptions/*`
+- **Analytics** — `/api/analytics/*` (Seller/Admin stats)
+
+## Authentication:
+Su dung Bearer token (Passport OAuth). 
+Dang nhap: `POST /api/auth/login` -> nhan access_token.
+Gan token vao header: `Authorization: Bearer {access_token}`',
+    ],
+
+    'servers' => [
+        'Local' => env('APP_URL', 'http://localhost'),
     ],
 
     /*

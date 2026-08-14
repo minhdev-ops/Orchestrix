@@ -2,27 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\Store;
+use App\Modules\AgriVerse\Models\Subscription;
+use App\Modules\AgriVerse\Models\ThreeDAsset;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Laravel\Passport\Contracts\OAuthenticatable as OAuthenticatableContract;
 use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
-use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Models\ThreeDAsset;
-use App\Modules\AgriVerse\Models\Subscription;
-use App\Modules\AgriVerse\Models\Store;
-use App\Modules\AgriVerse\Models\Order;
 
-class User extends Authenticatable
+class User extends Authenticatable implements OAuthenticatableContract
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, SoftDeletes;
 
     public const ROLE_ADMIN = 'admin';
+
     public const ROLE_SELLER = 'seller';
+
     public const ROLE_EMPLOYEE = 'employee';
+
     public const ROLE_BUYER = 'buyer';
 
     public static array $roles = [
@@ -34,7 +40,7 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
-     * 
+     *
      * These include core authentication fields plus commonly used
      * profile and status fields that can be utilized across projects.
      * Project-specific fields can be added in extended models.
@@ -65,6 +71,7 @@ class User extends Authenticatable
         'user_permissions',
         'last_login_at',
         'ip_address',
+        'fb',
         'seller_type',
         'seller_verified_at',
         'notification_preferences',
@@ -106,27 +113,24 @@ class User extends Authenticatable
             'metadata' => 'array',
             'profile_info' => 'array',
             'notification_preferences' => 'array',
+            'user_permissions' => 'array',
             'keyTime' => 'datetime',
         ];
     }
 
     /**
      * Check if the user has verified their email address.
-     *
-     * @return bool
      */
     public function hasVerifiedEmail(): bool
     {
-        return !is_null($this->email_verified_at);
+        return ! is_null($this->email_verified_at);
     }
 
     /**
      * Check if the user is an administrator.
-     * 
+     *
      * This method provides a hook for role-based authorization
      * that can be overridden in project-specific implementations.
-     *
-     * @return bool
      */
     public function isAdmin(): bool
     {
@@ -137,20 +141,18 @@ class User extends Authenticatable
      * Check if the user has a specific role, checking both the Spatie roles
      * relationship and the legacy string role column.
      *
-     * @param string|array|\Spatie\Permission\Models\Role|\Illuminate\Support\Collection $role
-     * @param string|null $guard
-     * @return bool
+     * @param  string|array|Role|Collection  $role
      */
     public function hasRole($role, ?string $guard = null): bool
     {
         $this->loadMissing('roles');
 
         // Check Spatie roles relationship
-        if ($role instanceof \Spatie\Permission\Models\Role) {
+        if ($role instanceof Role) {
             return $this->roles->contains($role->getKeyName(), $role->getKey());
         }
 
-        if ($role instanceof \Illuminate\Support\Collection) {
+        if ($role instanceof Collection) {
             return $role->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
         }
 
@@ -168,7 +170,8 @@ class User extends Authenticatable
 
         if (is_array($role)) {
             $userRoles = is_array($this->role) ? $this->role : [$this->role];
-            return !! array_intersect($userRoles, $role);
+
+            return (bool) array_intersect($userRoles, $role);
         }
 
         return false;
@@ -176,8 +179,6 @@ class User extends Authenticatable
 
     /**
      * Check if the user account is active.
-     *
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -186,11 +187,8 @@ class User extends Authenticatable
 
     /**
      * Record a successful login for the user.
-     *
-     * @param string $ipAddress
-     * @return void
      */
-    public function recordLogin(string $ipAddress = null): void
+    public function recordLogin(?string $ipAddress = null): void
     {
         $this->update([
             'last_login_at' => now(),
@@ -202,39 +200,33 @@ class User extends Authenticatable
 
     /**
      * Record a failed login attempt for the user.
-     *
-     * @param int $maxAttempts
-     * @param int $lockoutMinutes
-     * @return void
      */
     public function recordFailedLogin(int $maxAttempts = 5, int $lockoutMinutes = 15): void
     {
         $attempts = $this->failed_login_attempts + 1;
-        
+
         $updateData = ['failed_login_attempts' => $attempts];
-        
+
         if ($attempts >= $maxAttempts) {
             $updateData['locked_until'] = now()->addMinutes($lockoutMinutes);
         }
-        
+
         $this->update($updateData);
     }
 
     /**
      * Check if the user account is locked due to too many failed login attempts.
-     *
-     * @return bool
      */
     public function isLocked(): bool
     {
-        return !is_null($this->locked_until) && $this->locked_until->isFuture();
+        return ! is_null($this->locked_until) && $this->locked_until->isFuture();
     }
 
     /**
      * Scope a query to only include active users.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @return Builder
      */
     public function scopeActive($query)
     {
@@ -244,8 +236,8 @@ class User extends Authenticatable
     /**
      * Scope a query to only include inactive users.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @return Builder
      */
     public function scopeInactive($query)
     {
@@ -255,8 +247,8 @@ class User extends Authenticatable
     /**
      * Scope a query to only include locked users.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @return Builder
      */
     public function scopeLocked($query)
     {
@@ -273,7 +265,7 @@ class User extends Authenticatable
     {
         static::creating(function ($user) {
             if (empty($user->uuid)) {
-                $user->uuid = (string) \Illuminate\Support\Str::uuid();
+                $user->uuid = (string) Str::uuid();
             }
         });
     }

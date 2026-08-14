@@ -15,4 +15,8 @@ class SustainabilityReport extends Model
         'title', 'description', 'hero_image_url', 'quote', 'quote_author',
         'ethical_description', 'circular_description',
     ];
+
+    protected $casts = [
+        'year' => 'integer',
+    ];
 }

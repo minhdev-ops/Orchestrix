@@ -15,7 +15,7 @@
             <td class="p-3 font-medium text-stone-800">{{ b.title || '—' }}</td>
             <td class="p-3 text-stone-500 max-w-[120px] truncate">{{ b.link_url || '—' }}</td>
             <td class="p-3 text-stone-500">{{ b.sort_order }}</td>
-            <td class="p-3"><button @click="toggleActive(b)" class="text-xs px-2 py-1 rounded-full font-semibold" :class="b.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-stone-100 text-stone-500'">{{ b.is_active ? 'Bật' : 'Tắt' }}</button></td>
+            <td class="p-3"><button @click="toggleActive(b)" class="text-xs px-2 py-1 rounded-full font-semibold" :class="b.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-stone-100 text-stone-600'">{{ b.is_active ? 'Bật' : 'Tắt' }}</button></td>
             <td class="p-3 text-[10px] text-stone-500">{{ formatDateRange(b.starts_at, b.expires_at) }}</td>
             <td class="p-3 text-right">
               <button @click="openEdit(b)" class="text-emerald-600 hover:text-emerald-800 mr-2">Sửa</button>

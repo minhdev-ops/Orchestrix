@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\File;
+
 class ModuleManagerService
 {
     protected array $modules = [];
@@ -18,7 +20,7 @@ class ModuleManagerService
 
     public function getAllModules(): array
     {
-        $config = json_decode(\Illuminate\Support\Facades\File::get(base_path('modules.json')), true);
+        $config = json_decode(File::get(base_path('modules.json')), true);
         $result = [];
 
         foreach ($this->modules as $key => $module) {
@@ -34,7 +36,8 @@ class ModuleManagerService
     public function getActiveModules(): array
     {
         $all = $this->getAllModules();
-        return array_filter($all, fn($m) => $m['enabled']);
+
+        return array_filter($all, fn ($m) => $m['enabled']);
     }
 
     public function getModule(string $key): ?array

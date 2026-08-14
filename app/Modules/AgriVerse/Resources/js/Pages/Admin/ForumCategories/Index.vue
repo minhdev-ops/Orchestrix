@@ -48,7 +48,7 @@
             <td class="p-3 text-stone-400 font-mono">{{ c.slug }}</td>
             <td class="p-3 text-stone-500 max-w-[200px] truncate">{{ c.description || '—' }}</td>
             <td class="p-3 text-stone-500">{{ c.posts_count }}</td>
-            <td class="p-3"><span class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold" :class="c.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-stone-100 text-stone-400'">{{ c.is_active ? 'Hoạt động' : 'Ẩn' }}</span></td>
+            <td class="p-3"><span class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold" :class="c.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-stone-100 text-stone-500'">{{ c.is_active ? 'Hoạt động' : 'Ẩn' }}</span></td>
             <td class="p-3 text-right whitespace-nowrap">
               <button @click="edit(c)" class="text-sky-600 hover:text-sky-800 mr-2">Sửa</button>
               <button @click="destroy(c.id)" class="text-red-500 hover:text-red-700">Xóa</button>

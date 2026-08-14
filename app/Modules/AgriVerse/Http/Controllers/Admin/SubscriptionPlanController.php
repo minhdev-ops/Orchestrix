@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
+use App\Modules\AgriVerse\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\SubscriptionPlan;
 
 class SubscriptionPlanController
 {

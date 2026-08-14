@@ -3,9 +3,9 @@
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
 use App\Modules\AgriVerse\Models\ForumCategory;
-use App\Modules\AgriVerse\Models\ForumPost;
 use App\Modules\AgriVerse\Models\ForumComment;
 use App\Modules\AgriVerse\Models\ForumLike;
+use App\Modules\AgriVerse\Models\ForumPost;
 use App\Modules\AgriVerse\Services\ForumService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,9 +36,10 @@ class ForumController
         }
 
         if ($request->has('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', "%{$request->search}%")
-                  ->orWhere('content', 'like', "%{$request->search}%");
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
 
@@ -51,7 +52,7 @@ class ForumController
 
     public function show(ForumPost $post): JsonResponse
     {
-        if ($post->status !== 'approved' && auth()->id() !== $post->user_id && !auth()->user()->hasRole('admin')) {
+        if ($post->status !== 'approved' && auth()->id() !== $post->user_id && ! auth()->user()->hasRole('admin')) {
             return response()->json(['error' => 'Post not found'], 404);
         }
 
@@ -83,7 +84,7 @@ class ForumController
 
     public function update(Request $request, ForumPost $post): JsonResponse
     {
-        if (auth()->id() !== $post->user_id && !auth()->user()->hasRole('admin')) {
+        if (auth()->id() !== $post->user_id && ! auth()->user()->hasRole('admin')) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
 
@@ -104,7 +105,7 @@ class ForumController
 
     public function destroy(ForumPost $post): JsonResponse
     {
-        if (auth()->id() !== $post->user_id && !auth()->user()->hasRole('admin')) {
+        if (auth()->id() !== $post->user_id && ! auth()->user()->hasRole('admin')) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
 

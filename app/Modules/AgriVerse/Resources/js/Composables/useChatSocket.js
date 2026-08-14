@@ -1,3 +1,4 @@
+// TODO: Move host/port/path to env vars instead of hardcoding
 import { ref, onBeforeUnmount } from 'vue';
 import { getApiToken } from '../services/api';
 
@@ -18,8 +19,8 @@ export function useChatSocket() {
 
     try {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.hostname;
-      const socket = new WebSocket(`${protocol}//${host}:8080/JakartaEE-1.0-SNAPSHOT/ws/chat/${token}`);
+      const host = window.location.host;
+      const socket = new WebSocket(`${protocol}//${host}/ws/chat/${token}`);
 
       socket.onopen = () => {
         connected.value = true;
@@ -82,7 +83,6 @@ export function useChatSocket() {
           }
         }
 
-        console.log('[WebSocket] Decoded Protobuf:', data);
         messages.value.push(data);
         if (handlers.message) {
           for (const handler of handlers.message) {

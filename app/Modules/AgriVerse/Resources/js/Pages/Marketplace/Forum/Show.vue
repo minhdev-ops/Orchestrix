@@ -24,7 +24,28 @@
         </div>
 
         <div class="forum-post-body">
-          <p class="forum-post-content">{{ post.content }}</p>
+          <!-- Dynamic Table of Contents -->
+          <div v-if="toc.length > 0" class="forum-toc">
+            <h3 class="forum-toc-title">Mục lục</h3>
+            <ul class="forum-toc-list">
+              <li v-for="item in toc" :key="item.id" class="forum-toc-item" :class="'toc-level-' + item.level">
+                <a :href="'#' + item.id" @click.prevent="scrollToHeading(item.id)">{{ item.text }}</a>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Post Content parsed for headers -->
+          <div class="forum-post-content" v-html="parsedContent"></div>
+
+          <!-- Attached images gallery -->
+          <div v-if="post.images?.length" class="forum-images">
+            <h3 class="forum-images-title">Hình ảnh đính kèm</h3>
+            <div class="forum-images-grid">
+              <a v-for="(url, i) in post.images" :key="i" :href="url" target="_blank" class="forum-images-item">
+                <img :src="url" :alt="'Image ' + (i+1)" loading="lazy" />
+              </a>
+            </div>
+          </div>
         </div>
 
         <!-- Actions -->
@@ -110,6 +131,7 @@ import { route } from 'ziggy-js';
 import axios from 'axios';
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue';
 import { useChatSocket } from '@agriverse/Composables/useChatSocket';
+import { useAuth } from '@agriverse/Composables/useAuth';
 
 const { on, off, connect } = useChatSocket();
 const { props: pageProps } = usePage();
@@ -118,6 +140,46 @@ const props = defineProps({
   post: Object,
   comments: Array,
 });
+
+// Parse post content to extract Table of Contents and render HTML
+const parsedContent = computed(() => {
+  if (!props.post?.content) return '';
+    let html = props.post.content;
+  // Markdown images: ![alt](url)
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy" style="max-width:100%;height:auto;border-radius:8px;margin:16px 0;">');
+  // Markdown links: [text](url)
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  // Basic markdown header parsing
+  html = html.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
+    const level = hashes.length;
+    const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+    return `<h${level} id="heading-${id}" class="forum-heading">${text}</h${level}>`;
+  });
+  // Replace newlines with br for non-header text
+  html = html.replace(/\n(?!<h)/g, '<br>');
+  return html;
+});
+
+const toc = computed(() => {
+  if (!props.post?.content) return [];
+  const items = [];
+  const regex = /^(#{1,6})\s+(.+)$/gm;
+  let match;
+  while ((match = regex.exec(props.post.content)) !== null) {
+    const level = match[1].length;
+    const text = match[2];
+    const id = 'heading-' + text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+    items.push({ level, text, id, uniqueKey: Date.now() + Math.random() });
+  }
+  return items;
+});
+
+function scrollToHeading(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
 
 const newComment = ref('');
 const submitting = ref(false);
@@ -137,6 +199,7 @@ const canEdit = computed(() => {
 
 // Real-time via WebSocket — connect and listen for forum events
 onMounted(() => {
+  useAuth().syncFromPageProps()
   connect()
   on('message', handleForumEvent)
 })
@@ -168,7 +231,7 @@ function handleForumEvent(data) {
 
 async function toggleLike() {
   try {
-    const { data } = await axios.post(`/agriverse/api/forum/${props.post.id}/like`)
+    const { data } = await axios.post(route('agriverse.shop.forum.like', props.post.id))
     post.is_liked = data.liked
     post.likes_count = data.likes_count
   } catch {
@@ -181,12 +244,13 @@ async function submitComment() {
   if (!text || submitting.value) return
   submitting.value = true
   try {
-    const { data } = await axios.post(`/agriverse/api/forum/${props.post.id}/comments`, { content: text })
+    const { data } = await axios.post(route('agriverse.shop.forum.comment', props.post.id), { content: text })
     comments.value.push(data.comment)
     post.comments_count++
     newComment.value = ''
-  } catch {
-    // ignore
+  } catch (e) {
+    console.error('Comment error:', e.response?.data || e.message)
+    alert('Gửi bình luận thất bại. Vui lòng thử lại.')
   } finally {
     submitting.value = false
   }
@@ -277,12 +341,66 @@ function handleDelete() {
   border-bottom: 1px solid color-mix(in srgb, var(--ag-border) 50%, transparent);
   margin-bottom: 16px;
 }
+.forum-toc {
+  background: var(--ag-surface-container-low);
+  border: 1px solid var(--ag-border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+.forum-toc-title {
+  font-family: var(--ag-font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ag-text-primary);
+  margin-bottom: 16px;
+}
+.forum-toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.forum-toc-item {
+  margin-bottom: 8px;
+}
+.forum-toc-item a {
+  color: var(--ag-primary-600);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+.forum-toc-item a:hover {
+  color: var(--ag-primary-500);
+  text-decoration: underline;
+}
+.toc-level-2 { margin-left: 16px; }
+.toc-level-3 { margin-left: 32px; }
+.toc-level-4 { margin-left: 48px; }
+
+:deep(.forum-heading) {
+  font-family: var(--ag-font-display);
+  font-weight: 600;
+  color: var(--ag-text-primary);
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+:deep(h1.forum-heading) { font-size: 28px; }
+:deep(h2.forum-heading) { font-size: 24px; }
+:deep(h3.forum-heading) { font-size: 20px; }
+
 .forum-post-content {
   font-family: var(--ag-font-body);
   font-size: 16px;
   line-height: 28px;
   color: var(--ag-text-primary);
   white-space: pre-wrap;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.forum-post-content :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 .forum-post-actions {
   display: flex;
@@ -433,4 +551,38 @@ function handleDelete() {
   font-weight: 600;
   flex-shrink: 0;
 }
+
+/* Attached images */
+.forum-images {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in srgb, var(--ag-border) 50%, transparent);
+}
+.forum-images-title {
+  font-family: var(--ag-font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ag-text-primary);
+  margin-bottom: 12px;
+}
+.forum-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+.forum-images-item {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--ag-border);
+  transition: opacity 0.2s;
+}
+.forum-images-item:hover { opacity: 0.85; }
+.forum-images-item img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
 </style>
+

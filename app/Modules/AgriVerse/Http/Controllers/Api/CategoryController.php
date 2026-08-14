@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\Category;
 use App\Modules\AgriVerse\Http\Resources\CategoryResource;
 use App\Modules\AgriVerse\Http\Resources\ProductResource;
+use App\Modules\AgriVerse\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -24,6 +24,7 @@ class CategoryController
     public function show(Category $category): CategoryResource
     {
         $category->load('children', 'parent');
+
         return CategoryResource::make($category);
     }
 
@@ -40,7 +41,7 @@ class CategoryController
                     'best_seller' => $q->withCount('orders')->orderBy('orders_count', 'desc'),
                     default => $q->latest(),
                 };
-            }, fn($q) => $q->latest())
+            }, fn ($q) => $q->latest())
             ->paginate($request->per_page ?? 12);
 
         return ProductResource::collection($products);

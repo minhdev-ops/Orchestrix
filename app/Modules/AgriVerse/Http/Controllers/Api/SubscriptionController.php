@@ -2,11 +2,11 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\Subscription;
-use App\Modules\AgriVerse\Http\Resources\SubscriptionResource;
 use App\Modules\AgriVerse\Http\Requests\StoreSubscriptionRequest;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Modules\AgriVerse\Http\Resources\SubscriptionResource;
+use App\Modules\AgriVerse\Models\Subscription;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SubscriptionController
 {
@@ -45,6 +45,10 @@ class SubscriptionController
 
     public function cancel(Request $request, Subscription $subscription)
     {
+        if ($subscription->user_id !== $request->user()->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $subscription->update(['status' => 'cancelled']);
 
         return response()->json(['message' => 'Subscription cancelled.']);

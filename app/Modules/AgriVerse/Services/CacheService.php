@@ -2,16 +2,17 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Category;
+use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Store;
+use Illuminate\Support\Facades\Cache;
 
 class CacheService
 {
     protected int $defaultTTL = 3600; // 1 hour
+
     protected int $shortTTL = 300; // 5 minutes
+
     protected int $longTTL = 86400; // 24 hours
 
     /**
@@ -28,7 +29,7 @@ class CacheService
     /**
      * Get cached product
      */
-    public function getProduct(int $productId, callable $callback = null): ?Product
+    public function getProduct(int $productId, ?callable $callback = null): ?Product
     {
         $key = "{$this->prefixes['product']}:{$productId}";
 
@@ -59,7 +60,7 @@ class CacheService
     /**
      * Get cached product list
      */
-    public function getProductList(string $cacheKey, callable $callback, int $ttl = null): mixed
+    public function getProductList(string $cacheKey, callable $callback, ?int $ttl = null): mixed
     {
         $key = "{$this->prefixes['product']}:list:{$cacheKey}";
 
@@ -117,7 +118,7 @@ class CacheService
     /**
      * Invalidate category cache
      */
-    public function invalidateCategory(int $categoryId = null): void
+    public function invalidateCategory(?int $categoryId = null): void
     {
         if ($categoryId) {
             Cache::forget("{$this->prefixes['category']}:{$categoryId}");
@@ -156,12 +157,12 @@ class CacheService
 
         return Cache::remember($key, $this->shortTTL, function () {
             return [
-                'featured_products' => Product::where('is_active', true)
+                'featured_products' => Product::published()
                     ->with(['categories', 'store'])
                     ->inRandomOrder()
                     ->limit(12)
                     ->get(),
-                'latest_products' => Product::where('is_active', true)
+                'latest_products' => Product::published()
                     ->with(['categories', 'store'])
                     ->latest()
                     ->limit(12)
@@ -194,7 +195,7 @@ class CacheService
     /**
      * Cache search results
      */
-    public function cacheSearchResults(string $query, array $filters, callable $callback, int $ttl = null): mixed
+    public function cacheSearchResults(string $query, array $filters, callable $callback, ?int $ttl = null): mixed
     {
         $cacheKey = $this->generateSearchCacheKey($query, $filters);
         $key = "{$this->prefixes['search']}:{$cacheKey}";
@@ -208,6 +209,7 @@ class CacheService
     protected function generateSearchCacheKey(string $query, array $filters): string
     {
         $data = json_encode(['query' => $query, 'filters' => $filters]);
+
         return md5($data);
     }
 
@@ -243,7 +245,7 @@ class CacheService
         $this->getHomeData();
 
         // Warm up popular products
-        Product::where('is_active', true)
+        Product::published()
             ->with(['categories', 'store'])
             ->orderByDesc('views_count')
             ->limit(50)

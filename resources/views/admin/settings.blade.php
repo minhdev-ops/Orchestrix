@@ -30,12 +30,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-primary uppercase tracking-[0.25em]">Tên Hệ thống / Website</label>
-                    <input type="text" name="site_name" value="{{ env('APP_NAME', 'Orchestrix') }}" 
+                    <input type="text" name="site_name" value="{{ config('app.name', 'Orchestrix') }}" 
                            class="w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl px-6 py-4 text-on-surface font-bold focus:border-primary/50 outline-none transition-all">
                 </div>
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-primary uppercase tracking-[0.25em]">Email Liên hệ chính</label>
-                    <input type="email" name="contact_email" value="{{ env('CONTACT_EMAIL', 'admin@orchestrix.test') }}" 
+                    <input type="email" name="contact_email" value="{{ config('app.contact_email', 'admin@orchestrix.test') }}" 
                            class="w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl px-6 py-4 text-on-surface font-bold focus:border-primary/50 outline-none transition-all">
                 </div>
             </div>
@@ -53,19 +53,19 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-secondary uppercase tracking-[0.25em]">Mail Host</label>
-                    <input type="text" name="mail_host" value="{{ env('MAIL_HOST', 'smtp.mailtrap.io') }}" 
+                    <input type="text" name="mail_host" value="{{ config('mail.mailers.smtp.host', 'smtp.mailtrap.io') }}" 
                            class="w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl px-6 py-4 text-on-surface font-bold focus:border-secondary/50 outline-none transition-all">
                 </div>
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-secondary uppercase tracking-[0.25em]">Mail Port</label>
-                    <input type="text" name="mail_port" value="{{ env('MAIL_PORT', '2525') }}" 
+                    <input type="text" name="mail_port" value="{{ config('mail.mailers.smtp.port', '2525') }}" 
                            class="w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl px-6 py-4 text-on-surface font-bold focus:border-secondary/50 outline-none transition-all">
                 </div>
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-secondary uppercase tracking-[0.25em]">Encryption</label>
                     <select name="mail_encryption" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl px-6 py-4 text-on-surface font-bold appearance-none focus:border-secondary/50 outline-none transition-all">
-                        <option value="tls" {{ env('MAIL_ENCRYPTION') == 'tls' ? 'selected' : '' }}>TLS</option>
-                        <option value="ssl" {{ env('MAIL_ENCRYPTION') == 'ssl' ? 'selected' : '' }}>SSL</option>
+                        <option value="tls" {{ config('mail.mailers.smtp.encryption') == 'tls' ? 'selected' : '' }}>TLS</option>
+                        <option value="ssl" {{ config('mail.mailers.smtp.encryption') == 'ssl' ? 'selected' : '' }}>SSL</option>
                     </select>
                 </div>
             </div>
@@ -73,12 +73,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-secondary uppercase tracking-[0.25em]">Username</label>
-                    <input type="text" name="mail_username" value="{{ env('MAIL_USERNAME') }}" 
+                    <input type="text" name="mail_username" value="{{ config('mail.mailers.smtp.username') }}" 
                            class="w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl px-6 py-4 text-on-surface font-bold focus:border-secondary/50 outline-none transition-all">
                 </div>
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-secondary uppercase tracking-[0.25em]">Password</label>
-                    <input type="password" name="mail_password" value="{{ env('MAIL_PASSWORD') }}" 
+                    <input type="password" name="mail_password" value="{{ config('mail.mailers.smtp.password') }}" 
                            class="w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl px-6 py-4 text-on-surface font-bold focus:border-secondary/50 outline-none transition-all">
                 </div>
             </div>
@@ -101,14 +101,14 @@
                             <span class="material-symbols-outlined text-tertiary">hard_drive</span>
                             <span class="font-bold text-on-surface">Local Disk (Mặc định)</span>
                         </div>
-                        <input type="radio" name="storage_driver" value="local" {{ env('FILESYSTEM_DISK', 'local') == 'local' ? 'checked' : '' }} class="accent-tertiary w-5 h-5">
+                        <input type="radio" name="storage_driver" value="local" {{ config('filesystems.default', 'local') == 'local' ? 'checked' : '' }} class="accent-tertiary w-5 h-5">
                     </label>
                     <label class="group flex items-center justify-between p-6 rounded-2xl bg-surface-container-low/50 border border-transparent hover:border-tertiary/20 hover:bg-white transition-all cursor-pointer">
                         <div class="flex items-center gap-4">
                             <span class="material-symbols-outlined text-tertiary">cloud_queue</span>
                             <span class="font-bold text-on-surface">Amazon S3 / DigitalOcean</span>
                         </div>
-                        <input type="radio" name="storage_driver" value="s3" {{ env('FILESYSTEM_DISK') == 's3' ? 'checked' : '' }} class="accent-tertiary w-5 h-5">
+                        <input type="radio" name="storage_driver" value="s3" {{ config('filesystems.default') == 's3' ? 'checked' : '' }} class="accent-tertiary w-5 h-5">
                     </label>
                 </div>
             </div>

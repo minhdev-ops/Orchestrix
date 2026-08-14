@@ -11,7 +11,7 @@
           <div class="text-lg font-bold text-emerald-600 mt-1">{{ formatPrice(p.price_per_month) }}₫<span class="text-xs text-stone-400 font-normal">/tháng</span></div>
           <div class="text-xs text-stone-500 mt-2">3D models: {{ p.limit_3d_models }}</div>
           <div class="flex items-center gap-2 mt-2">
-            <span class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold" :class="p.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-stone-100 text-stone-500'">{{ p.status === 'active' ? 'Hoạt động' : 'Tắt' }}</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold" :class="p.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-stone-100 text-stone-600'">{{ p.status === 'active' ? 'Hoạt động' : 'Tắt' }}</span>
           </div>
           <div class="flex gap-2 mt-3 pt-3 border-t border-stone-100">
             <Link :href="route('admin.agriverse.plans.edit', p.id)" class="text-xs text-emerald-600 hover:text-emerald-800">Sửa</Link>

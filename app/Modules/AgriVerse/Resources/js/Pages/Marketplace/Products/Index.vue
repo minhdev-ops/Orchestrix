@@ -134,12 +134,21 @@
                   </div>
                   <p v-if="product.description" class="product-card-desc">{{ truncate(product.description, 80) }}</p>
                   <div class="product-card-footer">
-                    <div class="product-card-meta">
+                    <div class="product-card-meta flex flex-col gap-1">
                       <span v-if="product.store" class="product-card-store">{{ product.store.name }}</span>
+                      <span v-if="product.seller" class="text-xs text-stone-500 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">person</span>
+                        {{ product.seller.name }}
+                      </span>
                     </div>
-                    <button v-if="product.stock > 0" @click.prevent="quickAdd(product.id)" class="product-card-add">
-                      <span class="material-symbols-outlined">add_shopping_cart</span>
-                    </button>
+                    <div class="flex gap-2">
+                      <button v-if="product.seller && isAuthenticated" @click.prevent="chatWithSeller(product)" class="hover:bg-stone-100 p-2 rounded-xl transition-colors text-[var(--ag-primary-500)] flex items-center justify-center" title="Nhắn tin với người bán">
+                        <span class="material-symbols-outlined text-lg">chat</span>
+                      </button>
+                      <button v-if="product.stock > 0" @click.prevent="quickAdd(product.id)" class="product-card-add">
+                        <span class="material-symbols-outlined">add_shopping_cart</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -186,9 +195,13 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue';
 import { useToast } from 'primevue/usetoast';
+import { useChat } from '@agriverse/Composables/useChat';
+import webApi from '@agriverse/services/webApi';
 
 const toast = useToast();
 const page = usePage();
+const { openPanel } = useChat();
+const isAuthenticated = computed(() => !!page.props.auth?.user);
 
 const props = defineProps({
   products: { type: Object, default: () => ({ data: [], total: 0, links: [] }) },
@@ -315,6 +328,21 @@ function toggleWishlist(product) {
       toast.add({ severity: 'error', summary: 'Vui lòng đăng nhập', life: 2000 });
     },
   });
+}
+
+async function chatWithSeller(product) {
+  try {
+    const { data } = await webApi.post('/agriverse/api/chat/start', { product_id: product.id })
+    if (data.conversation) {
+      openPanel(data.conversation.id, data.conversation.product)
+    }
+  } catch (e) {
+    if (e.response?.status === 422) {
+      toast.add({ severity: 'warn', summary: e.response.data.error || 'Không thể nhắn tin', life: 3000 })
+    } else {
+      toast.add({ severity: 'error', summary: 'Vui lòng đăng nhập', life: 2000 })
+    }
+  }
 }
 </script>
 
@@ -742,7 +770,7 @@ function toggleWishlist(product) {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .product-card:hover .product-card-placeholder {
   transform: scale(1.06);
@@ -751,7 +779,7 @@ function toggleWishlist(product) {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .product-card:hover .product-card-real-img {
   transform: scale(1.06);

@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Http\Resources;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,12 +18,13 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'price' => (float) $this->price,
             'compare_price' => (float) $this->compare_price,
+            'image' => $this->image,
             'category' => $this->category,
             'tags' => $this->tags,
             'status' => $this->status,
             'store_id' => $this->store_id,
             'stock' => $this->stock,
-            'user' => new \App\Http\Resources\UserResource($this->whenLoaded('user')),
+            'user' => new UserResource($this->whenLoaded('user')),
             'store' => new StoreResource($this->whenLoaded('store')),
             'assets' => ThreeDAssetResource::collection($this->whenLoaded('assets')),
             'created_at' => $this->created_at,

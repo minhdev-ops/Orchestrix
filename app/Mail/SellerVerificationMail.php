@@ -11,6 +11,7 @@ class SellerVerificationMail extends Mailable
     use Queueable, SerializesModels;
 
     public $name;
+
     public $code;
 
     public function __construct($name, $code)

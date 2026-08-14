@@ -14,7 +14,7 @@
             <span class="store-card-letter">{{ store.name.charAt(0).toUpperCase() }}</span>
           </div>
           <div class="store-card-body">
-            <h3 class="store-card-name">{{ store.name }}</h3>
+            <h2 class="store-card-name">{{ store.name }}</h2>
             <div class="store-card-meta">
               <span class="store-card-count">{{ store.products_count || 0 }} sản phẩm</span>
               <span class="store-card-badge">Đang hoạt động</span>
@@ -28,7 +28,7 @@
         <div class="stores-empty-icon">
           <span class="material-symbols-outlined text-5xl">storefront</span>
         </div>
-        <h3 class="stores-empty-title">Chưa có cửa hàng nào</h3>
+        <h2 class="stores-empty-title">Chưa có cửa hàng nào</h2>
         <p class="stores-empty-desc">Hãy quay lại sau.</p>
       </div>
     </main>

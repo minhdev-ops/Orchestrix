@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. CATEGORIES (tree structure)
-        if (!Schema::hasTable('categories')) {
+        if (! Schema::hasTable('categories')) {
             Schema::create('categories', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -28,7 +28,7 @@ return new class extends Migration
         }
 
         // 2. PIVOT: product_category
-        if (!Schema::hasTable('category_product')) {
+        if (! Schema::hasTable('category_product')) {
             Schema::create('category_product', function (Blueprint $table) {
                 $table->foreignId('category_id')->constrained()->cascadeOnDelete();
                 $table->foreignId('product_id')->constrained()->cascadeOnDelete();
@@ -37,7 +37,7 @@ return new class extends Migration
         }
 
         // 3. CARTS
-        if (!Schema::hasTable('carts')) {
+        if (! Schema::hasTable('carts')) {
             Schema::create('carts', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -50,7 +50,7 @@ return new class extends Migration
         }
 
         // 4. WISHLISTS
-        if (!Schema::hasTable('wishlists')) {
+        if (! Schema::hasTable('wishlists')) {
             Schema::create('wishlists', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -61,7 +61,7 @@ return new class extends Migration
         }
 
         // 5. REVIEWS
-        if (!Schema::hasTable('reviews')) {
+        if (! Schema::hasTable('reviews')) {
             Schema::create('reviews', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -79,7 +79,7 @@ return new class extends Migration
         }
 
         // 6. PAYMENTS / TRANSACTIONS
-        if (!Schema::hasTable('transactions')) {
+        if (! Schema::hasTable('transactions')) {
             Schema::create('transactions', function (Blueprint $table) {
                 $table->id();
                 $table->string('transaction_id')->unique();
@@ -101,7 +101,7 @@ return new class extends Migration
         }
 
         // 7. NOTIFICATIONS
-        if (!Schema::hasTable('notifications')) {
+        if (! Schema::hasTable('notifications')) {
             Schema::create('notifications', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->string('type');
@@ -114,7 +114,7 @@ return new class extends Migration
         }
 
         // 8. ORDER STATUS HISTORY
-        if (!Schema::hasTable('order_statuses')) {
+        if (! Schema::hasTable('order_statuses')) {
             Schema::create('order_statuses', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('order_id')->constrained()->cascadeOnDelete();

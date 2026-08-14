@@ -2,10 +2,11 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use App\Modules\AgriVerse\Services\TwoFactorService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class TwoFactorController extends Controller
 {
@@ -27,7 +28,7 @@ class TwoFactorController extends Controller
         return Inertia::render('Marketplace/Settings/TwoFactor', [
             'isEnabled' => $isEnabled,
             'recoveryCodesCount' => $isEnabled ? $this->twoFactorService->getRecoveryCodesCount($user) : 0,
-            'enabledAt' => $isEnabled ? $user->two_factor_enabled_at->toISOString() : null,
+            'enabledAt' => $isEnabled && $user->two_factor_enabled_at ? Carbon::parse($user->two_factor_enabled_at)->toISOString() : null,
         ]);
     }
 
@@ -68,7 +69,7 @@ class TwoFactorController extends Controller
         $user = $request->user();
         $secret = session('2fa_setup_secret');
 
-        if (!$secret) {
+        if (! $secret) {
             return response()->json([
                 'message' => 'Phiên setup đã hết hạn. Vui lòng thử lại.',
             ], 422);
@@ -125,8 +126,9 @@ class TwoFactorController extends Controller
         $user = $request->user();
         $result = $this->twoFactorService->verifyLogin($user, $request->code);
 
-        if ($result['success'] && $result['requires_2fa'] ?? false) {
+        if ($result['success'] && ($result['requires_2fa'] ?? false)) {
             session(['2fa_verified' => true]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Xác thực thành công.',
@@ -145,6 +147,7 @@ class TwoFactorController extends Controller
         if ($user->isAdmin()) {
             return route('admin.agriverse.dashboard');
         }
+
         return route('agriverse.shop.home');
     }
 }

@@ -2,10 +2,11 @@
 
 namespace App\Modules\AgriVerse\Services;
 
+use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\OrderStatus;
+use App\Modules\AgriVerse\Models\Transaction;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Modules\AgriVerse\Models\Order;
-use App\Modules\AgriVerse\Models\Transaction;
 
 class PaymentService
 {
@@ -51,7 +52,7 @@ class PaymentService
             'vnp_CreateDate' => $vnp_CreateDate,
         ];
 
-        if (!empty($vnp_BankCode)) {
+        if (! empty($vnp_BankCode)) {
             $inputData['vnp_BankCode'] = $vnp_BankCode;
         }
 
@@ -60,15 +61,15 @@ class PaymentService
         $i = 0;
         foreach ($inputData as $key => $value) {
             if ($i) {
-                $querystring .= '&' . $key . '=' . $value;
+                $querystring .= '&'.$key.'='.$value;
             } else {
-                $querystring .= $key . '=' . $value;
+                $querystring .= $key.'='.$value;
                 $i++;
             }
         }
 
         $vnp_SecureHash = hash_hmac('sha512', $querystring, $vnp_HashSecret);
-        $vnp_Url .= '?' . $querystring . '&vnp_SecureHash=' . $vnp_SecureHash;
+        $vnp_Url .= '?'.$querystring.'&vnp_SecureHash='.$vnp_SecureHash;
 
         // Create pending transaction
         $this->createTransaction($order, 'vnpay', 'pending');
@@ -92,9 +93,9 @@ class PaymentService
         $i = 0;
         foreach ($input as $key => $value) {
             if ($i) {
-                $querystring .= '&' . $key . '=' . $value;
+                $querystring .= '&'.$key.'='.$value;
             } else {
-                $querystring .= $key . '=' . $value;
+                $querystring .= $key.'='.$value;
                 $i++;
             }
         }
@@ -129,7 +130,7 @@ class PaymentService
         $orderId = $order->id;
         $orderInfo = "Thanh toan don hang #{$orderId}";
         $amount = $order->total_amount;
-        $requestId = $orderId . '_' . time();
+        $requestId = $orderId.'_'.time();
         $extraData = '';
 
         // Create HMAC SHA256 signature
@@ -158,13 +159,16 @@ class PaymentService
 
             if ($response->successful() && $response->json('resultCode') === 0) {
                 $this->createTransaction($order, 'momo', 'pending');
+
                 return $response->json('payUrl');
             }
 
             Log::error('MoMo payment creation failed', $response->json());
+
             return null;
         } catch (\Exception $e) {
             Log::error('MoMo payment error', ['error' => $e->getMessage()]);
+
             return null;
         }
     }
@@ -226,10 +230,10 @@ class PaymentService
         $order = $transaction->order;
         if ($order && $order->status === 'pending') {
             $order->update(['status' => 'confirmed']);
-            \App\Modules\AgriVerse\Models\OrderStatus::create([
+            OrderStatus::create([
                 'order_id' => $order->id,
                 'status' => 'confirmed',
-                'note' => 'Payment received via ' . $transaction->payment_method,
+                'note' => 'Payment received via '.$transaction->payment_method,
             ]);
         }
 
@@ -281,7 +285,8 @@ class PaymentService
     protected function generateTransactionId(Order $order, string $method): string
     {
         $prefix = strtoupper(substr($method, 0, 3));
-        return "{$prefix}{$order->id}" . strtoupper(uniqid());
+
+        return "{$prefix}{$order->id}".strtoupper(uniqid());
     }
 
     /**

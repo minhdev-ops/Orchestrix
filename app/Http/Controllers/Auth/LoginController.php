@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -20,6 +21,7 @@ class LoginController extends Controller
     {
         if (Auth::check()) {
             $user = Auth::user();
+
             return match ($user->role) {
                 'admin' => '/admin/agriverse',
                 'seller' => '/admin/agriverse',
@@ -27,6 +29,7 @@ class LoginController extends Controller
                 default => '/agriverse',
             };
         }
+
         return '/agriverse';
     }
 
@@ -69,9 +72,9 @@ class LoginController extends Controller
     {
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             $error = 'Tài khoản hoặc mật khẩu chưa đúng';
-        } elseif (!$user->is_active) {
+        } elseif (! $user->is_active) {
             $error = 'Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email.';
         } else {
             $error = 'Thông tin đăng nhập không đúng';

@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Session;
 class I18nService
 {
     protected string $defaultLocale = 'vi';
+
     protected array $supportedLocales = ['vi', 'en'];
+
     protected array $translations = [];
 
     /**
@@ -24,7 +26,7 @@ class I18nService
      */
     public function setLocale(string $locale): bool
     {
-        if (!in_array($locale, $this->supportedLocales)) {
+        if (! in_array($locale, $this->supportedLocales)) {
             return false;
         }
 
@@ -65,7 +67,7 @@ class I18nService
         $value = $translations;
 
         foreach ($keys as $k) {
-            if (!isset($value[$k])) {
+            if (! isset($value[$k])) {
                 return $key;
             }
             $value = $value[$k];
@@ -237,10 +239,10 @@ class I18nService
         $locale = $this->getCurrentLocale();
 
         if ($locale === 'vi') {
-            return number_format($amount, 0, ',', '.') . ' ₫';
+            return number_format($amount, 0, ',', '.').' ₫';
         }
 
-        return '$' . number_format($amount, 2, '.', ',');
+        return '$'.number_format($amount, 2, '.', ',');
     }
 
     /**

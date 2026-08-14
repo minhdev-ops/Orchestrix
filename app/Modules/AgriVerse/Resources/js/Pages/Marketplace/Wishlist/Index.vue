@@ -9,13 +9,14 @@
         </div>
       </header>
 
-      <div v-if="wishlistItems.length" class="wishlist-grid">
-        <div v-for="(item, index) in wishlistItems" :key="item.id" class="wishlist-item-card">
+      <div v-if="items.length" class="wishlist-grid">
+        <div v-for="(item, index) in items" :key="item.id" class="wishlist-item-card">
           <div class="wishlist-card-visual">
             <button @click="toggleHeart(item)" class="wishlist-heart-btn">
-              <span class="material-symbols-outlined" :class="item.liked ? 'text-[var(--ag-danger)]' : 'text-[var(--ag-text-muted)]'">favorite</span>
+              <span class="material-symbols-outlined" :class="item.liked ? 'text-[var(--ag-danger)]' : 'text-[var(--ag-text-muted)]'" :style="`font-variation-settings: 'FILL' ${item.liked ? 1 : 0}`">favorite</span>
             </button>
-            <span class="wishlist-card-char">{{ item.product?.name?.charAt(0)?.toUpperCase() || 'P' }}</span>
+            <img v-if="item.product?.image" :src="item.product.image" :alt="item.product?.name" class="wishlist-card-img" />
+            <span v-else class="wishlist-card-char">{{ item.product?.name?.charAt(0)?.toUpperCase() || 'P' }}</span>
           </div>
           <div class="wishlist-card-info">
             <div class="wishlist-card-top">
@@ -65,9 +66,10 @@
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
           <div v-for="rec in recommendations" :key="rec.id" style="cursor: pointer; transition: transform 0.3s;">
             <Link :href="route('agriverse.shop.products.show', rec.id)" style="text-decoration: none; display: block;">
-              <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 12px; margin-bottom: 16px; background: var(--ag-surface-container); display: flex; align-items: center; justify-content: center;">
-                <span style="font-family: var(--ag-font-display); font-size: 36px; color: rgba(116, 121, 108, 0.15);">{{ rec.name?.charAt(0)?.toUpperCase() || 'P' }}</span>
-              </div>
+               <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: 12px; margin-bottom: 16px; background: var(--ag-surface-container); display: flex; align-items: center; justify-content: center;">
+                 <img v-if="rec.image" :src="rec.image" :alt="rec.name" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);" />
+                 <span v-else style="font-family: var(--ag-font-display); font-size: 36px; color: rgba(116, 121, 108, 0.15);">{{ rec.name?.charAt(0)?.toUpperCase() || 'P' }}</span>
+               </div>
               <h4 style="font-family: var(--ag-font-display); font-size: 18px; font-weight: 500; color: var(--ag-text-primary); margin-bottom: 4px;">{{ rec.name }}</h4>
               <span style="font-family: var(--ag-font-body); font-size: 14px; color: var(--ag-text-secondary);">{{ formatPrice(rec.price) }}₫</span>
             </Link>
@@ -88,11 +90,11 @@ import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
 const props = defineProps({
-  wishlistItems: { type: Array, default: () => [] },
+  wishlistItems: { type: Object, default: () => ({ data: [] }) },
   recommendations: { type: Array, default: () => [] },
 });
 
-const items = ref(props.wishlistItems.map(item => ({ ...item, liked: true })));
+const items = ref((props.wishlistItems?.data || []).map(item => ({ ...item, liked: true })));
 
 function truncate(text, len) {
   if (!text) return '';
@@ -100,11 +102,21 @@ function truncate(text, len) {
 }
 
 function toggleHeart(item) {
+  const wasLiked = item.liked;
   item.liked = !item.liked;
   router.post(route('agriverse.api.wishlist.toggle', item.product_id || item.product?.id), {}, {
     preserveState: true,
     preserveScroll: true,
-    onError: () => { item.liked = !item.liked; },
+    onSuccess: ({ data }) => {
+      if (data && typeof data.wishlisted === 'boolean') {
+        item.liked = data.wishlisted;
+      }
+    },
+    onError: (e) => {
+      item.liked = wasLiked;
+      const msg = e.response?.data?.error || 'Không thể thay đổi yêu thích';
+      toast.add({ severity: 'error', summary: msg, life: 3000 });
+    },
   });
 }
 
@@ -178,10 +190,23 @@ function removeItem(item) {
 }
 .wishlist-heart-btn:hover { transform: scale(1.1); }
 .wishlist-heart-btn .material-symbols-outlined { font-size: 20px; }
+.wishlist-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wishlist-item-card:hover .wishlist-card-img {
+  transform: scale(1.06);
+}
 .wishlist-card-char {
   font-family: var(--ag-font-display);
   font-size: 36px;
   color: color-mix(in srgb, var(--ag-text-secondary) 20%, transparent);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wishlist-item-card:hover .wishlist-card-char {
+  transform: scale(1.06);
 }
 .wishlist-card-info {
   padding: 0 4px;

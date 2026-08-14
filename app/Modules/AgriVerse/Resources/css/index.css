@@ -39,7 +39,7 @@
   --ag-accent-200: #ebe6dd;
   --ag-accent-300: #ddd6ca;
   --ag-accent-400: #c4c8ba;
-  --ag-accent-500: #a19f99;
+  --ag-accent-500: #65625c;
   --ag-accent-600: #74796c;
   --ag-accent-700: #5f5e59;
   --ag-accent-800: #474742;
@@ -66,7 +66,7 @@
   --ag-bg-card: #ffffff;
   --ag-bg-sand: #f4f1ea;
   --ag-text-primary: #1b1c1c;
-  --ag-text-secondary: #74796c;
+  --ag-text-secondary: #5f6358;
   --ag-text-muted: #c4c8ba;
   --ag-border: #eae7e7;
 
@@ -111,7 +111,7 @@
   --ag-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --ag-transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --ag-transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
-  --ag-transition-bounce: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ag-transition-bounce: 400ms cubic-bezier(0.16, 1, 0.3, 1);
 
   /* ---- Alias tokens (Material Design 3 naming for design HTML compatibility) ---- */
   /* Surface tones */
@@ -291,7 +291,7 @@ h3 { font-size: 24px; line-height: 32px; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ag-product-body {
@@ -551,7 +551,7 @@ h3 { font-size: 24px; line-height: 32px; }
 
 /* Scale In */
 .ag-scale-in {
-  animation: ag-scale-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: ag-scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes ag-scale-in {
@@ -817,7 +817,7 @@ h3 { font-size: 24px; line-height: 32px; }
   background: var(--ag-bg-card);
   border-radius: var(--ag-radius-2xl);
   box-shadow: var(--ag-shadow-xl);
-  animation: ag-scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: ag-scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .ag-modal-header {
@@ -879,19 +879,19 @@ h3 { font-size: 24px; line-height: 32px; }
 }
 
 .p-toast .p-toast-message.p-toast-message-success {
-  border-left: 4px solid var(--ag-success) !important;
+  border-left: 2px solid var(--ag-success) !important;
 }
 
 .p-toast .p-toast-message.p-toast-message-error {
-  border-left: 4px solid var(--ag-danger) !important;
+  border-left: 2px solid var(--ag-danger) !important;
 }
 
 .p-toast .p-toast-message.p-toast-message-warn {
-  border-left: 4px solid var(--ag-warning) !important;
+  border-left: 2px solid var(--ag-warning) !important;
 }
 
 .p-toast .p-toast-message.p-toast-message-info {
-  border-left: 4px solid var(--ag-info) !important;
+  border-left: 2px solid var(--ag-info) !important;
 }
 
 /* --------------------------------------------------------------------------

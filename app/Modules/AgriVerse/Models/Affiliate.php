@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,7 +28,7 @@ class Affiliate extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function referrals()
@@ -61,8 +62,11 @@ class Affiliate extends Model
 
     public function getConversionRateAttribute(): float
     {
-        if ($this->total_referrals === 0) return 0;
+        if ($this->total_referrals === 0) {
+            return 0;
+        }
         $completed = $this->referrals()->where('status', 'completed')->count();
+
         return round(($completed / $this->total_referrals) * 100, 2);
     }
 }

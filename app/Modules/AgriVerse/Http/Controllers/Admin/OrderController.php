@@ -2,12 +2,12 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Models\User;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\OrderStatus;
 use App\Modules\AgriVerse\Models\Product;
-use App\Models\User;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class OrderController
 {
@@ -21,7 +21,7 @@ class OrderController
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('uuid', 'like', "%{$request->search}%")
-                  ->orWhereHas('buyer', fn($b) => $b->where('name', 'like', "%{$request->search}%"));
+                    ->orWhereHas('buyer', fn ($b) => $b->where('name', 'like', "%{$request->search}%"));
             });
         }
 

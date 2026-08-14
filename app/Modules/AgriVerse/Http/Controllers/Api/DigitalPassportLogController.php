@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\DigitalPassportLog;
-use App\Modules\AgriVerse\Http\Resources\DigitalPassportLogResource;
 use App\Modules\AgriVerse\Http\Requests\StoreDigitalPassportLogRequest;
+use App\Modules\AgriVerse\Http\Resources\DigitalPassportLogResource;
+use App\Modules\AgriVerse\Models\DigitalPassportLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 

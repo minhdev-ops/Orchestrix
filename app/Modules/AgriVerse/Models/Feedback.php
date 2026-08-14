@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,8 +15,13 @@ class Feedback extends Model
         'user_id', 'title', 'content', 'status', 'is_pinned',
     ];
 
+    protected $casts = [
+        'is_pinned' => 'boolean',
+        'status' => 'string',
+    ];
+
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 }

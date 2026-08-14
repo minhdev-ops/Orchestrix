@@ -2,9 +2,11 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Modules\AgriVerse\Services\BackupService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class BackupController extends Controller
 {
@@ -23,7 +25,7 @@ class BackupController extends Controller
         $backups = $this->backupService->listBackups();
         $stats = $this->backupService->getStats();
 
-        return view('admin.backups.index', compact('backups', 'stats'));
+        return Inertia::render('Admin/Backups/Index', compact('backups', 'stats'));
     }
 
     /**
@@ -49,7 +51,8 @@ class BackupController extends Controller
             return redirect()->route('admin.agriverse.backups.index')
                 ->with('success', "Đã tạo backup {$type} thành công!");
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            Log::error('Backup error: '.$e->getMessage());
+            return back()->withErrors(['error' => 'Đã xảy ra lỗi khi tạo backup.']);
         }
     }
 

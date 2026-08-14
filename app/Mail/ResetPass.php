@@ -11,6 +11,7 @@ class ResetPass extends Mailable
     use Queueable, SerializesModels;
 
     public $pass;
+
     public $name;
 
     public function __construct($pass, $name)

@@ -2,10 +2,10 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\Cart;
-use App\Modules\AgriVerse\Http\Resources\CartResource;
 use App\Modules\AgriVerse\Http\Requests\StoreCartRequest;
 use App\Modules\AgriVerse\Http\Requests\UpdateCartRequest;
+use App\Modules\AgriVerse\Http\Resources\CartResource;
+use App\Modules\AgriVerse\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 

@@ -20,6 +20,7 @@ class SubscriptionPlan extends Model
         return [
             'features' => 'array',
             'price_per_month' => 'decimal:2',
+            'limit_3d_models' => 'integer',
         ];
     }
 

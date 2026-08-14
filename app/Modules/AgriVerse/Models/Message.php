@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
@@ -10,7 +11,7 @@ class Message extends Model
 
     public function sender()
     {
-        return $this->belongsTo(\App\Models\User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function order()

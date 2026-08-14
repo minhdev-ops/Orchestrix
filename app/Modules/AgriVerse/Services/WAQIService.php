@@ -7,12 +7,13 @@ use Illuminate\Support\Facades\Http;
 class WAQIService
 {
     protected string $baseUrl;
+
     protected string $token;
 
     public function __construct()
     {
-        $this->baseUrl = config('services.waqi.base_url', 'https://api.waqi.info');
-        $this->token = config('services.waqi.token', '');
+        $this->baseUrl = config('services.waqi.base_url') ?? 'https://api.waqi.info';
+        $this->token = config('services.waqi.token') ?? '';
     }
 
     public function getByCoordinates(float $lat, float $lng): ?array
@@ -25,7 +26,7 @@ class WAQIService
             'token' => $this->token,
         ]);
 
-        if (!$res->successful() || $res->json('status') !== 'ok') {
+        if (! $res->successful() || $res->json('status') !== 'ok') {
             return null;
         }
 
@@ -42,7 +43,7 @@ class WAQIService
             'token' => $this->token,
         ]);
 
-        if (!$res->successful() || $res->json('status') !== 'ok') {
+        if (! $res->successful() || $res->json('status') !== 'ok') {
             return null;
         }
 
@@ -51,7 +52,7 @@ class WAQIService
 
     protected function format(?array $data): ?array
     {
-        if (!$data || !isset($data['aqi'])) {
+        if (! $data || ! isset($data['aqi'])) {
             return null;
         }
 

@@ -2,13 +2,12 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Process;
 use Carbon\Carbon;
 
 class BackupService
 {
     protected string $backupPath = 'backups';
+
     protected int $keepDays = 30;
 
     /**
@@ -35,9 +34,9 @@ class BackupService
     /**
      * Backup database only
      */
-    public function backupDatabase(string $name = null): string
+    public function backupDatabase(?string $name = null): string
     {
-        $name = $name ?? 'db_backup_' . now()->format('Y-m-d_H-i-s');
+        $name = $name ?? 'db_backup_'.now()->format('Y-m-d_H-i-s');
         $filename = "{$name}.sql";
         $path = "{$this->backupPath}/database/{$filename}";
 
@@ -73,7 +72,7 @@ class BackupService
             escapeshellarg(storage_path("app/{$path}"))
         );
 
-        if (!empty($password)) {
+        if (! empty($password)) {
             $command = sprintf(
                 'mysqldump -h %s -P %s -u %s -p%s %s > %s 2>&1',
                 escapeshellarg($host),
@@ -88,7 +87,7 @@ class BackupService
         exec($command, $output, $returnCode);
 
         if ($returnCode !== 0) {
-            throw new \RuntimeException("Database backup failed: " . implode("\n", $output));
+            throw new \RuntimeException('Database backup failed: '.implode("\n", $output));
         }
     }
 
@@ -107,16 +106,16 @@ class BackupService
         exec($command, $output, $returnCode);
 
         if ($returnCode !== 0) {
-            throw new \RuntimeException("SQLite backup failed: " . implode("\n", $output));
+            throw new \RuntimeException('SQLite backup failed: '.implode("\n", $output));
         }
     }
 
     /**
      * Backup files only
      */
-    public function backupFiles(string $name = null): string
+    public function backupFiles(?string $name = null): string
     {
-        $name = $name ?? 'files_backup_' . now()->format('Y-m-d_H-i-s');
+        $name = $name ?? 'files_backup_'.now()->format('Y-m-d_H-i-s');
         $filename = "{$name}.tar.gz";
         $path = "{$this->backupPath}/files/{$filename}";
 
@@ -125,7 +124,7 @@ class BackupService
 
         // Create backup directory
         $backupDir = dirname($destPath);
-        if (!is_dir($backupDir)) {
+        if (! is_dir($backupDir)) {
             mkdir($backupDir, 0755, true);
         }
 
@@ -138,7 +137,7 @@ class BackupService
         exec($command, $output, $returnCode);
 
         if ($returnCode !== 0) {
-            throw new \RuntimeException("File backup failed: " . implode("\n", $output));
+            throw new \RuntimeException('File backup failed: '.implode("\n", $output));
         }
 
         return $path;
@@ -151,7 +150,7 @@ class BackupService
     {
         $fullPath = storage_path("app/{$backupPath}");
 
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             throw new \RuntimeException("Backup file not found: {$backupPath}");
         }
 
@@ -187,7 +186,7 @@ class BackupService
             escapeshellarg($filePath)
         );
 
-        if (!empty($password)) {
+        if (! empty($password)) {
             $command = sprintf(
                 'mysql -h %s -P %s -u %s -p%s %s < %s 2>&1',
                 escapeshellarg($host),
@@ -202,7 +201,7 @@ class BackupService
         exec($command, $output, $returnCode);
 
         if ($returnCode !== 0) {
-            throw new \RuntimeException("Database restore failed: " . implode("\n", $output));
+            throw new \RuntimeException('Database restore failed: '.implode("\n", $output));
         }
     }
 
@@ -255,7 +254,7 @@ class BackupService
     {
         $path = storage_path("app/{$this->backupPath}/{$type}/{$filename}");
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             return false;
         }
 
@@ -275,7 +274,7 @@ class BackupService
         foreach ($types as $type) {
             $path = storage_path("app/{$this->backupPath}/{$type}");
 
-            if (!is_dir($path)) {
+            if (! is_dir($path)) {
                 continue;
             }
 
@@ -329,6 +328,6 @@ class BackupService
             $i++;
         }
 
-        return round($size, 2) . ' ' . $units[$i];
+        return round($size, 2).' '.$units[$i];
     }
 }

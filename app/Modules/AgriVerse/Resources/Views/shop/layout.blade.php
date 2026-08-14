@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="@yield('meta_description', 'AgriVerse — Chợ cây cảnh bonsai trực tuyến, kết nối người mua với vườn ươm uy tín trên toàn quốc.')">
     <title>@yield('title', 'AgriVerse') — Chợ Cây Cảnh</title>
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- Roboto Typography --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

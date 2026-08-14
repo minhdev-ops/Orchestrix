@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         foreach (['carts', 'wishlists', 'notifications'] as $table) {
-            if (Schema::hasTable($table) && !Schema::hasColumn($table, 'is_delete')) {
+            if (Schema::hasTable($table) && ! Schema::hasColumn($table, 'is_delete')) {
                 Schema::table($table, function (Blueprint $t) {
                     $t->boolean('is_delete')->default(false)->after('updated_at');
                     $t->index('is_delete');

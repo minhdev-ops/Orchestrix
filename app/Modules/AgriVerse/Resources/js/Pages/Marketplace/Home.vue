@@ -4,7 +4,7 @@
     <header class="hero-section">
       <div class="hero-bg">
         <div class="hero-img">
-          <span class="hero-img-placeholder">{{ heroEmoji }}</span>
+          <img src="/images/hero-bonsai.jpg" alt="Bonsai" class="hero-img-photo" />
         </div>
         <div class="hero-gradient-overlay"></div>
         <div class="hero-scanline"></div>
@@ -14,7 +14,7 @@
         <div class="hero-data-card" :class="{ 'hero-data-pulse': airQuality && airQuality.aqi > 0 }">
           <p class="hero-data-label">Chất lượng không khí</p>
           <template v-if="airQuality">
-            <p class="hero-data-value" :style="{ color: airQuality.color }">
+            <p class="hero-data-value" :style="{ color: aqiTextColor }">
               AQI: {{ airQuality.aqi }}
             </p>
             <p class="hero-data-sub">{{ airLevelLabel }}</p>
@@ -50,6 +50,10 @@
             </Link>
             <Link :href="route('agriverse.shop.stores.index')" class="hero-btn-secondary">
               Gian hàng
+            </Link>
+            <Link :href="route('agriverse.shop.diagnostic.index')" class="hero-btn-secondary hero-btn-diagnostic">
+              <span class="material-symbols-outlined text-sm">ecg_heart</span>
+              Chẩn đoán cây
             </Link>
           </div>
         </div>
@@ -98,7 +102,7 @@
             :href="route('agriverse.shop.products.index', { category: cat.slug })"
             class="category-card">
             <div class="category-icon">
-              <span class="material-symbols-outlined category-icon-symbol">{{ categoryIcon(cat.name) }}</span>
+              <span class="material-symbols-outlined category-icon-symbol">{{ categoryIcon(cat) }}</span>
             </div>
             <h3 class="category-name">{{ cat.name }}</h3>
             <p class="category-count">{{ cat.products_count ?? 0 }} sản phẩm</p>
@@ -120,38 +124,18 @@
           </Link>
         </div>
 
-        <div class="featured-grid">
-          <div v-for="product in featuredProducts.slice(0, 4)" :key="product.id" class="product-card">
-            <Link :href="route('agriverse.shop.products.show', product.id)" class="product-card-link">
-              <div class="product-card-img">
-                <img v-if="product.image" :src="product.image" :alt="product.name" class="w-full h-full object-cover" />
-                <div v-else class="product-card-placeholder">
-                  <span>{{ product.name.charAt(0).toUpperCase() }}</span>
-                </div>
-                <div class="product-card-badges">
-                  <span v-if="product.compare_price && product.compare_price > product.price" class="product-badge-discount">
-                    -{{ Math.round((1 - product.price / product.compare_price) * 100) }}%
-                  </span>
-                </div>
-              </div>
-              <div class="product-card-body">
-                <div class="product-card-top">
-                  <h3 class="product-card-name">{{ product.name }}</h3>
-                  <span class="product-card-price">{{ formatPrice(product.price) }}₫</span>
-                </div>
-                <div class="product-card-meta">
-                  <div class="product-card-meta-item">
-                    <span class="material-symbols-outlined">height</span>
-                    <span>30-50 cm</span>
-                  </div>
-                  <div class="product-card-meta-item">
-                    <span class="material-symbols-outlined">schedule</span>
-                    <span>3-5 năm tuổi</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
+        <div class="carousel-wrap">
+          <button @click="scrollCarousel(-1)" class="carousel-btn carousel-btn-prev" :disabled="carouselAtStart">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <div ref="carouselRef" class="carousel-track" @scroll="onCarouselScroll">
+            <div v-for="product in featuredProducts" :key="product.id" class="carousel-item">
+              <ProductCard :product="product" />
+            </div>
           </div>
+          <button @click="scrollCarousel(1)" class="carousel-btn carousel-btn-next" :disabled="carouselAtEnd">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
         </div>
       </div>
     </section>
@@ -164,7 +148,8 @@
             <div class="commitment-blur-bg"></div>
             <div class="commitment-frame">
               <div class="commitment-frame-bg">
-                <span class="text-8xl text-[var(--ag-primary-300)]/30">{{ heroEmoji }}</span>
+                <img v-if="commitmentImage" :src="commitmentImage" alt="Nghệ nhân chăm sóc bonsai" class="commitment-frame-img" />
+                <span v-else class="text-8xl text-[var(--ag-primary-300)]/30">{{ heroEmoji }}</span>
               </div>
             </div>
             <div class="commitment-stats-card">
@@ -188,7 +173,7 @@
                   <span class="material-symbols-outlined">eco</span>
                 </div>
                 <div>
-                  <h4 class="commitment-feature-title">Nghệ nhân tạo tác</h4>
+                  <h3 class="commitment-feature-title">Nghệ nhân tạo tác</h3>
                   <p class="commitment-feature-desc">Mỗi cây bonsai đều được tạo tác bởi nghệ nhân lành nghề với tâm huyết và kinh nghiệm.</p>
                 </div>
               </div>
@@ -197,7 +182,7 @@
                   <span class="material-symbols-outlined">analytics</span>
                 </div>
                 <div>
-                  <h4 class="commitment-feature-title">Kiểm định sức khỏe</h4>
+                  <h3 class="commitment-feature-title">Kiểm định sức khỏe</h3>
                   <p class="commitment-feature-desc">Mỗi cây cảnh đều được kiểm tra sức khỏe trước khi đến tay người yêu cây.</p>
                 </div>
               </div>
@@ -206,12 +191,34 @@
                   <span class="material-symbols-outlined">box_edit</span>
                 </div>
                 <div>
-                  <h4 class="commitment-feature-title">Đóng gói chuyên nghiệp</h4>
+                  <h3 class="commitment-feature-title">Đóng gói chuyên nghiệp</h3>
                   <p class="commitment-feature-desc">Bao bì chuyên dụng cho cây cảnh, đảm bảo cây luôn xanh tốt khi đến tay bạn.</p>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Diagnostic Promo Section -->
+    <section class="section-diagnostic">
+      <div class="section-container">
+        <div class="diagnostic-promo">
+          <div class="diagnostic-promo-icon">
+            <span class="material-symbols-outlined">psychology</span>
+          </div>
+          <div class="diagnostic-promo-content">
+            <span class="diagnostic-promo-badge">Phòng chẩn đoán AI</span>
+            <h2 class="diagnostic-promo-title">Cây của bạn đang có vấn đề?</h2>
+            <p class="diagnostic-promo-desc">
+              Tải ảnh cây cảnh của bạn lên, AI sẽ phân tích sâu bệnh, thiếu dinh dưỡng và gợi ý cách xử lý ngay lập tức.
+            </p>
+          </div>
+          <Link :href="route('agriverse.shop.diagnostic.index')" class="diagnostic-promo-btn">
+            Chẩn đoán ngay
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </Link>
         </div>
       </div>
     </section>
@@ -226,10 +233,10 @@
           <div class="cta-content">
             <h2 class="cta-title">Chuyên gia tư vấn.<br/>Kiến thức khoa học.</h2>
             <p class="cta-desc">Kết nối với nghệ nhân bonsai của chúng tôi để được tư vấn về cách chọn và chăm sóc cây cảnh phù hợp nhất với không gian của bạn.</p>
-            <Link :href="route('agriverse.shop.stores.index')" class="cta-btn">
+            <button type="button" @click="openAIExpert" class="cta-btn">
               Nói chuyện với chuyên gia
               <span class="material-symbols-outlined">support_agent</span>
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -239,18 +246,34 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue';
-import { useToast } from 'primevue/usetoast';
+import ProductCard from '@agriverse/Components/ProductCard.vue';
 import axios from 'axios';
-
-const toast = useToast();
 
 const props = defineProps({
   categories: Array,
   featuredProducts: Array,
   stores: Array,
+  commitmentImage: String,
 });
+
+const carouselRef = ref(null);
+const carouselAtStart = ref(true);
+const carouselAtEnd = ref(false);
+
+function scrollCarousel(dir) {
+  if (!carouselRef.value) return;
+  const scrollAmount = carouselRef.value.querySelector('.carousel-item')?.offsetWidth + 24 || 320;
+  carouselRef.value.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+}
+
+function onCarouselScroll() {
+  if (!carouselRef.value) return;
+  const el = carouselRef.value;
+  carouselAtStart.value = el.scrollLeft <= 4;
+  carouselAtEnd.value = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+}
 
 const airQuality = ref(null);
 const geoError = ref(false);
@@ -267,6 +290,24 @@ const airLevelLabel = computed(() => {
   };
   return map[airQuality.value.level] || '';
 });
+
+const aqiTextColor = computed(() => {
+  const hex = airQuality.value?.color;
+  if (!hex) return 'var(--ag-text-muted)';
+  return ensureTextContrast(hex);
+});
+
+function ensureTextContrast(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const luminance = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255);
+  if (luminance > 0.6) {
+    const mix = 0.55;
+    return `#${[r, g, b].map(c => Math.round(c * (1 - mix)).toString(16).padStart(2, '0')).join('')}`;
+  }
+  return hex;
+}
 
 const heroEmoji = computed(() => {
   const emojis = ['🌲', '🎍', '🌿', '🌱', '🍀', '🪴'];
@@ -307,6 +348,14 @@ async function fetchAirQuality(lat, lng) {
 }
 
 const categoryIconMap = {
+  'bonsai-co-thu': 'forest',
+  'cay-canh-mini': 'eco',
+  'sen-da-xuong-rong': 'potted_plant',
+  'cay-thuy-sinh': 'water',
+  'cay-an-qua-bonsai': 'nutrition',
+  'chau-ke-canh': 'pottery',
+  'dat-phan-bon': 'agriculture',
+  'phu-kien-dung-cu': 'handyman',
   'bonsai': 'forest',
   'cây phong thủy': 'yard',
   'sen đá': 'spa',
@@ -322,25 +371,17 @@ const categoryIconMap = {
   'hạt giống': 'seed',
 }
 
-function categoryIcon(name) {
-  const key = (name || '').toLowerCase()
+function categoryIcon(cat) {
+  if (cat?.slug && categoryIconMap[cat.slug]) return categoryIconMap[cat.slug];
+  const key = (cat?.name || '').toLowerCase();
   for (const [k, icon] of Object.entries(categoryIconMap)) {
-    if (key.includes(k)) return icon
+    if (key.includes(k)) return icon;
   }
-  return 'eco'
+  return 'eco';
 }
 
-function formatPrice(price) {
-  return new Intl.NumberFormat('vi-VN').format(price || 0);
-}
-
-function addToCart(productId) {
-  router.post(route('agriverse.api.cart.add'), { product_id: productId, quantity: 1 }, {
-    preserveState: true,
-    preserveScroll: true,
-    onSuccess: () => toast.add({ severity: 'success', summary: 'Đã thêm vào giỏ hàng', life: 2000 }),
-    onError: () => toast.add({ severity: 'error', summary: 'Vui lòng đăng nhập', life: 2000 }),
-  });
+function openAIExpert() {
+  window.dispatchEvent(new CustomEvent('agriverse-open-ai-expert'));
 }
 </script>
 
@@ -372,23 +413,18 @@ function addToCart(productId) {
 .hero-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background: linear-gradient(135deg, var(--ag-primary-50), var(--ag-surface), var(--ag-primary-100));
 }
-.hero-img-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.hero-img-photo {
   width: 100%;
   height: 100%;
-  font-size: 120px;
-  opacity: 0.15;
-  background: linear-gradient(135deg, var(--ag-primary-50), var(--ag-surface), var(--ag-primary-100));
-  animation: subtle-zoom 20s ease-in-out infinite alternate;
+  object-fit: cover;
+  object-position: center center;
 }
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(252, 249, 248, 0.4) 0%, rgba(252, 249, 248, 0.95) 40%, rgba(252, 249, 248, 1) 100%);
+  background: linear-gradient(to bottom, rgba(252, 249, 248, 0.25) 0%, rgba(252, 249, 248, 0.6) 40%, rgba(252, 249, 248, 0.95) 100%);
 }
 .hero-scanline {
   position: absolute;
@@ -420,8 +456,8 @@ function addToCart(productId) {
   .text-2xl { font-size: 18px; }
 }
 .hero-data-card {
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
   border: 1px solid color-mix(in srgb, var(--ag-outline) 20%, transparent);
   padding: 16px;
   border-radius: 12px;
@@ -434,7 +470,7 @@ function addToCart(productId) {
 }
 .hero-data-label {
   font-size: 11px;
-  opacity: 0.6;
+  color: var(--ag-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 4px;
@@ -445,6 +481,7 @@ function addToCart(productId) {
 }
 .hero-data-sub {
   font-size: 14px;
+  color: var(--ag-text-secondary);
 }
 .text-2xl {
   font-size: 24px;
@@ -488,8 +525,6 @@ function addToCart(productId) {
   font-family: var(--ag-font-body);
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
   color: var(--ag-primary-500);
 }
 .hero-title {
@@ -565,6 +600,14 @@ function addToCart(productId) {
   color: var(--ag-primary-500);
 }
 .hero-btn-secondary:active { transform: scale(0.95); }
+.hero-btn-diagnostic {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-btn-diagnostic .material-symbols-outlined {
+  color: var(--ag-primary-500);
+}
 
 .hero-scroll-indicator {
   position: absolute;
@@ -752,7 +795,8 @@ function addToCart(productId) {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 8px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .category-card:hover .category-icon {
   background: var(--ag-primary-500);
@@ -780,144 +824,69 @@ function addToCart(productId) {
   text-align: center;
 }
 
-/* Featured Products (Bento Grid) */
+/* Featured Products (Carousel) */
 .section-featured {
   padding: 96px 0;
 }
 @media (max-width: 640px) {
   .section-featured { padding: 56px 0; }
 }
-.featured-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px 24px;
-}
-@media (min-width: 640px) {
-  .featured-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (min-width: 1024px) {
-  .featured-grid { grid-template-columns: repeat(4, 1fr); }
-}
-
-.product-card {
-  background: transparent;
-  border-radius: 0;
-  overflow: visible;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: none;
-  box-shadow: none;
-  cursor: pointer;
-}
-.product-card:hover {
-  transform: translateY(-4px);
-}
-.product-card-link {
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.product-card-img {
+.carousel-wrap {
   position: relative;
-  aspect-ratio: 4 / 5;
-  border-radius: var(--ag-radius-lg);
-  overflow: hidden;
-  background: var(--ag-surface-container-low);
-  margin-bottom: 24px;
 }
-@media (max-width: 640px) {
-  .product-card-img { margin-bottom: 16px; }
+.carousel-track {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 0;
 }
-.product-card-placeholder {
-  width: 100%;
-  height: 100%;
+.carousel-track::-webkit-scrollbar { display: none; }
+.carousel-item {
+  flex: 0 0 calc((100% - 72px) / 4);
+  scroll-snap-align: start;
+  min-width: 0;
+}
+@media (max-width: 1024px) {
+  .carousel-item { flex-basis: calc((100% - 40px) / 3); }
+}
+@media (max-width: 768px) {
+  .carousel-item { flex: 0 0 calc((100% - 24px) / 2); }
+  .carousel-btn { display: none; }
+}
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--ag-border);
+  background: var(--ag-bg-card);
+  box-shadow: var(--ag-shadow-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.product-card:hover .product-card-placeholder {
-  transform: scale(1.05);
-}
-.product-card-placeholder span {
-  font-family: var(--ag-font-display);
-  font-size: 56px;
-  font-weight: 500;
-  color: var(--ag-neutral-400);
-}
-.product-card-badges {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.product-badge-discount {
-  padding: 3px 10px;
-  background: rgba(139, 79, 39, 0.12);
-  color: var(--ag-secondary-500);
-  border-radius: 9999px;
-  font-family: var(--ag-font-body);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  backdrop-filter: blur(4px);
-}
-.product-card-body {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-.product-card-top {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
-.product-card-name {
-  font-family: var(--ag-font-display);
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--ag-text-primary);
-  margin: 0 0 4px;
-}
-@media (max-width: 640px) {
-  .product-card-name { font-size: 18px; }
-  .product-card-price { font-size: 17px; }
-}
-.product-card-price {
-  font-family: var(--ag-font-display);
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--ag-primary-500);
-  white-space: nowrap;
-}
-.product-card-meta {
-  display: flex;
-  gap: 16px;
-  border-top: 1px solid color-mix(in srgb, var(--ag-border) 50%, transparent);
-  padding-top: 16px;
-  margin-top: auto;
-}
-.product-card-meta-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.product-card-meta-item .material-symbols-outlined {
-  font-size: 16px;
-  color: var(--ag-primary-500);
-}
-.product-card-meta-item span:last-child {
-  font-family: var(--ag-font-body);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
   color: var(--ag-text-secondary);
+  opacity: 0;
 }
+.carousel-btn:hover {
+  background: var(--ag-primary-500);
+  color: white;
+  border-color: var(--ag-primary-500);
+}
+.carousel-btn:disabled {
+  opacity: 0 !important;
+  cursor: default;
+}
+.carousel-wrap:hover .carousel-btn { opacity: 1; }
+.carousel-btn-prev { left: -22px; }
+.carousel-btn-next { right: -22px; }
 
 /* Commitment Section */
 .section-commitment {
@@ -971,6 +940,12 @@ function addToCart(productId) {
   align-items: center;
   justify-content: center;
 }
+.commitment-frame-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .commitment-stats-card {
   position: absolute;
   bottom: -32px;
@@ -1017,8 +992,6 @@ function addToCart(productId) {
   font-family: var(--ag-font-body);
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
   color: var(--ag-primary-500);
   margin-bottom: 24px;
   display: block;
@@ -1059,6 +1032,7 @@ function addToCart(productId) {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 8px;
   color: var(--ag-primary-500);
   transition: all 0.3s;
 }
@@ -1082,6 +1056,80 @@ function addToCart(productId) {
   line-height: 24px;
   color: var(--ag-text-secondary);
 }
+
+/* Diagnostic Promo Section */
+.section-diagnostic {
+  padding: 8px 0 96px;
+}
+@media (max-width: 640px) {
+  .section-diagnostic { padding: 8px 0 56px; }
+}
+.diagnostic-promo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(135deg, #1b3a34, #2c5a4f);
+  border-radius: 28px;
+  padding: 28px 32px;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+@media (max-width: 768px) {
+  .diagnostic-promo { flex-direction: column; text-align: center; padding: 32px 24px; }
+}
+.diagnostic-promo-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.diagnostic-promo-icon .material-symbols-outlined { font-size: 32px; }
+.diagnostic-promo-content {
+  flex: 1;
+  min-width: 0;
+}
+.diagnostic-promo-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+}
+.diagnostic-promo-title {
+  font-family: var(--ag-font-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 30px;
+  margin-bottom: 6px;
+}
+.diagnostic-promo-desc {
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.diagnostic-promo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: white;
+  color: #1b3a34;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.diagnostic-promo-btn:hover { transform: translateY(-2px); }
+.diagnostic-promo-btn:active { transform: scale(0.97); }
 
 /* CTA Section */
 .section-cta {

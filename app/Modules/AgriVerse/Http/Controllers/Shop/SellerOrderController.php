@@ -2,11 +2,11 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Modules\AgriVerse\Models\DigitalPassportLog;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\OrderStatus;
-use App\Modules\AgriVerse\Models\DigitalPassportLog;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SellerOrderController
 {
@@ -133,7 +133,7 @@ class SellerOrderController
             abort(403);
         }
 
-        if (!in_array($order->status, ['pending', 'confirmed'])) {
+        if (! in_array($order->status, ['pending', 'confirmed'])) {
             return back()->with('error', 'Đơn hàng không thể hủy ở trạng thái hiện tại.');
         }
 
@@ -148,7 +148,7 @@ class SellerOrderController
         OrderStatus::create([
             'order_id' => $order->id,
             'status' => 'cancelled',
-            'note' => 'Người bán hủy: ' . $request->reason,
+            'note' => 'Người bán hủy: '.$request->reason,
             'user_id' => auth()->id(),
         ]);
 

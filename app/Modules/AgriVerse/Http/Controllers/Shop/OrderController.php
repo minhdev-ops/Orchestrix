@@ -2,15 +2,15 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
+use App\Modules\AgriVerse\Models\DigitalPassportLog;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\OrderStatus;
 use App\Modules\AgriVerse\Models\Refund;
 use App\Modules\AgriVerse\Models\Transaction;
-use App\Modules\AgriVerse\Models\DigitalPassportLog;
 use App\Modules\AgriVerse\Services\GHNService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class OrderController
 {
@@ -26,30 +26,28 @@ class OrderController
         ]);
     }
 
-    public function show($id)
+    public function show(Order $order)
     {
-        $order = Order::findOrFail($id);
 
         if ($order->buyer_id !== auth()->id()) {
             abort(403);
         }
 
-        $order->load(['product.passportLogs.performer', 'store', 'statuses', 'contract', 'transaction', 'refunds']);
+        $order->load(['product.passportLogs.performer', 'store', 'statuses.user', 'contract', 'transaction', 'refunds']);
 
         return Inertia::render('Marketplace/Orders/Show', [
             'order' => $order,
         ]);
     }
 
-    public function cancel(Request $request, $id)
+    public function cancel(Request $request, Order $order)
     {
-        $order = Order::findOrFail($id);
 
         if ($order->buyer_id !== auth()->id()) {
             abort(403);
         }
 
-        if (!in_array($order->status, ['pending', 'confirmed'])) {
+        if (! in_array($order->status, ['pending', 'confirmed'])) {
             return back()->with('error', 'Đơn hàng không thể hủy ở trạng thái hiện tại.');
         }
 
@@ -64,7 +62,7 @@ class OrderController
         OrderStatus::create([
             'order_id' => $order->id,
             'status' => 'cancelled',
-            'note' => 'Khách hủy: ' . $request->reason,
+            'note' => 'Khách hủy: '.$request->reason,
             'user_id' => auth()->id(),
         ]);
 
@@ -82,15 +80,14 @@ class OrderController
             ->with('success', 'Đơn hàng đã được hủy.');
     }
 
-    public function requestRefund(Request $request, $id)
+    public function requestRefund(Request $request, Order $order)
     {
-        $order = Order::findOrFail($id);
 
         if ($order->buyer_id !== auth()->id()) {
             abort(403);
         }
 
-        if (!in_array($order->status, ['delivered', 'completed'])) {
+        if (! in_array($order->status, ['delivered', 'completed'])) {
             return back()->with('error', 'Chỉ có thể yêu cầu hoàn tiền cho đơn đã giao.');
         }
 
@@ -116,7 +113,7 @@ class OrderController
         OrderStatus::create([
             'order_id' => $order->id,
             'status' => $order->status,
-            'note' => 'Yêu cầu hoàn tiền: ' . $data['reason'],
+            'note' => 'Yêu cầu hoàn tiền: '.$data['reason'],
             'user_id' => auth()->id(),
         ]);
 
@@ -144,7 +141,7 @@ class OrderController
             'user_id' => auth()->id(),
         ]);
 
-        if (!$order->transaction()->where('payment_status', 'paid')->exists()) {
+        if (! $order->transaction()->where('payment_status', 'paid')->exists()) {
             Transaction::create([
                 'order_id' => $order->id,
                 'user_id' => $order->seller_id,
@@ -170,7 +167,19 @@ class OrderController
 
     public function tracking()
     {
-        return Inertia::render('Marketplace/Tracking/Index');
+        $recentOrders = [];
+        if (auth()->check()) {
+            $recentOrders = Order::with('product')
+                ->where('buyer_id', auth()->id())
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->toArray();
+        }
+
+        return Inertia::render('Marketplace/Tracking/Index', [
+            'recentOrders' => $recentOrders,
+        ]);
     }
 
     public function lookupTracking(Request $request): JsonResponse
@@ -182,13 +191,13 @@ class OrderController
         $order = Order::with(['product', 'store'])
             ->where(function ($q) use ($request) {
                 $q->where('tracking_number', $request->code)
-                  ->orWhere('uuid', $request->code)
-                  ->orWhere('id', is_numeric($request->code) ? $request->code : 0);
+                    ->orWhere('uuid', $request->code)
+                    ->orWhere('id', is_numeric($request->code) ? $request->code : 0);
             })
             ->where('buyer_id', auth()->id())
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return response()->json(['error' => 'Không tìm thấy đơn hàng.'], 404);
         }
 

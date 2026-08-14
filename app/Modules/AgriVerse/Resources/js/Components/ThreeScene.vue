@@ -5,20 +5,20 @@
     <!-- Loading -->
     <div v-if="loading" class="absolute inset-0 flex flex-col items-center justify-center bg-stone-50/80 backdrop-blur-sm">
       <div class="w-8 h-8 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin mb-2" />
-      <span class="text-xs text-stone-500">Đang tải mô hình 3D...</span>
+      <span class="text-xs text-emerald-700">Đang tải mô hình 3D...</span>
     </div>
 
     <!-- Progress -->
     <div v-if="progress > 0 && progress < 100" class="absolute bottom-4 left-4 right-4">
       <div class="h-1 bg-stone-200 rounded-full overflow-hidden">
-        <div class="h-full bg-emerald-500 rounded-full transition-all duration-300" :style="{ width: progress + '%' }" />
+        <div class="h-full bg-emerald-500 rounded-full transition-transform duration-300 origin-left" :style="{ transform: 'scaleX(' + (progress / 100) + ')' }" />
       </div>
     </div>
 
     <!-- Error -->
     <div v-if="error" class="absolute inset-0 flex flex-col items-center justify-center bg-stone-50/80">
       <span class="material-symbols-outlined text-3xl text-stone-300 mb-2">broken_image</span>
-      <span class="text-xs text-stone-500">Không thể tải mô hình</span>
+      <span class="text-xs text-emerald-700">Không thể tải mô hình</span>
     </div>
 
     <!-- Controls Overlay -->

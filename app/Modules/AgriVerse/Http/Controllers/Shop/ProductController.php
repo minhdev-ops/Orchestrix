@@ -2,18 +2,19 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
+use App\Modules\AgriVerse\Models\Category;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\Wishlist;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Models\Category;
 
 class ProductController
 {
     public function index(Request $request)
     {
-        $query = Product::published()->with(['store'])->withCount(['orders as sold_count' => fn($q) => $q->whereIn('status', ['completed', 'delivered'])]);
+        $query = Product::published()->with(['store', 'user'])->withCount(['orders as sold_count' => fn ($q) => $q->whereIn('status', ['completed', 'delivered'])]);
         $wishlistedIds = auth()->check()
-            ? \App\Modules\AgriVerse\Models\Wishlist::where('user_id', auth()->id())->pluck('product_id')->toArray()
+            ? Wishlist::where('user_id', auth()->id())->pluck('product_id')->toArray()
             : [];
 
         if ($request->filled('category')) {
@@ -44,7 +45,7 @@ class ProductController
             default => $query->latest(),
         };
 
-        $products = $query->paginate(24)->appends($request->only(['search', 'category', 'min_price', 'max_price', 'in_stock', 'sort']))->through(fn($product) => [
+        $products = $query->paginate(24)->appends($request->only(['search', 'category', 'min_price', 'max_price', 'in_stock', 'sort']))->through(fn ($product) => [
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
@@ -58,6 +59,7 @@ class ProductController
             'model_3d_path' => $product->model_3d_path,
             'wishlisted' => in_array($product->id, $wishlistedIds),
             'store' => $product->store ? ['id' => $product->store->id, 'name' => $product->store->name] : null,
+            'seller' => $product->user ? ['id' => $product->user->id, 'name' => $product->user->name] : null,
         ]);
 
         $categories = Category::active()->root()->get();
@@ -71,13 +73,14 @@ class ProductController
 
     public function show(Product $product)
     {
-        $product->loadCount(['orders as sold_count' => fn($q) => $q->whereIn('status', ['completed', 'delivered'])]);
-        $product->load(['store', 'reviews.user', 'passportLogs.performer', 'user']);
+        $product->loadCount(['orders as sold_count' => fn ($q) => $q->whereIn('status', ['completed', 'delivered'])]);
+        $product->load(['store', 'passportLogs.performer', 'user']);
+        $product->load(['reviews' => fn ($q) => $q->where('is_approved', true), 'reviews.user']);
 
-        $wishlisted = auth()->check() && \App\Modules\AgriVerse\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $product->id)->exists();
+        $wishlisted = auth()->check() && Wishlist::where('user_id', auth()->id())->where('product_id', $product->id)->exists();
 
         $relatedProducts = Product::published()
-            ->withCount(['orders as sold_count' => fn($q) => $q->whereIn('status', ['completed', 'delivered'])])
+            ->withCount(['orders as sold_count' => fn ($q) => $q->whereIn('status', ['completed', 'delivered'])])
             ->where('id', '!=', $product->id)
             ->where(function ($q) use ($product) {
                 if ($product->category) {
@@ -87,7 +90,7 @@ class ProductController
             ->latest()
             ->take(4)
             ->get()
-            ->map(fn($p) => [
+            ->map(fn ($p) => [
                 'id' => $p->id,
                 'name' => $p->name,
                 'price' => $p->price,
@@ -111,18 +114,19 @@ class ProductController
                 'sold_count' => $product->sold_count,
                 'wishlisted' => $wishlisted,
                 'technical_specs' => $product->technical_specs,
+                'metadata' => $product->metadata,
                 'model_3d_path' => $product->model_3d_path,
                 'model_3d_url' => $product->model_3d_url,
                 'store' => $product->store ? ['id' => $product->store->id, 'name' => $product->store->name] : null,
                 'seller' => $product->user ? ['id' => $product->user->id, 'name' => $product->user->name] : null,
-                'reviews' => $product->reviews->map(fn($r) => [
+                'reviews' => $product->reviews->map(fn ($r) => [
                     'id' => $r->id,
                     'rating' => $r->rating,
                     'comment' => $r->comment,
                     'created_at' => $r->created_at->diffForHumans(),
                     'user' => $r->user ? ['id' => $r->user->id, 'name' => $r->user->name] : null,
                 ]),
-                'passport_logs' => $product->passportLogs->map(fn($log) => [
+                'passport_logs' => $product->passportLogs->map(fn ($log) => [
                     'id' => $log->id,
                     'action' => $log->action,
                     'data' => $log->data,
@@ -131,6 +135,72 @@ class ProductController
                 ]),
             ],
             'relatedProducts' => $relatedProducts,
+        ]);
+    }
+
+    public function compare(Request $request)
+    {
+        $ids = $request->query('ids', '');
+
+        $productIds = collect(explode(',', $ids))
+            ->map(fn ($id) => (int) trim($id))
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values()
+            ->toArray();
+
+        if (empty($productIds)) {
+            return Inertia::render('Marketplace/Compare/Index', [
+                'products' => [],
+                'specs' => [],
+            ]);
+        }
+
+        $products = Product::published()
+            ->whereIn('id', $productIds)
+            ->with(['store', 'manufacturer', 'productType'])
+            ->withAvg('reviews', 'rating')
+            ->withCount(['reviews', 'orders as sold_count' => fn ($q) => $q->whereIn('status', ['completed', 'delivered'])])
+            ->get()
+            ->map(fn ($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'price' => $p->price,
+                'compare_price' => $p->compare_price,
+                'image' => $p->image,
+                'category' => $p->category,
+                'description' => $p->description,
+                'stock' => $p->stock,
+                'status' => $p->status,
+                'is_featured' => $p->is_featured,
+                'sold_count' => $p->sold_count,
+                'technical_specs' => $p->technical_specs,
+                'metadata' => $p->metadata,
+                'tags' => $p->tags,
+                'store_name' => $p->store?->name,
+                'manufacturer_name' => $p->manufacturer?->name,
+                'product_type_name' => $p->productType?->name,
+                'avg_rating' => $p->reviews_avg_rating ? round($p->reviews_avg_rating, 1) : null,
+                'reviews_count' => $p->reviews_count,
+                'has_variants' => $p->has_variants,
+                'model_3d_url' => $p->model_3d_url,
+            ]);
+
+        $allSpecs = collect();
+        foreach ($products as $product) {
+            if ($product['technical_specs']) {
+                foreach ($product['technical_specs'] as $key => $value) {
+                    if (!$allSpecs->has($key)) {
+                        $allSpecs->push($key);
+                    }
+                }
+            }
+        }
+
+        return Inertia::render('Marketplace/Compare/Index', [
+            'products' => $products,
+            'specs' => $allSpecs->values(),
         ]);
     }
 

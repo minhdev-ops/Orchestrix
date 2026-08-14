@@ -14,7 +14,7 @@ class CartResource extends JsonResource
             'product' => new ProductResource($this->whenLoaded('product')),
             'store' => new StoreResource($this->whenLoaded('store')),
             'quantity' => $this->quantity,
-            'subtotal' => $this->product?->price * $this->quantity,
+            'subtotal' => $this->whenLoaded('product', fn () => $this->product->price * $this->quantity, 0),
             'created_at' => $this->created_at,
         ];
     }

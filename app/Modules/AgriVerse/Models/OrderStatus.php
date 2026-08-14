@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,6 +12,10 @@ class OrderStatus extends Model
 
     protected $fillable = ['order_id', 'status', 'note', 'user_id'];
 
+    protected $casts = [
+        'status' => 'string',
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class);
@@ -18,6 +23,6 @@ class OrderStatus extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 }

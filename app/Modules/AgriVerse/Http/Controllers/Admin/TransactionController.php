@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
+use App\Modules\AgriVerse\Models\Transaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Transaction;
 
 class TransactionController
 {
@@ -29,6 +29,7 @@ class TransactionController
     public function show(Transaction $transaction)
     {
         $transaction->load(['order.product', 'order.buyer', 'user']);
+
         return Inertia::render('Admin/Transactions/Show', [
             'transaction' => $transaction,
         ]);

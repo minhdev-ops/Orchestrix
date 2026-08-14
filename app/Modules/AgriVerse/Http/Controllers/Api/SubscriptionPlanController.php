@@ -2,8 +2,8 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\SubscriptionPlan;
 use App\Modules\AgriVerse\Http\Resources\SubscriptionPlanResource;
+use App\Modules\AgriVerse\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 
 class SubscriptionPlanController

@@ -34,6 +34,43 @@
         </button>
       </section>
 
+      <!-- Pending Posts Section -->
+      <section v-if="pendingPosts && pendingPosts.data && pendingPosts.data.length > 0" class="forum-pending-section">
+        <div class="forum-pending-header">
+          <h2 class="forum-pending-title">Bài viết của bạn đang chờ duyệt</h2>
+          <p class="forum-pending-desc">{{ pendingPosts.data.length }} bài viết</p>
+        </div>
+        <div class="forum-grid">
+          <article v-for="p in pendingPosts.data" :key="p.id" class="forum-card pending-card">
+            <Link :href="route('agriverse.shop.forum.show', p.id)" class="forum-card-link">
+              <div class="forum-card-img">
+                <img v-if="p.images?.length" :src="p.images[0]" alt="" class="forum-card-thumb" loading="lazy" />
+                <span v-else class="forum-card-letter">{{ (p.title || '?').charAt(0).toUpperCase() }}</span>
+              </div>
+              <div class="forum-card-body">
+                <div class="forum-card-tags">
+                  <span class="forum-status-badge forum-status-pending">Chờ duyệt</span>
+                  <span v-if="p.category" class="forum-card-cat">{{ p.category.name }}</span>
+                </div>
+                <h3 class="forum-card-title">{{ p.title }}</h3>
+                <p class="forum-card-desc">{{ p.content }}</p>
+                <div class="forum-card-meta">
+                  <div class="forum-card-author">
+                    <div class="forum-avatar">
+                      <span>{{ p.user?.name?.charAt(0)?.toUpperCase() || '?' }}</span>
+                    </div>
+                    <div>
+                      <span class="forum-card-author-name">{{ p.user?.name }}</span>
+                      <span class="forum-card-date">{{ p.created_at }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </article>
+        </div>
+      </section>
+
       <section class="forum-posts">
         <div class="forum-posts-header">
           <h2 class="forum-section-title">Bài viết mới nhất</h2>
@@ -51,7 +88,8 @@
           <article v-for="p in posts.data" :key="p.id" class="forum-card">
             <Link :href="route('agriverse.shop.forum.show', p.id)" class="forum-card-link">
               <div class="forum-card-img">
-                <span class="forum-card-letter">{{ (p.title || '?').charAt(0).toUpperCase() }}</span>
+                <img v-if="p.images?.length" :src="p.images[0]" alt="" class="forum-card-thumb" loading="lazy" />
+                <span v-else class="forum-card-letter">{{ (p.title || '?').charAt(0).toUpperCase() }}</span>
                 <div v-if="p.is_pinned" class="forum-card-pin">
                   <span class="material-symbols-outlined">push_pin</span>
                 </div>
@@ -59,6 +97,7 @@
               <div class="forum-card-body">
                 <div class="forum-card-tags">
                   <span v-if="p.category" class="forum-card-cat">{{ p.category.name }}</span>
+                  <span v-if="p.status" class="forum-status-badge" :class="p.status === 'approved' ? 'forum-status-approved' : 'forum-status-pending'">{{ p.status === 'approved' ? 'Đã duyệt' : 'Chờ duyệt' }}</span>
                 </div>
                 <h3 class="forum-card-title">{{ p.title }}</h3>
                 <p class="forum-card-desc">{{ p.content }}</p>
@@ -118,6 +157,7 @@ const props = defineProps({
   categories: Array,
   posts: Object,
   filters: Object,
+  pendingPosts: Object,
 });
 
 const searchQuery = ref(props.filters?.search || '');
@@ -269,6 +309,58 @@ function applyFilters() {
   border-color: var(--ag-primary-500);
 }
 
+.forum-pending-section {
+  max-width: 1280px;
+  margin: 0 auto 64px;
+  padding: 0 64px;
+}
+@media (max-width: 768px) {
+  .forum-pending-section { padding: 0 20px; }
+}
+.forum-pending-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(116, 121, 108, 0.12);
+}
+.forum-pending-title {
+  font-family: var(--ag-font-display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ag-text-primary);
+}
+.forum-pending-desc {
+  font-family: var(--ag-font-body);
+  font-size: 13px;
+  color: var(--ag-text-secondary);
+}
+.forum-status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-family: var(--ag-font-body);
+}
+.forum-status-pending {
+  background: rgba(255, 193, 7, 0.12);
+  color: #d97706;
+}
+.forum-status-approved {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+.pending-card {
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+.pending-card:hover {
+  box-shadow: 0 12px 32px -8px rgba(44,44,44,0.12);
+}
+
 .forum-posts {
   max-width: 1280px;
   margin: 0 auto 80px;
@@ -369,6 +461,11 @@ function applyFilters() {
   color: #d97706;
 }
 .forum-card-pin .material-symbols-outlined { font-size: 18px; }
+.forum-card-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .forum-card-body {
   padding: 20px;
   display: flex;
@@ -378,6 +475,7 @@ function applyFilters() {
 .forum-card-tags {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
   margin-bottom: 10px;
 }
 .forum-card-cat {

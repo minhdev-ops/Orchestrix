@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,6 +22,7 @@ class Refund extends Model
         return [
             'amount' => 'decimal:2',
             'processed_at' => 'datetime',
+            'images' => 'array',
         ];
     }
 
@@ -31,12 +33,12 @@ class Refund extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function processor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'processed_by');
+        return $this->belongsTo(User::class, 'processed_by');
     }
 
     public function scopePending($query)

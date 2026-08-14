@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,13 +29,13 @@ class Order extends Model
             'unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
             'discount_amount' => 'decimal:2',
-        'commission_fee' => 'decimal:2',
-        'total_amount' => 'decimal:2',
-        'shipping_fee' => 'decimal:2',
-        'estimated_delivery' => 'date',
-        'delivered_at' => 'datetime',
-        'cancelled_at' => 'datetime',
-        'metadata' => 'array',
+            'commission_fee' => 'decimal:2',
+            'total_amount' => 'decimal:2',
+            'shipping_fee' => 'decimal:2',
+            'estimated_delivery' => 'date',
+            'delivered_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+            'metadata' => 'array',
         ];
     }
 
@@ -59,12 +60,12 @@ class Order extends Model
 
     public function buyer()
     {
-        return $this->belongsTo(\App\Models\User::class, 'buyer_id');
+        return $this->belongsTo(User::class, 'buyer_id');
     }
 
     public function seller()
     {
-        return $this->belongsTo(\App\Models\User::class, 'seller_id');
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
     public function store()

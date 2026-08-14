@@ -2,13 +2,12 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use App\Models\User;
 use App\Modules\AgriVerse\Models\Affiliate;
-use App\Modules\AgriVerse\Models\Referral;
 use App\Modules\AgriVerse\Models\Commission;
 use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\Referral;
+use Illuminate\Database\Eloquent\Collection;
 
 class AffiliateService
 {
@@ -41,7 +40,7 @@ class AffiliateService
             ->active()
             ->first();
 
-        if (!$affiliate) {
+        if (! $affiliate) {
             return null;
         }
 
@@ -79,12 +78,12 @@ class AffiliateService
             ->where('status', 'pending')
             ->first();
 
-        if (!$referral) {
+        if (! $referral) {
             return null;
         }
 
         $affiliate = $referral->affiliate;
-        if (!$affiliate || $affiliate->status !== 'active') {
+        if (! $affiliate || $affiliate->status !== 'active') {
             return null;
         }
 
@@ -157,6 +156,7 @@ class AffiliateService
     public function approveCommission(Commission $commission): Commission
     {
         $commission->update(['status' => 'approved']);
+
         return $commission->fresh();
     }
 
@@ -169,6 +169,7 @@ class AffiliateService
             'status' => 'paid',
             'paid_at' => now(),
         ]);
+
         return $commission->fresh();
     }
 
@@ -191,7 +192,7 @@ class AffiliateService
     /**
      * Get top affiliates
      */
-    public function getTopAffiliates(int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    public function getTopAffiliates(int $limit = 10): Collection
     {
         return Affiliate::with('user')
             ->active()

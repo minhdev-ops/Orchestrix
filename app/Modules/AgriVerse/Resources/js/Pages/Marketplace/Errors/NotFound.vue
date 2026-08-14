@@ -16,39 +16,39 @@
 
       <section class="not-found-cards">
         <div class="not-found-grid">
-          <div class="not-found-card">
+          <Link :href="route('agriverse.shop.products.index')" class="not-found-card">
             <div class="not-found-card-icon not-found-card-icon-primary">
               <span class="material-symbols-outlined">potted_plant</span>
             </div>
             <h3 class="not-found-card-title">Mua Hàng Mới Về</h3>
             <p class="not-found-card-desc">Khám phá những bộ sưu tập thực vật mới nhất của chúng tôi, tươi tốt từ nhà kính và sẵn sàng cho ngôi nhà mới.</p>
-            <a href="#" class="not-found-card-link">
+            <span class="not-found-card-link">
               Xem Bộ sưu tập
               <span class="material-symbols-outlined">arrow_forward</span>
-            </a>
-          </div>
-          <div class="not-found-card">
+            </span>
+          </Link>
+          <Link :href="route('agriverse.shop.quiz.index')" class="not-found-card">
             <div class="not-found-card-icon not-found-card-icon-secondary">
               <span class="material-symbols-outlined">workspace_premium</span>
             </div>
             <h3 class="not-found-card-title">Phát hiện Quý hiếm</h3>
             <p class="not-found-card-desc">Các mẫu vật kỳ lạ độc đáo và giới hạn dành cho nhà làm vườn chuyên nghiệp và nhà sưu tầm tận tâm.</p>
-            <a href="#" class="not-found-card-link">
+            <span class="not-found-card-link">
               Khám phá Quý hiếm
               <span class="material-symbols-outlined">arrow_forward</span>
-            </a>
-          </div>
-          <div class="not-found-card">
+            </span>
+          </Link>
+          <Link :href="route('agriverse.shop.journal.index')" class="not-found-card">
             <div class="not-found-card-icon not-found-card-icon-fixed">
               <span class="material-symbols-outlined">menu_book</span>
             </div>
             <h3 class="not-found-card-title">Wiki Chăm sóc</h3>
             <p class="not-found-card-desc">Kho tàng kiến thức thực vật khoa học. Tìm hiểu cách nuôi dưỡng sự sống trong vi khí hậu cụ thể của bạn.</p>
-            <a href="#" class="not-found-card-link">
+            <span class="not-found-card-link">
               Khám phá Hướng dẫn
               <span class="material-symbols-outlined">arrow_forward</span>
-            </a>
-          </div>
+            </span>
+          </Link>
         </div>
       </section>
 
@@ -68,6 +68,8 @@
 </template>
 
 <script setup>
+import { Link } from '@inertiajs/vue3'
+import { route } from 'ziggy-js'
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue'
 
 function particleStyle(n) {
@@ -114,7 +116,7 @@ function particleStyle(n) {
 .not-found-mist {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 0%, var(--ag-background) 95%);
+  background: linear-gradient(to bottom, transparent 0%, var(--ag-bg) 95%);
   pointer-events: none;
 }
 .not-found-hero-text {
@@ -132,7 +134,7 @@ function particleStyle(n) {
   font-weight: 500;
   line-height: 42px;
   letter-spacing: -0.01em;
-  color: var(--ag-on-surface);
+  color: var(--ag-text-primary);
   margin-bottom: 16px;
 }
 @media (min-width: 768px) {
@@ -146,37 +148,37 @@ function particleStyle(n) {
   font-family: var(--ag-font-body);
   font-size: 18px;
   line-height: 28px;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
   opacity: 0.9;
 }
 
 .not-found-cards {
-  max-width: var(--ag-container-max);
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 80px var(--ag-margin-desktop);
+  padding: 80px 64px;
 }
 @media (max-width: 768px) {
-  .not-found-cards { padding: 80px var(--ag-margin-mobile); }
+  .not-found-cards { padding: 80px 20px; }
 }
 .not-found-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--ag-gutter);
+  gap: 24px;
 }
 @media (min-width: 768px) {
   .not-found-grid { grid-template-columns: repeat(3, 1fr); }
 }
 .not-found-card {
-  background: var(--ag-surface-container-lowest);
+  background: var(--ag-bg-card);
   padding: 32px;
   border-radius: var(--ag-radius-xl);
-  border: 1px solid color-mix(in srgb, var(--ag-primary) 5%, transparent);
-  box-shadow: 0 10px 30px rgba(72, 103, 48, 0.05);
+  border: 1px solid color-mix(in srgb, var(--ag-primary-500) 5%, transparent);
+  box-shadow: var(--ag-shadow-lg);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .not-found-card:hover {
   transform: translateY(-8px);
@@ -194,30 +196,30 @@ function particleStyle(n) {
   font-size: 24px;
 }
 .not-found-card-icon-primary {
-  background: color-mix(in srgb, var(--ag-primary) 10%, transparent);
-  color: var(--ag-primary);
+  background: color-mix(in srgb, var(--ag-primary-500) 10%, transparent);
+  color: var(--ag-primary-500);
 }
 .not-found-card-icon-secondary {
-  background: color-mix(in srgb, var(--ag-secondary) 10%, transparent);
-  color: var(--ag-secondary);
+  background: color-mix(in srgb, var(--ag-primary-500) 10%, transparent);
+  color: var(--ag-primary-500);
 }
 .not-found-card-icon-fixed {
-  background: color-mix(in srgb, var(--ag-primary-fixed) 30%, transparent);
-  color: var(--ag-primary);
+  background: color-mix(in srgb, color-mix(in srgb, var(--ag-primary-500) 10%, transparent) 30%, transparent);
+  color: var(--ag-primary-500);
 }
 .not-found-card-title {
   font-family: var(--ag-font-display);
   font-size: 32px;
   font-weight: 500;
   line-height: 40px;
-  color: var(--ag-on-surface);
+  color: var(--ag-text-primary);
   margin-bottom: 12px;
 }
 .not-found-card-desc {
   font-family: var(--ag-font-body);
   font-size: 16px;
   line-height: 24px;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
   margin-bottom: 32px;
   flex-grow: 1;
 }
@@ -229,7 +231,7 @@ function particleStyle(n) {
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.05em;
-  color: var(--ag-primary);
+  color: var(--ag-primary-500);
   text-decoration: none;
   transition: gap 0.3s;
 }
@@ -242,7 +244,7 @@ function particleStyle(n) {
 
 .not-found-quote {
   width: 100%;
-  background: var(--ag-surface-container-low);
+  background: var(--ag-bg);
   padding: 128px 20px;
   display: flex;
   flex-direction: column;
@@ -252,7 +254,7 @@ function particleStyle(n) {
 }
 .not-found-quote-icon {
   font-size: 48px;
-  color: color-mix(in srgb, var(--ag-primary) 30%, transparent);
+  color: color-mix(in srgb, var(--ag-primary-500) 30%, transparent);
   margin-bottom: 24px;
 }
 .not-found-quote-text {
@@ -262,7 +264,7 @@ function particleStyle(n) {
   font-weight: 500;
   font-style: italic;
   line-height: 40px;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
   margin-bottom: 16px;
 }
 .not-found-quote-cite {
@@ -271,7 +273,7 @@ function particleStyle(n) {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--ag-outline);
+  color: var(--ag-text-muted);
   font-style: normal;
 }
 
@@ -285,7 +287,7 @@ function particleStyle(n) {
 .not-found-particle {
   position: fixed;
   border-radius: 50%;
-  background: var(--ag-primary);
+  background: var(--ag-primary-500);
   opacity: 0.2;
   animation: not-found-float var(--duration, 12s) ease-in-out var(--delay, 0s) infinite;
 }

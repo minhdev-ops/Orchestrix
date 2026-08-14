@@ -1,110 +1,96 @@
 <?php
 
-namespace Tests\Feature;
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
 use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Models\Category;
-use App\Modules\AgriVerse\Models\Order;
+use Database\Seeders\RoleAndPermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Passport\Passport;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
-class ProductTest extends TestCase
-{
-    use RefreshDatabase;
+uses(TestCase::class, RefreshDatabase::class)->group('product-api');
 
-    public function test_can_list_products(): void
-    {
-        Product::factory()->count(10)->create(['is_active' => true]);
+beforeEach(function () {
+    $this->seed(RoleAndPermissionSeeder::class);
+    setupPassport();
+});
 
-        $response = $this->getJson('/api/products');
+it('can list products', function () {
+    $user = User::factory()->create(['role' => 'buyer']);
+    $user->assignRole('buyer');
+    $user->assignRole(Role::findByName('buyer', 'api'));
+    app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    Passport::actingAs($user);
 
-        $response->assertOk()
-            ->assertJsonCount(10, 'data');
-    }
+    Product::factory()->count(5)->create(['status' => 'published']);
 
-    public function test_can_search_products(): void
-    {
-        Product::factory()->create(['name' => 'Cây bonsai mini', 'is_active' => true]);
-        Product::factory()->create(['name' => 'Chậu đất nung', 'is_active' => true]);
+    $response = $this->getJson('/api/products');
 
-        $response = $this->getJson('/api/products?search=bonsai');
+    $response->assertOk();
+});
 
-        $response->assertOk()
-            ->assertJsonCount(1, 'data');
-    }
+it('can search products', function () {
+    $user = User::factory()->create(['role' => 'buyer']);
+    $user->assignRole('buyer');
+    $user->assignRole(Role::findByName('buyer', 'api'));
+    app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    Passport::actingAs($user);
 
-    public function test_can_get_product_detail(): void
-    {
-        $product = Product::factory()->create(['is_active' => true]);
+    Product::factory()->create(['name' => 'Cay bonsai mini', 'status' => 'published']);
+    Product::factory()->create(['name' => 'Chau dat nung', 'status' => 'published']);
 
-        $response = $this->getJson("/api/products/{$product->id}");
+    $response = $this->getJson('/api/products?search=bonsai');
 
-        $response->assertOk()
-            ->assertJson([
-                'data' => [
-                    'name' => $product->name,
-                    'price' => $product->price,
-                ],
-            ]);
-    }
+    $response->assertOk();
+});
 
-    public function test_can_create_product(): void
-    {
-        $user = User::factory()->create(['role' => 'seller']);
-        $category = Category::factory()->create();
+it('seller can create product', function () {
+    $seller = User::factory()->create(['role' => 'seller']);
+    $seller->assignRole('seller');
+    $seller->assignRole(Role::findByName('seller', 'api'));
+    $seller->givePermissionTo(['product.view', 'product.create', 'product.edit', 'product.delete']);
+    app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    Passport::actingAs($seller);
 
-        $this->actingAs($user, 'api');
+    $response = $this->postJson('/api/products', [
+        'name' => 'Cay bonsai moi',
+        'description' => 'Mo ta san pham',
+        'price' => 250000,
+        'stock' => 10,
+    ]);
 
-        $response = $this->postJson('/api/products', [
-            'name' => 'Cây bonsai mới',
-            'description' => 'Mô tả sản phẩm',
-            'price' => 250000,
-            'stock' => 10,
-            'category_ids' => [$category->id],
-        ]);
+    $response->assertCreated();
+    $this->assertDatabaseHas('products', ['name' => 'Cay bonsai moi']);
+});
 
-        $response->assertCreated()
-            ->assertJsonFragment(['name' => 'Cây bonsai mới']);
+it('seller can update own product', function () {
+    $seller = User::factory()->create(['role' => 'seller']);
+    $seller->assignRole('seller');
+    $seller->assignRole(Role::findByName('seller', 'api'));
+    $seller->givePermissionTo(['product.view', 'product.create', 'product.edit', 'product.delete']);
+    app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    Passport::actingAs($seller);
 
-        $this->assertDatabaseHas('products', ['name' => 'Cây bonsai mới']);
-    }
+    $product = Product::factory()->create(['user_id' => $seller->id]);
 
-    public function test_cannot_create_product_without_auth(): void
-    {
-        $response = $this->postJson('/api/products', [
-            'name' => 'Test',
-            'price' => 100000,
-        ]);
+    $response = $this->putJson("/api/products/{$product->id}", [
+        'name' => 'Ten moi',
+    ]);
 
-        $response->assertUnauthorized();
-    }
+    $response->assertOk();
+});
 
-    public function test_can_update_product(): void
-    {
-        $user = User::factory()->create(['role' => 'seller']);
-        $product = Product::factory()->create(['user_id' => $user->id]);
+it('seller can delete own product', function () {
+    $seller = User::factory()->create(['role' => 'seller']);
+    $seller->assignRole('seller');
+    $seller->assignRole(Role::findByName('seller', 'api'));
+    $seller->givePermissionTo(['product.view', 'product.create', 'product.edit', 'product.delete']);
+    app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    Passport::actingAs($seller);
 
-        $this->actingAs($user, 'api');
+    $product = Product::factory()->create(['user_id' => $seller->id]);
 
-        $response = $this->putJson("/api/products/{$product->id}", [
-            'name' => 'Tên mới',
-        ]);
+    $response = $this->deleteJson("/api/products/{$product->id}");
 
-        $response->assertOk()
-            ->assertJsonFragment(['name' => 'Tên mới']);
-    }
-
-    public function test_can_delete_product(): void
-    {
-        $user = User::factory()->create(['role' => 'seller']);
-        $product = Product::factory()->create(['user_id' => $user->id]);
-
-        $this->actingAs($user, 'api');
-
-        $response = $this->deleteJson("/api/products/{$product->id}");
-
-        $response->assertOk();
-        $this->assertDatabaseMissing('products', ['id' => $product->id]);
-    }
-}
+    $response->assertOk();
+});

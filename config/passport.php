@@ -45,4 +45,16 @@ return [
 
     'connection' => env('PASSPORT_CONNECTION'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Token Expiration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may set the expiration for access tokens. By default, tokens
+    | expire after 1 year. Set to null for no expiration (not recommended).
+    |
+    */
+
+    'token_expiration' => env('PASSPORT_TOKEN_EXPIRATION', 365),
+
 ];

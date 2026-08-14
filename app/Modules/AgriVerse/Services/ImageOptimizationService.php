@@ -6,7 +6,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
-use Intervention\Image\Drivers\Gd\Driver;
 
 class ImageOptimizationService
 {
@@ -18,6 +17,7 @@ class ImageOptimizationService
     ];
 
     protected array $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
     protected int $maxSize = 5120; // 5MB
 
     /**
@@ -25,7 +25,7 @@ class ImageOptimizationService
      */
     public function process(UploadedFile $file, string $directory = 'products'): array
     {
-        if (!in_array($file->getMimeType(), $this->allowedMimes)) {
+        if (! in_array($file->getMimeType(), $this->allowedMimes)) {
             throw new \InvalidArgumentException('Định dạng ảnh không hỗ trợ.');
         }
 
@@ -100,9 +100,9 @@ class ImageOptimizationService
      */
     public function addWatermark(string $imagePath, string $watermarkText = 'AgriVerse'): string
     {
-        $ fullPath = Storage::disk('public')->path($imagePath);
+        $fullPath = Storage::disk('public')->path($imagePath);
 
-        if (!File::exists($fullPath)) {
+        if (! File::exists($fullPath)) {
             return $imagePath;
         }
 
@@ -120,7 +120,7 @@ class ImageOptimizationService
         $watermarkedPath = str_replace('/original/', '/watermarked/', $imagePath);
         $watermarkedDir = dirname(Storage::disk('public')->path($watermarkedPath));
 
-        if (!File::exists($watermarkedDir)) {
+        if (! File::exists($watermarkedDir)) {
             File::makeDirectory($watermarkedDir, 0755, true);
         }
 
@@ -135,7 +135,7 @@ class ImageOptimizationService
      */
     protected function generateFilename(UploadedFile $file): string
     {
-        return uniqid() . '.' . 'webp';
+        return uniqid().'.'.'webp';
     }
 
     /**
@@ -145,7 +145,7 @@ class ImageOptimizationService
     {
         $fullPath = Storage::disk('public')->path($path);
 
-        if (!File::exists($fullPath)) {
+        if (! File::exists($fullPath)) {
             return null;
         }
 

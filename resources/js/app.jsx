@@ -1,3 +1,4 @@
+// Dead file — not compiled by Vite. Remove if unused.
 import './bootstrap';
 import '../css/app.css';
 

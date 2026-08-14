@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class HomeController extends Controller
 {
     /**
@@ -18,14 +16,13 @@ class HomeController extends Controller
 
     /**
      * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index()
     {
         if (auth()->user()->hasRole('admin')) {
             return redirect()->route('admin.agriverse.dashboard');
         }
+
         return redirect()->route('agriverse.shop.home');
     }
 }

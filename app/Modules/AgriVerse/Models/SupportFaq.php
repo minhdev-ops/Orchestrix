@@ -12,6 +12,7 @@ class SupportFaq extends Model
     {
         return [
             'is_published' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 }

@@ -1,39 +1,47 @@
 <?php
 
+namespace App\Services;
 
-    namespace App\Services;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
-
-    use App\Models\User;
-
-    class UserService implements Service {
-        private static $instant = null;
-
-        private function __construct() {
-        }
-
-        public static function getInstant(): UserService {
-            if ( self::$instant == null ) {
-                self::$instant = new UserService();
-            }
-
-            return self::$instant;
-        }
-        public function saveSession(User $user){
-            $user->loginAt = now();
-            session()->put( 'auth', $user );
-            session()->forget( 'logf' );
-            $_SESSION['auth']  = true;
-            $_SESSION['email'] = $user->email;
-            $_SESSION['group'] = $user->group;
-            $_SESSION['host']  = env( 'APP_URL' );
-        }
-
-        public function getAll() {
-            // TODO: Implement getAll() method.
-        }
-
-        public function getByGroup(array $group){
-            return User::select('id','name','email','phone','group','gender','birthday')->where('active',1)->whereIn('group',$group)->get();
-        }
+class UserService extends BaseService
+{
+    protected function modelClass(): string
+    {
+        return User::class;
     }
+
+    public function createUser(array $data): User
+    {
+        $data['password'] = Hash::make($data['password']);
+
+        return $this->create($data);
+    }
+
+    public function updateUser(User $user, array $data): User
+    {
+        if (isset($data['password']) && $data['password']) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        return $this->update($user, $data);
+    }
+
+    public function toggleActive(User $user): User
+    {
+        $user->update(['is_active' => ! $user->is_active]);
+
+        return $user->fresh();
+    }
+
+    public function getByGroup(array $group)
+    {
+        return User::select('id', 'name', 'email', 'phone', 'role', 'birthday')
+            ->where('is_active', 1)
+            ->whereIn('role', $group)
+            ->get();
+    }
+}

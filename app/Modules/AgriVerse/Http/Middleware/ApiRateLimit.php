@@ -2,10 +2,10 @@
 
 namespace App\Modules\AgriVerse\Http\Middleware;
 
+use App\Modules\AgriVerse\Services\RateLimitService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Modules\AgriVerse\Services\RateLimitService;
 
 class ApiRateLimit
 {

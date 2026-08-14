@@ -2,11 +2,11 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Category;
+use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Store;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class SearchService
 {
@@ -29,15 +29,15 @@ class SearchService
                 ->with(['categories', 'store'])
                 ->where('is_active', true);
 
-            if (!empty($query)) {
+            if (! empty($query)) {
                 // Use MySQL FULLTEXT if available, fallback to LIKE
                 if ($this->hasFulltextIndex()) {
-                    $searchQuery->whereRaw("MATCH(name, description) AGAINST(? IN BOOLEAN MODE)", [$this->prepareFulltextQuery($query)]);
+                    $searchQuery->whereRaw('MATCH(name, description) AGAINST(? IN BOOLEAN MODE)', [$this->prepareFulltextQuery($query)]);
                 } else {
                     $searchQuery->where(function ($q) use ($query) {
                         $q->where('name', 'like', "%{$query}%")
-                          ->orWhere('description', 'like', "%{$query}%")
-                          ->orWhere('sku', 'like', "%{$query}%");
+                            ->orWhere('description', 'like', "%{$query}%")
+                            ->orWhere('sku', 'like', "%{$query}%");
                     });
                 }
             }
@@ -61,10 +61,10 @@ class SearchService
             return [];
         }
 
-        $cacheKey = "autocomplete:" . md5($query);
+        $cacheKey = 'autocomplete:'.md5($query);
 
         return Cache::remember($cacheKey, 300, function () use ($query, $limit) {
-            $products = Product::where('is_active', true)
+            $products = Product::published()
                 ->where('name', 'like', "%{$query}%")
                 ->select('id', 'name', 'price', 'image')
                 ->limit($limit)
@@ -109,7 +109,7 @@ class SearchService
      */
     public function getPopularSearches(int $limit = 10): array
     {
-        $cacheKey = "popular_searches";
+        $cacheKey = 'popular_searches';
 
         return Cache::remember($cacheKey, 3600, function () use ($limit) {
             // Get from search_logs table if exists, otherwise return defaults
@@ -172,17 +172,17 @@ class SearchService
      */
     protected function applyFilters($query, array $filters): mixed
     {
-        if (!empty($filters['category'])) {
+        if (! empty($filters['category'])) {
             $query->whereHas('categories', function ($q) use ($filters) {
                 $q->where('slug', $filters['category']);
             });
         }
 
-        if (!empty($filters['min_price'])) {
+        if (! empty($filters['min_price'])) {
             $query->where('price', '>=', $filters['min_price']);
         }
 
-        if (!empty($filters['max_price'])) {
+        if (! empty($filters['max_price'])) {
             $query->where('price', '<=', $filters['max_price']);
         }
 
@@ -190,13 +190,15 @@ class SearchService
             $query->where('stock', '>', 0);
         }
 
-        if (!empty($filters['store_id'])) {
+        if (! empty($filters['store_id'])) {
             $query->where('store_id', $filters['store_id']);
         }
 
-        if (!empty($filters['rating'])) {
+        if (! empty($filters['rating'])) {
             $query->whereHas('reviews', function ($q) use ($filters) {
-                $q->havingRaw('AVG(rating) >= ?', [$filters['rating']]);
+                $q->select('product_id')
+                  ->groupBy('product_id')
+                  ->havingRaw('AVG(rating) >= ?', [$filters['rating']]);
             });
         }
 
@@ -215,7 +217,7 @@ class SearchService
             'popular' => $query->orderByDesc('views_count'),
             'rating' => $query->withAvg('reviews', 'rating')->orderByDesc('reviews_avg_rating'),
             'relevance' => $searchQuery
-                ? $query->orderByRaw("CASE WHEN name LIKE ? THEN 0 ELSE 1 END", ["%{$searchQuery}%"])
+                ? $query->orderByRaw('CASE WHEN name LIKE ? THEN 0 ELSE 1 END', ["%{$searchQuery}%"])
                 : $query->latest(),
             default => $query->latest(),
         };
@@ -228,6 +230,7 @@ class SearchService
     {
         try {
             $indexes = DB::select("SHOW INDEX FROM products WHERE Index_type = 'FULLTEXT'");
+
             return count($indexes) > 0;
         } catch (\Exception $e) {
             return false;
@@ -241,6 +244,7 @@ class SearchService
     {
         $words = explode(' ', $query);
         $prepared = array_map(fn ($word) => "+{$word}*", $words);
+
         return implode(' ', $prepared);
     }
 }

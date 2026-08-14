@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. MANUFACTURERS
-        if (!Schema::hasTable('manufacturers')) {
+        if (! Schema::hasTable('manufacturers')) {
             Schema::create('manufacturers', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -25,7 +25,7 @@ return new class extends Migration
         }
 
         // 2. PRODUCT TYPES (wine type: red, white, sparkling, etc.)
-        if (!Schema::hasTable('product_types')) {
+        if (! Schema::hasTable('product_types')) {
             Schema::create('product_types', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -38,7 +38,7 @@ return new class extends Migration
         }
 
         // 3. TAGS
-        if (!Schema::hasTable('tags')) {
+        if (! Schema::hasTable('tags')) {
             Schema::create('tags', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -50,7 +50,7 @@ return new class extends Migration
         }
 
         // 4. PIVOT: product_tag
-        if (!Schema::hasTable('product_tag')) {
+        if (! Schema::hasTable('product_tag')) {
             Schema::create('product_tag', function (Blueprint $table) {
                 $table->foreignId('product_id')->constrained()->cascadeOnDelete();
                 $table->foreignId('tag_id')->constrained()->cascadeOnDelete();
@@ -59,7 +59,7 @@ return new class extends Migration
         }
 
         // 5. PRODUCT IMAGES (replaces web.sql p_img)
-        if (!Schema::hasTable('product_images')) {
+        if (! Schema::hasTable('product_images')) {
             Schema::create('product_images', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('product_id')->constrained()->cascadeOnDelete();
@@ -74,7 +74,7 @@ return new class extends Migration
         }
 
         // 6. PIVOT: coupon_product (replaces web.sql dis_process)
-        if (!Schema::hasTable('coupon_product')) {
+        if (! Schema::hasTable('coupon_product')) {
             Schema::create('coupon_product', function (Blueprint $table) {
                 $table->foreignId('coupon_id')->constrained()->cascadeOnDelete();
                 $table->foreignId('product_id')->constrained()->cascadeOnDelete();
@@ -83,7 +83,7 @@ return new class extends Migration
         }
 
         // 7. USER VOUCHERS (user-claimed coupons)
-        if (!Schema::hasTable('user_vouchers')) {
+        if (! Schema::hasTable('user_vouchers')) {
             Schema::create('user_vouchers', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -97,7 +97,7 @@ return new class extends Migration
         }
 
         // 8. BANNERS
-        if (!Schema::hasTable('banners')) {
+        if (! Schema::hasTable('banners')) {
             Schema::create('banners', function (Blueprint $table) {
                 $table->id();
                 $table->string('title')->nullable();
@@ -115,7 +115,7 @@ return new class extends Migration
         }
 
         // 9. FEEDBACK
-        if (!Schema::hasTable('feedback')) {
+        if (! Schema::hasTable('feedback')) {
             Schema::create('feedback', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
@@ -130,16 +130,16 @@ return new class extends Migration
 
         // 12. ADD COLUMNS TO PRODUCTS
         Schema::table('products', function (Blueprint $table) {
-            if (!Schema::hasColumn('products', 'manufacturer_id')) {
+            if (! Schema::hasColumn('products', 'manufacturer_id')) {
                 $table->foreignId('manufacturer_id')->nullable()->constrained()->nullOnDelete()->after('category');
             }
-            if (!Schema::hasColumn('products', 'product_type_id')) {
+            if (! Schema::hasColumn('products', 'product_type_id')) {
                 $table->foreignId('product_type_id')->nullable()->constrained()->nullOnDelete()->after('manufacturer_id');
             }
-            if (!Schema::hasColumn('products', 'is_featured')) {
+            if (! Schema::hasColumn('products', 'is_featured')) {
                 $table->boolean('is_featured')->default(false)->after('status');
             }
-            if (!Schema::hasColumn('products', 'image')) {
+            if (! Schema::hasColumn('products', 'image')) {
                 $table->string('image')->nullable()->after('slug');
             }
         });

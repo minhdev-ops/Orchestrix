@@ -3,9 +3,9 @@
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
 use App\Modules\AgriVerse\Models\ChatConversation;
-use App\Modules\AgriVerse\Models\ChatMessage;
 use App\Modules\AgriVerse\Models\ChatGroup;
 use App\Modules\AgriVerse\Models\ChatGroupMember;
+use App\Modules\AgriVerse\Models\ChatMessage;
 use App\Modules\AgriVerse\Services\ChatService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -90,7 +90,7 @@ class ChatController
 
         $buyerId = $request->user()->id;
 
-        if ($buyerId == $data['seller_id']) {
+        if ($buyerId === (int) $data['seller_id']) {
             return response()->json(['error' => 'Cannot start conversation with yourself'], 422);
         }
 
@@ -133,7 +133,7 @@ class ChatController
             ->where('user_id', $userId)
             ->exists();
 
-        if (!$isMember) {
+        if (! $isMember) {
             return response()->json(['error' => 'Not a member of this group'], 403);
         }
 
@@ -153,7 +153,7 @@ class ChatController
             ->where('user_id', $userId)
             ->exists();
 
-        if (!$isMember) {
+        if (! $isMember) {
             return response()->json(['error' => 'Not a member of this group'], 403);
         }
 

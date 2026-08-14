@@ -5,6 +5,9 @@ namespace App\Modules\AgriVerse\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @deprecated No corresponding DigitalPassport model exists.
+ */
 class DigitalPassportResource extends JsonResource
 {
     public function toArray(Request $request): array

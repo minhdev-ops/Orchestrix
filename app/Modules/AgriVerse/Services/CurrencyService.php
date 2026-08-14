@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 class CurrencyService
 {
     protected string $defaultCurrency = 'VND';
+
     protected array $supportedCurrencies = ['VND', 'USD'];
 
     /**
@@ -45,12 +46,13 @@ class CurrencyService
 
         $rates = $this->getRates();
 
-        if (!isset($rates[$from]) || !isset($rates[$to])) {
+        if (! isset($rates[$from]) || ! isset($rates[$to])) {
             return $amount;
         }
 
         // Convert to VND first, then to target
         $inVnd = $amount / $rates[$from];
+
         return $inVnd * $rates[$to];
     }
 
@@ -70,6 +72,7 @@ class CurrencyService
 
         if ($apiRates) {
             Cache::put('currency_rates', $apiRates, now()->addHours(6));
+
             return $apiRates;
         }
 
@@ -104,16 +107,16 @@ class CurrencyService
     /**
      * Format amount with currency
      */
-    public function format(float $amount, string $currency = null): string
+    public function format(float $amount, ?string $currency = null): string
     {
         $currency = $currency ?? $this->defaultCurrency;
         $symbol = $this->symbols[$currency] ?? $currency;
 
         if ($currency === 'VND') {
-            return number_format($amount, 0, ',', '.') . ' ' . $symbol;
+            return number_format($amount, 0, ',', '.').' '.$symbol;
         }
 
-        return $symbol . number_format($amount, 2, '.', ',');
+        return $symbol.number_format($amount, 2, '.', ',');
     }
 
     /**
@@ -129,11 +132,12 @@ class CurrencyService
      */
     public function setUserCurrency(string $currency): bool
     {
-        if (!in_array($currency, $this->supportedCurrencies)) {
+        if (! in_array($currency, $this->supportedCurrencies)) {
             return false;
         }
 
         session(['currency' => $currency]);
+
         return true;
     }
 
@@ -169,7 +173,7 @@ class CurrencyService
     /**
      * Convert price for display
      */
-    public function displayPrice(float $priceVnd, string $targetCurrency = null): string
+    public function displayPrice(float $priceVnd, ?string $targetCurrency = null): string
     {
         $targetCurrency = $targetCurrency ?? $this->getUserCurrency();
 
@@ -178,6 +182,7 @@ class CurrencyService
         }
 
         $converted = $this->convert($priceVnd, 'VND', $targetCurrency);
+
         return $this->format($converted, $targetCurrency);
     }
 
@@ -186,7 +191,7 @@ class CurrencyService
      */
     public function getCurrencyInfo(string $currency): ?array
     {
-        if (!$this->isSupported($currency)) {
+        if (! $this->isSupported($currency)) {
             return null;
         }
 

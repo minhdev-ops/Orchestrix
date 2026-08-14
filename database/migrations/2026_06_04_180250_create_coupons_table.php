@@ -32,10 +32,10 @@ return new class extends Migration
         });
 
         Schema::table('orders', function (Blueprint $table) {
-            if (!Schema::hasColumn('orders', 'coupon_id')) {
+            if (! Schema::hasColumn('orders', 'coupon_id')) {
                 $table->foreignId('coupon_id')->nullable()->constrained()->nullOnDelete()->after('store_id');
             }
-            if (!Schema::hasColumn('orders', 'discount_amount')) {
+            if (! Schema::hasColumn('orders', 'discount_amount')) {
                 $table->decimal('discount_amount', 15, 2)->default(0)->after('commission_fee');
             }
         });
@@ -44,8 +44,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            if (Schema::hasColumn('orders', 'coupon_id')) $table->dropColumn('coupon_id');
-            if (Schema::hasColumn('orders', 'discount_amount')) $table->dropColumn('discount_amount');
+            if (Schema::hasColumn('orders', 'coupon_id')) {
+                $table->dropColumn('coupon_id');
+            }
+            if (Schema::hasColumn('orders', 'discount_amount')) {
+                $table->dropColumn('discount_amount');
+            }
         });
         Schema::dropIfExists('coupons');
     }

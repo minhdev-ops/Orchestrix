@@ -2,11 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Store;
 use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Models\SellerVerification;
+use App\Modules\AgriVerse\Models\Store;
+use Inertia\Inertia;
 
 class StoreController
 {
@@ -22,13 +20,12 @@ class StoreController
         ]);
     }
 
-    public function show($id)
+    public function show(Store $store)
     {
-        $store = Store::findOrFail($id);
 
         $products = Product::published()
             ->where('store_id', $store->id)
-            ->withCount(['orders as sold_count' => fn($q) => $q->whereIn('status', ['completed', 'delivered'])])
+            ->withCount(['orders as sold_count' => fn ($q) => $q->whereIn('status', ['completed', 'delivered'])])
             ->latest()
             ->paginate(12);
 

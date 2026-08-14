@@ -12,22 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            if (!Schema::hasColumn('orders', 'store_id')) {
+            if (! Schema::hasColumn('orders', 'store_id')) {
                 $table->foreignId('store_id')->nullable()->constrained()->nullOnDelete()->after('product_id');
             }
-            if (!Schema::hasColumn('orders', 'quantity')) {
+            if (! Schema::hasColumn('orders', 'quantity')) {
                 $table->integer('quantity')->default(1)->after('store_id');
             }
-            if (!Schema::hasColumn('orders', 'unit_price')) {
+            if (! Schema::hasColumn('orders', 'unit_price')) {
                 $table->decimal('unit_price', 15, 2)->default(0)->after('quantity');
             }
-            if (!Schema::hasColumn('orders', 'total_price')) {
+            if (! Schema::hasColumn('orders', 'total_price')) {
                 $table->decimal('total_price', 15, 2)->default(0)->after('unit_price');
             }
-            if (!Schema::hasColumn('orders', 'shipping_address')) {
+            if (! Schema::hasColumn('orders', 'shipping_address')) {
                 $table->text('shipping_address')->nullable()->after('commission_fee');
             }
-            if (!Schema::hasColumn('orders', 'notes')) {
+            if (! Schema::hasColumn('orders', 'notes')) {
                 $table->text('notes')->nullable()->after('shipping_address');
             }
         });

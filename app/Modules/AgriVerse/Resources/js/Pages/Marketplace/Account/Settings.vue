@@ -69,9 +69,9 @@
           <section v-if="activeTab === 'security'" class="settings-section">
             <div class="settings-section-header">
               <h2 class="settings-section-title">Bảo mật</h2>
-              <p class="settings-section-desc">Thay đổi mật khẩu để giữ tài khoản an toàn.</p>
+              <p class="settings-section-desc">Bảo vệ tài khoản bằng mật khẩu và xác thực hai yếu tố.</p>
             </div>
-            <div class="settings-section-body">
+            <div class="settings-section-body space-y-4">
               <form @submit.prevent="changePassword" class="settings-card">
                 <div class="settings-form-grid">
                   <div class="settings-field settings-field-full">
@@ -101,6 +101,20 @@
                   </button>
                 </div>
               </form>
+
+              <div class="settings-card">
+                <div class="settings-form-grid">
+                  <div class="settings-field settings-field-full">
+                    <label class="settings-label">Xác thực hai yếu tố (2FA)</label>
+                    <p class="text-sm text-[var(--ag-text-secondary)] mb-3">Tăng cường bảo mật tài khoản bằng mã xác thực từ ứng dụng Authenticator.</p>
+                    <Link :href="route('agriverse.shop.2fa.index')"
+                      class="settings-btn settings-btn-primary inline-flex items-center gap-2 no-underline">
+                      <span class="material-symbols-outlined text-base">security</span>
+                      Quản lý 2FA
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -173,7 +187,7 @@
 import { ref, reactive, computed } from 'vue';
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue';
 import { useToast } from 'primevue/usetoast';
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import webApi from '@agriverse/services/webApi';
 
 const toast = useToast();

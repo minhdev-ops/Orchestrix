@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Modules\AgriVerse\Models\Manufacturer;
 use App\Modules\AgriVerse\Models\ProductType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class AgriVerseReferenceSeeder extends Seeder
 {
@@ -20,7 +21,7 @@ class AgriVerseReferenceSeeder extends Seeder
         foreach ($types as $name) {
             ProductType::firstOrCreate(
                 ['name' => $name],
-                ['slug' => \Illuminate\Support\Str::slug($name), 'is_active' => true]
+                ['slug' => Str::slug($name), 'is_active' => true]
             );
         }
 

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Modules\AgriVerse\Http\Controllers\Api\PushNotificationController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['api', 'auth:api'])->prefix('api')->group(function () {
     // Push Notifications

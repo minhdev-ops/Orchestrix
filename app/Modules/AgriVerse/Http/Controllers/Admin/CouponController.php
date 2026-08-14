@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
+use App\Modules\AgriVerse\Models\Coupon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Coupon;
 
 class CouponController
 {
@@ -62,7 +62,7 @@ class CouponController
     public function update(Request $request, Coupon $coupon)
     {
         $validated = $request->validate([
-            'code' => 'required|string|max:50|unique:coupons,code,' . $coupon->id,
+            'code' => 'required|string|max:50|unique:coupons,code,'.$coupon->id,
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => 'required|in:percent,fixed',

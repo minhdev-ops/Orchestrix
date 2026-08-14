@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\Review;
-use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Http\Resources\ReviewResource;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -48,7 +48,7 @@ class ReviewController
 
     public function destroy(Request $request, Review $review)
     {
-        if ($review->user_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
+        if ($review->user_id !== $request->user()->id && ! $request->user()->hasRole('admin')) {
             abort(403, 'Forbidden');
         }
 

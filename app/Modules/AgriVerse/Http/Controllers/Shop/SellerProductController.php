@@ -2,13 +2,13 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
+use App\Modules\AgriVerse\Models\Category;
+use App\Modules\AgriVerse\Models\DigitalPassportLog;
+use App\Modules\AgriVerse\Models\Manufacturer;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\ProductType;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Models\DigitalPassportLog;
-use App\Modules\AgriVerse\Models\Category;
-use App\Modules\AgriVerse\Models\Manufacturer;
-use App\Modules\AgriVerse\Models\ProductType;
 
 class SellerProductController
 {
@@ -39,6 +39,8 @@ class SellerProductController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'technical_specs' => 'nullable|json',
+            'metadata' => 'nullable|json',
             'price' => 'required|numeric|min:0',
             'compare_price' => 'nullable|numeric|min:0',
             'category' => 'nullable|string|max:255',
@@ -56,13 +58,21 @@ class SellerProductController
         $validated['status'] = $validated['status'] ?? 'pending_review';
         $validated['store_id'] = auth()->user()->stores()->first()?->id;
 
-        if (!empty($validated['tags'])) {
+        if (! empty($validated['tags'])) {
             $validated['tags'] = array_map('trim', explode(',', $validated['tags']));
+        }
+
+        // Decode JSON fields
+        if (! empty($validated['technical_specs']) && is_string($validated['technical_specs'])) {
+            $validated['technical_specs'] = json_decode($validated['technical_specs'], true);
+        }
+        if (! empty($validated['metadata']) && is_string($validated['metadata'])) {
+            $validated['metadata'] = json_decode($validated['metadata'], true);
         }
 
         $product = Product::create($validated);
 
-        if (!empty($validated['category'])) {
+        if (! empty($validated['category'])) {
             $cat = Category::where('name', $validated['category'])->first();
             if ($cat) {
                 $product->categories()->attach($cat->id);
@@ -106,6 +116,8 @@ class SellerProductController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'technical_specs' => 'nullable|json',
+            'metadata' => 'nullable|json',
             'price' => 'required|numeric|min:0',
             'compare_price' => 'nullable|numeric|min:0',
             'category' => 'nullable|string|max:255',
@@ -119,8 +131,16 @@ class SellerProductController
             'status' => 'nullable|string|in:draft,pending_review',
         ]);
 
-        if (!empty($validated['tags'])) {
+        if (! empty($validated['tags'])) {
             $validated['tags'] = array_map('trim', explode(',', $validated['tags']));
+        }
+
+        // Decode JSON fields
+        if (! empty($validated['technical_specs']) && is_string($validated['technical_specs'])) {
+            $validated['technical_specs'] = json_decode($validated['technical_specs'], true);
+        }
+        if (! empty($validated['metadata']) && is_string($validated['metadata'])) {
+            $validated['metadata'] = json_decode($validated['metadata'], true);
         }
 
         $validated['status'] = $validated['status'] ?? 'pending_review';
@@ -128,7 +148,7 @@ class SellerProductController
 
         $product->update($validated);
 
-        if (!empty($validated['category'])) {
+        if (! empty($validated['category'])) {
             $cat = Category::where('name', $validated['category'])->first();
             if ($cat) {
                 $product->categories()->sync([$cat->id]);

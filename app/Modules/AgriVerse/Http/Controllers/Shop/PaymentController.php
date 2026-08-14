@@ -2,11 +2,11 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\Transaction;
 use App\Modules\AgriVerse\Services\PaymentService;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PaymentController
 {
@@ -26,9 +26,7 @@ class PaymentController
             abort(403);
         }
 
-        $existingTransaction = Transaction::where('order_id', $order->id)
-            ->where('payment_status', 'pending')
-            ->first();
+        $existingTransaction = Transaction::where('order_id', $order->id)->first();
 
         if ($existingTransaction && $existingTransaction->payment_status === 'paid') {
             return redirect()->route('agriverse.shop.checkout.success', $order)
@@ -42,11 +40,11 @@ class PaymentController
                 'id' => $order->id,
                 'total_amount' => $order->total_amount,
                 'product' => [
-                    'name' => $order->product->name,
-                    'price' => $order->product->price,
+                    'name' => optional($order->product)->name,
+                    'price' => optional($order->product)->price,
                 ],
                 'store' => [
-                    'name' => $order->store->name ?? null,
+                    'name' => optional($order->store)->name,
                 ],
             ],
             'paymentMethods' => $this->paymentService->getAvailableMethods(),
@@ -80,6 +78,7 @@ class PaymentController
                 if ($paymentUrl) {
                     return response()->json(['payment_url' => $paymentUrl]);
                 }
+
                 return back()->withErrors(['payment_method' => 'Không thể tạo thanh toán VNPay']);
 
             case 'momo':
@@ -89,15 +88,18 @@ class PaymentController
                 if ($paymentUrl) {
                     return response()->json(['payment_url' => $paymentUrl]);
                 }
+
                 return back()->withErrors(['payment_method' => 'Không thể tạo thanh toán MoMo']);
 
             case 'banking':
                 $transaction = $this->paymentService->processBankingPayment($order);
+
                 return redirect()->route('agriverse.shop.payment.banking', $order);
 
             case 'cod':
             default:
                 $transaction = $this->paymentService->processCodPayment($order);
+
                 return redirect()->route('agriverse.shop.checkout.success', $order)
                     ->with('success', 'Đặt hàng thành công! Thanh toán khi nhận hàng.');
         }
@@ -150,6 +152,7 @@ class PaymentController
             if ($transaction && $transaction->payment_status !== 'paid') {
                 $this->paymentService->markAsPaid($transaction, $result['transaction_no']);
             }
+
             return response()->json(['RspCode' => '00', 'Message' => 'success']);
         }
 
@@ -169,7 +172,7 @@ class PaymentController
             ->latest()
             ->first();
 
-        if ($result['success'] && $result['response_code'] == 0) {
+        if ($result['success'] && $result['response_code'] === 0) {
             if ($transaction) {
                 $this->paymentService->markAsPaid($transaction, $result['transaction_no']);
             }
@@ -199,10 +202,11 @@ class PaymentController
             ->latest()
             ->first();
 
-        if ($result['success'] && $result['response_code'] == 0) {
+        if ($result['success'] && $result['response_code'] === 0) {
             if ($transaction && $transaction->payment_status !== 'paid') {
                 $this->paymentService->markAsPaid($transaction, $result['transaction_no']);
             }
+
             return response()->json(['resultCode' => 0, 'message' => 'success']);
         }
 
@@ -225,7 +229,7 @@ class PaymentController
                 'id' => $order->id,
                 'total_amount' => $order->total_amount,
                 'product' => [
-                    'name' => $order->product->name,
+                    'name' => optional($order->product)->name,
                 ],
             ],
             'bankInfo' => [

@@ -2,11 +2,11 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
+use App\Modules\AgriVerse\Http\Requests\StoreOrderRequest;
+use App\Modules\AgriVerse\Http\Resources\OrderResource;
+use App\Modules\AgriVerse\Models\Coupon;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\OrderStatus;
-use App\Modules\AgriVerse\Models\Coupon;
-use App\Modules\AgriVerse\Http\Resources\OrderResource;
-use App\Modules\AgriVerse\Http\Requests\StoreOrderRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -87,7 +87,7 @@ class OrderController
     {
         $this->authorizeView($order);
 
-        if (!in_array($order->status, ['pending', 'confirmed'])) {
+        if (! in_array($order->status, ['pending', 'confirmed'])) {
             return response()->json(['message' => 'Order cannot be cancelled.'], 422);
         }
 
@@ -105,7 +105,7 @@ class OrderController
 
     public function confirm(Request $request, Order $order)
     {
-        if ($order->seller_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
+        if ($order->seller_id !== $request->user()->id && ! $request->user()->hasRole('admin')) {
             abort(403, 'Forbidden');
         }
         if ($order->status !== 'pending') {
@@ -125,7 +125,7 @@ class OrderController
 
     public function deliver(Request $request, Order $order)
     {
-        if ($order->seller_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
+        if ($order->seller_id !== $request->user()->id && ! $request->user()->hasRole('admin')) {
             abort(403, 'Forbidden');
         }
         if ($order->status !== 'confirmed') {
@@ -145,7 +145,7 @@ class OrderController
 
     public function complete(Request $request, Order $order)
     {
-        if ($order->buyer_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
+        if ($order->buyer_id !== $request->user()->id && ! $request->user()->hasRole('admin')) {
             abort(403, 'Forbidden');
         }
         if ($order->status !== 'delivered') {

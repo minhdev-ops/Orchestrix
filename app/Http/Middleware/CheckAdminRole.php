@@ -4,22 +4,20 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckAdminRole
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập trang quản trị.');
+        if (! Auth::check() || Auth::user()->role !== 'admin') {
+            $error = 'Bạn không có quyền truy cập trang quản trị.';
+            if ($request->inertia()) {
+                return Inertia::location(redirect()->route('home')->with('error', $error));
+            }
+            return redirect()->route('home')->with('error', $error);
         }
 
         return $next($request);

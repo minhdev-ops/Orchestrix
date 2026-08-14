@@ -2,10 +2,12 @@
 
 namespace App\Modules\AgriVerse\Services;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\EventlogBatch;
+use Spatie\Activitylog\Models\Activity;
 
 class AuditLogService
 {
@@ -17,7 +19,13 @@ class AuditLogService
     public function startBatch(string $name = 'default'): self
     {
         $this->batchName = $name;
-        activity()->batchName($name)->performedOn(auth()->user());
+        $user = Auth::user();
+        if ($user) {
+            activity()->batchName($name)->performedOn($user);
+        } else {
+            activity()->batchName($name);
+        }
+
         return $this;
     }
 
@@ -29,8 +37,8 @@ class AuditLogService
         activity()
             ->tap(function ($event) use ($properties) {
                 $event->properties = array_merge($event->properties ?? [], $properties);
-                $event->ip_address = request()->ip();
-                $event->user_agent = request()->userAgent();
+                $event->ip_address = Request::ip();
+                $event->user_agent = Request::userAgent();
             })
             ->log($description);
 
@@ -43,6 +51,7 @@ class AuditLogService
     public function logCreated($model, array $extra = []): self
     {
         $className = class_basename($model);
+
         return $this->log("Created {$className}", array_merge([
             'model_type' => get_class($model),
             'model_id' => $model->id,
@@ -53,6 +62,7 @@ class AuditLogService
     public function logUpdated($model, array $old = [], array $new = [], array $extra = []): self
     {
         $className = class_basename($model);
+
         return $this->log("Updated {$className}", array_merge([
             'model_type' => get_class($model),
             'model_id' => $model->id,
@@ -64,6 +74,7 @@ class AuditLogService
     public function logDeleted($model, array $extra = []): self
     {
         $className = class_basename($model);
+
         return $this->log("Deleted {$className}", array_merge([
             'model_type' => get_class($model),
             'model_id' => $model->id,
@@ -145,27 +156,27 @@ class AuditLogService
     /**
      * Get activity logs
      */
-    public function getLogs(array $filters = [], int $limit = 50): \Illuminate\Database\Eloquent\Collection
+    public function getLogs(array $filters = [], int $limit = 50): Collection
     {
-        $query = \Spatie\Activitylog\Models\Activity::query();
+        $query = Activity::query();
 
-        if (!empty($filters['user_id'])) {
+        if (! empty($filters['user_id'])) {
             $query->where('causer_id', $filters['user_id']);
         }
 
-        if (!empty($filters['model_type'])) {
+        if (! empty($filters['model_type'])) {
             $query->where('subject_type', $filters['model_type']);
         }
 
-        if (!empty($filters['event'])) {
+        if (! empty($filters['event'])) {
             $query->where('event', $filters['event']);
         }
 
-        if (!empty($filters['start_date'])) {
+        if (! empty($filters['start_date'])) {
             $query->where('created_at', '>=', $filters['start_date']);
         }
 
-        if (!empty($filters['end_date'])) {
+        if (! empty($filters['end_date'])) {
             $query->where('created_at', '<=', $filters['end_date']);
         }
 
@@ -175,9 +186,9 @@ class AuditLogService
     /**
      * Export logs to CSV
      */
-    public function exportToCsv(array $filters = [], string $filename = null): string
+    public function exportToCsv(array $filters = [], ?string $filename = null): string
     {
-        $filename = $filename ?? 'audit_logs_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $filename = $filename ?? 'audit_logs_'.now()->format('Y-m-d_H-i-s').'.csv';
         $logs = $this->getLogs($filters, 10000);
 
         $headers = ['ID', 'Description', 'User', 'IP', 'User Agent', 'Properties', 'Created At'];
@@ -211,7 +222,7 @@ class AuditLogService
      */
     public function getStats(string $period = 'day'): array
     {
-        $query = \Spatie\Activitylog\Models\Activity::query();
+        $query = Activity::query();
 
         return [
             'total' => $query->count(),

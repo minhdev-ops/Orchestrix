@@ -21,7 +21,7 @@
           </div>
           <div class="flex items-end gap-2 h-32">
             <div v-for="(val, i) in chartData" :key="i" class="flex-1 flex flex-col items-center gap-1">
-              <div class="w-full rounded-t-md transition-all duration-300" :style="{ height: Math.max((val / maxChart) * 100, 4) + '%', background: 'var(--ag-primary-500)' }" :title="formatPrice(val) + '₫'"></div>
+              <div class="w-full h-full min-h-[4px] rounded-t-md bg-[var(--ag-primary-500)] transition-transform duration-300 origin-bottom" :style="{ transform: 'scaleY(' + Math.max((val / maxChart), 0.04) + ')' }" :title="formatPrice(val) + '₫'"></div>
               <span class="text-[9px] text-stone-400">{{ chartLabels[i] }}</span>
             </div>
           </div>

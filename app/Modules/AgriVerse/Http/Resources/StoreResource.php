@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Http\Resources;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,7 +16,7 @@ class StoreResource extends JsonResource
             'description' => $this->description,
             'logo' => $this->logo,
             'status' => $this->status,
-            'owner' => new \App\Http\Resources\UserResource($this->whenLoaded('owner')),
+            'owner' => new UserResource($this->whenLoaded('owner')),
             'products_count' => $this->whenCounted('products'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

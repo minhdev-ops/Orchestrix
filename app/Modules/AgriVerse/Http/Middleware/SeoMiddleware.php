@@ -2,10 +2,13 @@
 
 namespace App\Modules\AgriVerse\Http\Middleware;
 
+use App\Modules\AgriVerse\Models\Category;
+use App\Modules\AgriVerse\Models\Store;
+use App\Modules\AgriVerse\Services\SeoService;
 use Closure;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Services\SeoService;
+use Symfony\Component\HttpFoundation\Response;
 
 class SeoMiddleware
 {
@@ -16,7 +19,7 @@ class SeoMiddleware
         $this->seoService = $seoService;
     }
 
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next): Response
     {
         // Share SEO data with all Inertia pages
         Inertia::share('seo', function () use ($request) {
@@ -33,11 +36,15 @@ class SeoMiddleware
         // Default SEO data
         $seo = $this->seoService->homeMeta();
 
-        // Product page
         if ($route && $route->getName() === 'agriverse.shop.products.show') {
             $product = $request->route('product');
             if ($product) {
-                $seo = $this->seoService->productMeta($product);
+                if (! $product instanceof \App\Modules\AgriVerse\Models\Product) {
+                    $product = \App\Modules\AgriVerse\Models\Product::find($product);
+                }
+                if ($product instanceof \App\Modules\AgriVerse\Models\Product) {
+                    $seo = $this->seoService->productMeta($product);
+                }
             }
         }
 
@@ -45,7 +52,7 @@ class SeoMiddleware
         if ($route && $route->getName() === 'agriverse.shop.products.index') {
             $category = $request->query('category');
             if ($category) {
-                $catModel = \App\Modules\AgriVerse\Models\Category::where('slug', $category)->first();
+                $catModel = Category::where('slug', $category)->first();
                 if ($catModel) {
                     $seo = $this->seoService->categoryMeta($catModel);
                 }
@@ -56,7 +63,12 @@ class SeoMiddleware
         if ($route && $route->getName() === 'agriverse.shop.stores.show') {
             $store = $request->route('store');
             if ($store) {
-                $seo = $this->seoService->storeMeta($store);
+                if (! $store instanceof Store) {
+                    $store = Store::find($store);
+                }
+                if ($store instanceof Store) {
+                    $seo = $this->seoService->storeMeta($store);
+                }
             }
         }
 

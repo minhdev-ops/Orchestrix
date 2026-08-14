@@ -25,6 +25,14 @@
             >Cộng đồng</button>
           </div>
 
+          <!-- New message (messages tab) -->
+          <div v-if="activeTab === 'messages'" class="chat-new-msg-wrap">
+            <button class="chat-new-msg-btn" @click="openNewMessage">
+              <span class="material-symbols-outlined" style="font-size:18px">edit</span>
+              Tin nhắn mới
+            </button>
+          </div>
+
           <!-- Search (messages tab) -->
           <div v-if="activeTab === 'messages'" class="chat-search-wrap">
             <span class="material-symbols-outlined chat-search-icon">search</span>
@@ -43,10 +51,14 @@
             <!-- Conversation List -->
             <template v-if="activeTab === 'messages'">
               <div v-if="loading" class="chat-loading">Đang tải...</div>
-              <div v-else-if="filteredConversations.length === 0" class="chat-empty">
-                <span class="material-symbols-outlined" style="font-size:48px;opacity:0.3">chat</span>
-                <p>Chưa có tin nhắn nào</p>
-              </div>
+<div v-else-if="filteredConversations.length === 0" class="chat-empty">
+    <span class="material-symbols-outlined" style="font-size:48px;opacity:0.3">chat</span>
+    <p>Chưa có tin nhắn nào</p>
+    <button class="chat-empty-btn" @click="openNewMessage">
+      <span class="material-symbols-outlined" style="font-size:16px">edit</span>
+      Bắt đầu cuộc trò chuyện
+    </button>
+  </div>
               <div v-else class="chat-conv-list">
                 <div
                   v-for="conv in filteredConversations"
@@ -121,6 +133,10 @@
               </div>
               <div class="chat-main-user-info">
                 <span class="chat-main-user-name">{{ activeConv?.other_user?.name || 'Người dùng' }}</span>
+                <span v-if="activeConv?.product" class="chat-context-chip">
+                  <span class="material-symbols-outlined" style="font-size:13px">spa</span>
+                  {{ activeConv.product.name }}
+                </span>
               </div>
             </div>
             <div class="chat-main-actions">
@@ -255,7 +271,12 @@
           <div class="chat-empty-state">
             <span class="material-symbols-outlined" style="font-size:72px;opacity:0.15">chat</span>
             <h3>Tin nhắn của bạn</h3>
-            <p>Chọn một cuộc trò chuyện để bắt đầu</p>
+            <p>Chọn một cuộc trò chuyện hoặc bắt đầu cuộc trò chuyện mới với người bán.</p>
+            <p class="chat-empty-state-hint">Bắt đầu bằng cách chọn sản phẩm yêu thích để nhắn tin với người bán.</p>
+            <button class="chat-empty-state-btn" @click="openNewMessage">
+              <span class="material-symbols-outlined" style="font-size:18px">edit</span>
+              Tin nhắn mới
+            </button>
           </div>
         </div>
 
@@ -322,6 +343,47 @@
             </div>
           </div>
         </Teleport>
+
+        <!-- New Message Modal -->
+        <Teleport to="body">
+          <div v-if="showNewMessage" class="chat-overlay" @click.self="showNewMessage = false">
+            <div class="chat-modal">
+              <div class="chat-modal-header">
+                <span class="chat-modal-title">Bắt đầu cuộc trò chuyện</span>
+                <button class="chat-header-btn" @click="showNewMessage = false">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+              <div class="chat-modal-body">
+                <input
+                  v-model="productSearchQuery"
+                  class="chat-modal-input"
+                  placeholder="Tìm sản phẩm / người bán..."
+                  @input="fetchPickableProducts"
+                />
+                <div v-if="loadingPickable" class="chat-loading" style="padding:16px">Đang tải sản phẩm...</div>
+                <div v-else-if="pickableProducts.length > 0" class="chat-user-list">
+                  <div
+                    v-for="p in filteredPickableProducts"
+                    :key="p.id"
+                    class="chat-product-item"
+                    @click="startConversation(p)"
+                  >
+                    <img v-if="p.image" :src="p.image" class="chat-product-thumb" alt="" />
+                    <div v-else class="chat-product-thumb" style="display:flex;align-items:center;justify-content:center;">
+                      <span class="material-symbols-outlined" style="opacity:0.4">spa</span>
+                    </div>
+                    <div class="chat-product-info">
+                      <span class="chat-product-name">{{ p.name }}</span>
+                      <span class="chat-product-seller">{{ p.seller_name }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="chat-loading" style="padding:16px">Không có sản phẩm nào để liên hệ. Hãy vào trang sản phẩm để nhắn tin với người bán.</div>
+              </div>
+            </div>
+          </div>
+        </Teleport>
       </div>
     </div>
   </Transition>
@@ -340,7 +402,7 @@ if (token) {
   axios.defaults.headers.common['X-CSRF-TOKEN'] = token
 }
 
-const { state, closePanel, selectConversation } = useChat()
+const { state, closePanel, selectConversation, clearPendingMessage, setUnreadTotal } = useChat()
 const { connect, on, off, connected } = useChatSocket()
 const userId = document.querySelector('meta[name="user-id"]')?.getAttribute('content')
 
@@ -380,6 +442,12 @@ const searchUserQuery = ref('')
 const searchUserResults = ref([])
 const searchingUsers = ref(false)
 
+// New message flow
+const showNewMessage = ref(false)
+const productSearchQuery = ref('')
+const pickableProducts = ref([])
+const loadingPickable = ref(false)
+
 // activeChatId = 'c{id}' for conversation, 'g{id}' for group
 const activeChatId = ref(null)
 
@@ -405,6 +473,11 @@ watch(() => state.activeConversationId, (id) => {
     activeTab.value = 'messages'
     resetChat()
     activeChatId.value = 'c' + id
+    const conv = conversations.value.find(c => 'c' + c.id === activeChatId.value)
+    if (conv && conv.unread > 0) {
+      conv.unread = 0
+      recomputeUnread()
+    }
     fetchMessages()
   }
 })
@@ -433,24 +506,40 @@ watch(activeChatId, (id) => {
 
 const handleIncomingMessage = async (data) => {
   if (!data) return
-  if (data.type === 'private' && state.panelOpen) {
+  if (data.type === 'private') {
+    const otherId = String(data.from)
+    const isOwn = otherId === String(userId)
     const conv = conversations.value.find(c =>
-      String(data.from) === String(c.buyer_id) ||
-      String(data.from) === String(c.seller_id)
+      String(c.buyer_id) === otherId ||
+      String(c.seller_id) === otherId
     )
-    if (conv && activeChatId.value === 'c' + conv.id) {
-      const isOwn = String(data.from) === userId
-      if (!isOwn) {
-        chatMessages.value.push({
-          id: 'ws-' + Date.now(),
-          message: data.content,
-          is_mine: false,
-          created_at: new Date(data.timestamp || Date.now()).toISOString()
-        })
-        await nextTick()
-        scrollToBottom()
+
+    if (conv) {
+      conv.last_message = data.content
+      conv.last_message_at = new Date(data.timestamp || Date.now()).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      if (!isOwn && activeChatId.value !== 'c' + conv.id) {
+        conv.unread = (conv.unread || 0) + 1
       }
+      const idx = conversations.value.indexOf(conv)
+      if (idx > 0) {
+        conversations.value.splice(idx, 1)
+        conversations.value.unshift(conv)
+      }
+    } else {
+      fetchConversations()
     }
+
+    if (state.panelOpen && activeChatId.value === 'c' + conv?.id && !isOwn) {
+      chatMessages.value.push({
+        id: 'ws-' + Date.now(),
+        message: data.content,
+        is_mine: false,
+        created_at: new Date(data.timestamp || Date.now()).toISOString()
+      })
+      await nextTick()
+      scrollToBottom()
+    }
+    recomputeUnread()
   }
   if (data.type === 'group' && state.panelOpen) {
     const isOwn = String(data.from) === userId
@@ -469,9 +558,16 @@ const handleIncomingMessage = async (data) => {
   }
 }
 
+function recomputeUnread() {
+  const total = conversations.value.reduce((sum, c) => sum + (c.unread || 0), 0)
+  setUnreadTotal(total)
+}
+
 onMounted(() => {
   connect()
   on('message', handleIncomingMessage)
+  fetchConversations()
+  fetchGroups()
 })
 
 const groupMembersMap = ref({})
@@ -512,8 +608,10 @@ async function fetchConversations() {
   try {
     const { data } = await axios.get('/agriverse/api/chat/conversations')
     conversations.value = data.conversations || []
+    recomputeUnread()
   } catch {
     conversations.value = []
+    recomputeUnread()
   } finally {
     loading.value = false
   }
@@ -538,6 +636,10 @@ async function openConversation(conv) {
   activeChatId.value = 'c' + conv.id
   selectConversation(conv.id)
   activeTab.value = 'messages'
+  if (conv.unread > 0) {
+    conv.unread = 0
+    recomputeUnread()
+  }
   await fetchMessages()
   inputRef.value?.focus()
 }
@@ -554,11 +656,18 @@ async function fetchMessages() {
     hasMore.value = data.has_more ?? false
     await nextTick()
     scrollToBottom()
+    if (state.pendingMessage) {
+      const text = state.pendingMessage
+      clearPendingMessage()
+      await sendRawMessage(text)
+    }
   } catch {
     chatMessages.value = []
     hasMore.value = false
   } finally {
     messagesLoading.value = false
+    await nextTick()
+    scrollToBottom()
   }
 }
 
@@ -566,7 +675,7 @@ async function loadOlderMessages() {
   if (!hasMore.value || isLoadingMore.value || messagesLoading.value) return
   isLoadingMore.value = true
   page.value++
-  const prevScrollHeight = messageAreaRef.value?.$el?.scrollHeight || 0
+  const prevScrollHeight = messageAreaRef.value?.scrollRef?.scrollHeight || 0
   try {
     const convId = activeChatId.value.slice(1)
     const { data } = await axios.get(`/agriverse/api/chat/${convId}/messages`, {
@@ -577,8 +686,8 @@ async function loadOlderMessages() {
     if (msgs.length > 0) {
       chatMessages.value = [...msgs, ...chatMessages.value]
       await nextTick()
-      if (messageAreaRef.value?.$el) {
-        messageAreaRef.value.$el.scrollTop = messageAreaRef.value.$el.scrollHeight - prevScrollHeight
+      if (messageAreaRef.value?.scrollRef) {
+        messageAreaRef.value.scrollRef.scrollTop = messageAreaRef.value.scrollRef.scrollHeight - prevScrollHeight
       }
     }
   } catch {
@@ -588,8 +697,7 @@ async function loadOlderMessages() {
   }
 }
 
-async function sendMessage() {
-  const text = newMessage.value.trim()
+async function sendRawMessage(text) {
   if (!text || sending.value || !activeChatId.value?.startsWith('c')) return
 
   const tempId = 'temp-' + Date.now()
@@ -600,7 +708,6 @@ async function sendMessage() {
     created_at: new Date().toISOString(),
     is_sending: true
   })
-  newMessage.value = ''
   await nextTick()
   scrollToBottom()
   inputRef.value?.focus()
@@ -620,6 +727,13 @@ async function sendMessage() {
     await nextTick()
     inputRef.value?.focus()
   }
+}
+
+async function sendMessage() {
+  const text = newMessage.value.trim()
+  if (!text) return
+  newMessage.value = ''
+  await sendRawMessage(text)
 }
 
 // ===== Group Chat =====
@@ -676,7 +790,7 @@ async function loadOlderGroupMessages() {
   if (!groupHasMore.value || groupLoadingOlder.value || groupMessagesLoading.value) return
   groupLoadingOlder.value = true
   groupPage.value++
-  const prevScrollHeight = messageAreaRef.value?.$el?.scrollHeight || 0
+  const prevScrollHeight = messageAreaRef.value?.scrollRef?.scrollHeight || 0
   try {
     const groupId = activeChatId.value.slice(1)
     const { data } = await axios.get(`/agriverse/api/chat/groups/${groupId}/messages`, {
@@ -687,8 +801,8 @@ async function loadOlderGroupMessages() {
     if (msgs.length > 0) {
       groupMessages.value = [...msgs, ...groupMessages.value]
       await nextTick()
-      if (messageAreaRef.value?.$el) {
-        messageAreaRef.value.$el.scrollTop = messageAreaRef.value.$el.scrollHeight - prevScrollHeight
+      if (messageAreaRef.value?.scrollRef) {
+        messageAreaRef.value.scrollRef.scrollTop = messageAreaRef.value.scrollRef.scrollHeight - prevScrollHeight
       }
     }
   } catch {
@@ -784,10 +898,53 @@ async function addMember(user) {
   }
 }
 
+// ===== New message flow =====
+
+const filteredPickableProducts = computed(() => {
+  const q = productSearchQuery.value.toLowerCase().trim()
+  if (!q) return pickableProducts.value
+  return pickableProducts.value.filter(p =>
+    p.name?.toLowerCase().includes(q) || p.seller_name?.toLowerCase().includes(q)
+  )
+})
+
+async function openNewMessage() {
+  showNewMessage.value = true
+  productSearchQuery.value = ''
+  await fetchPickableProducts()
+}
+
+async function fetchPickableProducts() {
+  loadingPickable.value = true
+  try {
+    const { data } = await axios.get('/agriverse/api/chat/pickable-products')
+    pickableProducts.value = data.products || []
+  } catch {
+    pickableProducts.value = []
+  } finally {
+    loadingPickable.value = false
+  }
+}
+
+async function startConversation(product) {
+  showNewMessage.value = false
+  try {
+    const { data } = await axios.post('/agriverse/api/chat/start', { product_id: product.id })
+    activeTab.value = 'messages'
+    resetChat()
+    activeChatId.value = 'c' + data.conversation.id
+    await fetchMessages()
+    inputRef.value?.focus()
+  } catch (e) {
+    const msg = e.response?.data?.error || 'Không thể bắt đầu trò chuyện'
+    alert(msg)
+  }
+}
+
 const scrollToBottom = () => {
   nextTick(() => {
-    if (messageAreaRef.value?.$el) {
-      messageAreaRef.value.$el.scrollTop = messageAreaRef.value.$el.scrollHeight
+    if (messageAreaRef.value?.scrollRef) {
+      messageAreaRef.value.scrollRef.scrollTop = messageAreaRef.value.scrollRef.scrollHeight
     }
   })
 }
@@ -818,29 +975,30 @@ function formatTime(dateStr) {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(27, 28, 28, 0.45);
+  backdrop-filter: blur(2px);
 }
 
 .chat-panel {
-  width: 840px;
+  width: 880px;
   max-width: 95vw;
-  height: 640px;
+  height: 660px;
   max-height: 90vh;
-  background: #fff;
-  border-radius: 16px;
+  background: var(--ag-bg-card);
+  border-radius: var(--ag-radius-2xl);
   display: flex;
   overflow: hidden;
-  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--ag-shadow-xl);
 }
 
 /* ===== Left Sidebar ===== */
 .chat-sidebar {
   width: 300px;
   min-width: 300px;
-  border-right: 1px solid #e5e5e5;
+  border-right: 1px solid var(--ag-border);
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--ag-bg-card);
 }
 
 .chat-sidebar-header {
@@ -851,9 +1009,10 @@ function formatTime(dateStr) {
 }
 
 .chat-sidebar-title {
+  font-family: var(--ag-font-display);
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--ag-text-primary);
 }
 
 .chat-header-btn {
@@ -866,11 +1025,13 @@ function formatTime(dateStr) {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: var(--ag-text-secondary);
+  transition: background 0.15s, color 0.15s;
 }
 
 .chat-header-btn:hover {
-  background: #f0f0f0;
+  background: var(--ag-surface-container);
+  color: var(--ag-text-primary);
 }
 
 /* Tabs */
@@ -885,22 +1046,53 @@ function formatTime(dateStr) {
   padding: 8px 0;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--ag-radius-md);
   font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: var(--ag-text-secondary);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
 .chat-tab:hover {
-  background: #f5f5f5;
+  background: var(--ag-surface-container);
+  color: var(--ag-text-primary);
 }
 
 .chat-tab--active {
-  background: #e8f0fe;
-  color: #0084ff;
+  background: color-mix(in srgb, var(--ag-primary-500) 12%, transparent);
+  color: var(--ag-primary-600);
   font-weight: 600;
+}
+
+/* New message button (messages tab) */
+.chat-new-msg-wrap {
+  padding: 12px 16px 0;
+}
+
+.chat-new-msg-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: var(--ag-radius-lg);
+  background: var(--ag-primary-500);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.chat-new-msg-btn:hover {
+  background: var(--ag-primary-600);
+}
+
+.chat-new-msg-btn:active {
+  transform: scale(0.98);
 }
 
 /* Search */
@@ -915,25 +1107,25 @@ function formatTime(dateStr) {
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
-  color: #999;
+  color: var(--ag-text-muted);
   pointer-events: none;
 }
 
 .chat-search {
   width: 100%;
   padding: 8px 12px 8px 36px;
-  border: 1px solid #e5e5e5;
-  border-radius: 20px;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-full);
   font-size: 13px;
   outline: none;
-  background: #f5f5f5;
+  background: var(--ag-surface-container-low);
   box-sizing: border-box;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .chat-search:focus {
-  background: #fff;
-  border-color: #0084ff;
+  background: var(--ag-bg-card);
+  border-color: var(--ag-primary-500);
 }
 
 /* Create group button */
@@ -948,19 +1140,19 @@ function formatTime(dateStr) {
   justify-content: center;
   gap: 6px;
   padding: 8px 12px;
-  border: 1px dashed #ccc;
-  border-radius: 8px;
+  border: 1px dashed var(--ag-border);
+  border-radius: var(--ag-radius-md);
   background: transparent;
   font-size: 13px;
-  color: #666;
+  color: var(--ag-text-secondary);
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .chat-create-group-btn:hover {
-  background: #f5f5f5;
-  border-color: #0084ff;
-  color: #0084ff;
+  background: var(--ag-surface-container);
+  border-color: var(--ag-primary-500);
+  color: var(--ag-primary-600);
 }
 
 /* Sidebar body */
@@ -972,7 +1164,7 @@ function formatTime(dateStr) {
 .chat-loading {
   padding: 24px;
   text-align: center;
-  color: #999;
+  color: var(--ag-text-muted);
   font-size: 13px;
 }
 
@@ -983,9 +1175,53 @@ function formatTime(dateStr) {
   justify-content: center;
   height: 100%;
   gap: 8px;
-  color: #999;
+  color: var(--ag-text-muted);
   font-size: 13px;
   padding: 24px;
+}
+
+.chat-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--ag-radius-full);
+  background: var(--ag-primary-500);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.chat-empty-btn:hover {
+  background: var(--ag-primary-600);
+}
+
+.chat-empty-state-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: var(--ag-radius-full);
+  background: var(--ag-primary-500);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.chat-empty-state-btn:hover {
+  background: var(--ag-primary-600);
+}
+
+.chat-empty-state-btn:active {
+  transform: scale(0.97);
 }
 
 /* Conversation/Group items */
@@ -1003,35 +1239,35 @@ function formatTime(dateStr) {
 }
 
 .chat-conv-item:hover {
-  background: #f5f5f5;
+  background: var(--ag-surface-container);
 }
 
 .chat-conv-item--active {
-  background: #e8f0fe;
+  background: color-mix(in srgb, var(--ag-primary-500) 12%, transparent);
 }
 
 .chat-avatar {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: #0084ff;
+  background: var(--ag-primary-500);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 17px;
   flex-shrink: 0;
 }
 
 .chat-avatar--sm {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   font-size: 14px;
 }
 
 .chat-avatar--group {
-  background: #42b72a;
+  background: var(--ag-secondary-500);
 }
 
 .chat-avatar-text {
@@ -1053,7 +1289,7 @@ function formatTime(dateStr) {
 .chat-conv-name {
   font-size: 14px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--ag-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1061,7 +1297,7 @@ function formatTime(dateStr) {
 
 .chat-conv-time {
   font-size: 11px;
-  color: #999;
+  color: var(--ag-text-muted);
   white-space: nowrap;
 }
 
@@ -1074,7 +1310,7 @@ function formatTime(dateStr) {
 
 .chat-conv-preview {
   font-size: 13px;
-  color: #666;
+  color: var(--ag-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1086,7 +1322,7 @@ function formatTime(dateStr) {
   height: 18px;
   padding: 0 5px;
   border-radius: 9px;
-  background: #e41e3f;
+  background: var(--ag-danger);
   color: #fff;
   font-size: 11px;
   font-weight: 600;
@@ -1100,8 +1336,8 @@ function formatTime(dateStr) {
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 9999px;
-  background: #fef3c7;
-  color: #d97706;
+  background: color-mix(in srgb, var(--ag-warning) 15%, transparent);
+  color: var(--ag-warning);
   white-space: nowrap;
 }
 .chat-conv-item--pending {
@@ -1114,30 +1350,40 @@ function formatTime(dateStr) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--ag-bg-card);
   min-width: 0;
 }
 
 .chat-main--empty {
   align-items: center;
   justify-content: center;
+  background: var(--ag-bg-sand);
 }
 
 .chat-empty-state {
   text-align: center;
-  color: #999;
+  color: var(--ag-text-muted);
+  max-width: 320px;
 }
 
 .chat-empty-state h3 {
+  font-family: var(--ag-font-display);
   font-size: 18px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--ag-text-primary);
   margin: 16px 0 4px;
 }
 
 .chat-empty-state p {
   font-size: 14px;
-  color: #666;
+  color: var(--ag-text-secondary);
+  line-height: 1.5;
+}
+
+.chat-empty-state-hint {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--ag-text-muted);
 }
 
 .chat-pending-state {
@@ -1147,18 +1393,18 @@ function formatTime(dateStr) {
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #999;
+  color: var(--ag-text-muted);
   padding: 40px 24px;
 }
 .chat-pending-state h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #d97706;
+  color: var(--ag-warning);
   margin: 12px 0 4px;
 }
 .chat-pending-state p {
   font-size: 13px;
-  color: #999;
+  color: var(--ag-text-muted);
   max-width: 240px;
 }
 
@@ -1167,7 +1413,7 @@ function formatTime(dateStr) {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--ag-border);
   gap: 12px;
   flex-shrink: 0;
 }
@@ -1182,11 +1428,11 @@ function formatTime(dateStr) {
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: var(--ag-text-secondary);
 }
 
 .chat-back-btn:hover {
-  background: #f0f0f0;
+  background: var(--ag-surface-container);
 }
 
 .chat-main-user {
@@ -1204,7 +1450,7 @@ function formatTime(dateStr) {
 .chat-main-user-name {
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--ag-text-primary);
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1213,7 +1459,7 @@ function formatTime(dateStr) {
 
 .chat-main-user-status {
   font-size: 12px;
-  color: #999;
+  color: var(--ag-text-muted);
 }
 
 .chat-main-actions {
@@ -1239,16 +1485,16 @@ function formatTime(dateStr) {
   max-width: 70%;
   padding: 8px 14px;
   border-radius: 18px;
-  background: #fff;
-  color: #1a1a1a;
+  background: var(--ag-bg-card);
+  color: var(--ag-text-primary);
   font-size: 14px;
-  line-height: 1.4;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  line-height: 1.45;
+  box-shadow: var(--ag-shadow-sm);
   word-wrap: break-word;
 }
 
 .chat-bubble--mine {
-  background: #0084ff;
+  background: var(--ag-primary-500);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
@@ -1261,7 +1507,7 @@ function formatTime(dateStr) {
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #42b72a;
+  color: var(--ag-primary-600);
   margin-bottom: 2px;
 }
 
@@ -1280,24 +1526,24 @@ function formatTime(dateStr) {
 
 .chat-bubble-time {
   font-size: 11px;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .chat-bubble--mine .chat-bubble-time {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .chat-msg-row--theirs .chat-bubble-time {
-  color: #999;
+  color: var(--ag-text-muted);
 }
 
 .chat-seen-icon {
   font-size: 14px;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .chat-bubble--mine .chat-seen-icon {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .chat-seen-icon--sending {
@@ -1312,21 +1558,21 @@ function formatTime(dateStr) {
 /* Input */
 .chat-input-wrap {
   padding: 8px 16px 12px;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--ag-border);
   flex-shrink: 0;
-  background: #fff;
+  background: var(--ag-bg-card);
 }
 .chat-input-target {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 0 4px 6px;
-  color: var(--ag-text-muted, #999);
+  color: var(--ag-text-muted);
   font-size: 12px;
 }
 .chat-input-target-text {
   font-weight: 600;
-  color: var(--ag-primary-500, #486730);
+  color: var(--ag-primary-600);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1336,9 +1582,16 @@ function formatTime(dateStr) {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f0f2f5;
-  border-radius: 24px;
+  background: var(--ag-surface-container-low);
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-full);
   padding: 4px 4px 4px 16px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.chat-input-box:focus-within {
+  background: var(--ag-bg-card);
+  border-color: var(--ag-primary-500);
 }
 
 .chat-input {
@@ -1347,7 +1600,7 @@ function formatTime(dateStr) {
   background: transparent;
   font-size: 14px;
   outline: none;
-  color: #1a1a1a;
+  color: var(--ag-text-primary);
   min-height: 24px;
 }
 
@@ -1356,32 +1609,54 @@ function formatTime(dateStr) {
   height: 36px;
   border: none;
   border-radius: 50%;
-  background: #0084ff;
+  background: var(--ag-primary-500);
   color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.1s;
 }
 
 .chat-send-btn:hover {
-  background: #006edb;
+  background: var(--ag-primary-600);
+}
+
+.chat-send-btn:active {
+  transform: scale(0.92);
 }
 
 .chat-send-btn:disabled {
-  background: #ccc;
+  background: var(--ag-surface-container);
+  color: var(--ag-text-muted);
   cursor: not-allowed;
 }
 
-/* Modal (create group) */
+/* Product context chip in header */
+.chat-context-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 180px;
+  padding: 3px 10px;
+  border-radius: var(--ag-radius-full);
+  background: var(--ag-surface-container-low);
+  border: 1px solid var(--ag-border);
+  font-size: 11px;
+  color: var(--ag-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Modal (create group / new message) */
 .chat-modal {
-  background: #fff;
-  border-radius: 16px;
-  width: 400px;
+  background: var(--ag-bg-card);
+  border-radius: var(--ag-radius-2xl);
+  width: 420px;
   max-width: 90vw;
-  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--ag-shadow-xl);
   overflow: hidden;
 }
 
@@ -1390,23 +1665,27 @@ function formatTime(dateStr) {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--ag-border);
 }
 
 .chat-modal-title {
+  font-family: var(--ag-font-display);
   font-size: 16px;
   font-weight: 600;
+  color: var(--ag-text-primary);
 }
 
 .chat-modal-body {
   padding: 20px;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .chat-modal-input {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-md);
   font-size: 14px;
   outline: none;
   box-sizing: border-box;
@@ -1414,7 +1693,7 @@ function formatTime(dateStr) {
 }
 
 .chat-modal-input:focus {
-  border-color: #0084ff;
+  border-color: var(--ag-primary-500);
 }
 
 .chat-modal-footer {
@@ -1422,13 +1701,13 @@ function formatTime(dateStr) {
   justify-content: flex-end;
   gap: 8px;
   padding: 12px 20px;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--ag-border);
 }
 
 .chat-modal-cancel,
 .chat-modal-confirm {
   padding: 8px 20px;
-  border-radius: 8px;
+  border-radius: var(--ag-radius-md);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -1437,25 +1716,26 @@ function formatTime(dateStr) {
 }
 
 .chat-modal-cancel {
-  background: #f0f0f0;
-  color: #666;
+  background: var(--ag-surface-container);
+  color: var(--ag-text-secondary);
 }
 
 .chat-modal-cancel:hover {
-  background: #e5e5e5;
+  background: var(--ag-surface-container-high);
 }
 
 .chat-modal-confirm {
-  background: #0084ff;
+  background: var(--ag-primary-500);
   color: #fff;
 }
 
 .chat-modal-confirm:hover {
-  background: #006edb;
+  background: var(--ag-primary-600);
 }
 
 .chat-modal-confirm:disabled {
-  background: #ccc;
+  background: var(--ag-surface-container);
+  color: var(--ag-text-muted);
   cursor: not-allowed;
 }
 
@@ -1464,6 +1744,9 @@ function formatTime(dateStr) {
   margin-top: 12px;
   max-height: 240px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .chat-user-item {
@@ -1471,13 +1754,13 @@ function formatTime(dateStr) {
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: var(--ag-radius-md);
   cursor: pointer;
   transition: background 0.1s;
 }
 
 .chat-user-item:hover {
-  background: #f0f2f5;
+  background: var(--ag-surface-container);
 }
 
 .chat-avatar--xs {
@@ -1488,7 +1771,50 @@ function formatTime(dateStr) {
 
 .chat-user-name {
   font-size: 14px;
-  color: #1a1a1a;
+  color: var(--ag-text-primary);
+}
+
+/* Product picker for new message */
+.chat-product-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--ag-radius-md);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.chat-product-item:hover {
+  background: var(--ag-surface-container);
+}
+
+.chat-product-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ag-radius-md);
+  object-fit: cover;
+  background: var(--ag-surface-container);
+  flex-shrink: 0;
+}
+
+.chat-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-product-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ag-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-product-seller {
+  font-size: 12px;
+  color: var(--ag-text-muted);
 }
 
 /* Transitions */

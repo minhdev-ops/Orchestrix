@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->unsignedBigInteger('product_id');
             $table->text('last_message')->nullable();
             $table->timestamp('last_message_at')->nullable();
             $table->foreignId('last_sender_id')->nullable()->constrained('users')->nullOnDelete();

@@ -1,12 +1,17 @@
 <?php
 
+/**
+ * @deprecated Use App\Modules\AgriVerse\Http\Controllers\Admin\ReportController instead.
+ * This controller uses Blade views; the module version uses Inertia SPA.
+ * Kept for backward compatibility. Will be removed in next major version.
+ */
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\Transaction;
-use App\Modules\AgriVerse\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,11 +30,9 @@ class ReportController extends Controller
             default => '%Y-%m',
         };
 
-        $revenueData = $query->select(
-            DB::raw("DATE_FORMAT(created_at, '$groupFormat') as period"),
-            DB::raw('SUM(amount) as total'),
-            DB::raw('COUNT(*) as count')
-        )
+        $revenueData = $query->selectRaw("DATE_FORMAT(created_at, ?) as period", [$groupFormat])
+            ->selectRaw('SUM(amount) as total')
+            ->selectRaw('COUNT(*) as count')
             ->groupBy('period')
             ->orderBy('period', 'desc')
             ->limit(12)

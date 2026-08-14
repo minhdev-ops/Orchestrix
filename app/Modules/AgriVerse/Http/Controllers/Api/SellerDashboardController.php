@@ -2,13 +2,13 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
+use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\Store;
+use App\Modules\AgriVerse\Models\StoreSubscription;
+use App\Modules\AgriVerse\Models\ThreeDAsset;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Modules\AgriVerse\Models\Store;
-use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Models\Order;
-use App\Modules\AgriVerse\Models\ThreeDAsset;
-use App\Modules\AgriVerse\Models\StoreSubscription;
 use Illuminate\Support\Facades\DB;
 
 class SellerDashboardController
@@ -18,7 +18,7 @@ class SellerDashboardController
         $user = $request->user();
         $store = Store::where('owner_id', $user->id)->first();
 
-        if (!$store) {
+        if (! $store) {
             abort(404, 'You have no store. Create one first.');
         }
 

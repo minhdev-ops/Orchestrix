@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @deprecated Settings management is being migrated to the AgriVerse module.
+ * This controller uses Blade views; the module version uses Inertia SPA.
+ * Kept for backward compatibility. Will be removed in next major version.
+ */
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;

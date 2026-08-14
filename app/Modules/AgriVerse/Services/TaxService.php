@@ -105,7 +105,7 @@ class TaxService
         $taxData = $this->calculateOrderTax($order);
 
         return [
-            'invoice_number' => 'VAT-' . $order->id . '-' . now()->format('Ymd'),
+            'invoice_number' => 'VAT-'.$order->id.'-'.now()->format('Ymd'),
             'invoice_date' => now()->format('d/m/Y'),
             'seller' => [
                 'name' => $order->store?->name ?? config('app.name'),
@@ -120,7 +120,7 @@ class TaxService
             'subtotal' => $taxData['subtotal'],
             'total_tax' => $taxData['total_tax'],
             'total' => $taxData['total_with_tax'],
-            'amount_in_words' => $this->numberToWords($taxData['total_with_tax']) . ' đồng',
+            'amount_in_words' => $this->numberToWords($taxData['total_with_tax']).' đồng',
         ];
     }
 
@@ -143,7 +143,9 @@ class TaxService
         ];
 
         foreach ($orders as $order) {
-            if (!$order->product) continue;
+            if (! $order->product) {
+                continue;
+            }
 
             $taxData = $this->calculateItemTax($order->product, $order->quantity);
             $report['total_revenue'] += $taxData['subtotal'];
@@ -151,7 +153,7 @@ class TaxService
 
             $categories = $order->product->categories->pluck('name', 'slug')->toArray();
             foreach ($categories as $slug => $name) {
-                if (!isset($report['by_category'][$slug])) {
+                if (! isset($report['by_category'][$slug])) {
                     $report['by_category'][$slug] = [
                         'name' => $name,
                         'revenue' => 0,
@@ -176,28 +178,30 @@ class TaxService
         $ones = ['', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
         $tens = ['', 'mười', 'hai mươi', 'ba mươi', 'bốn mươi', 'năm mươi', 'sáu mươi', 'bảy mươi', 'tám mươi', 'chín mươi'];
 
-        if ($number == 0) return 'không';
+        if ($number === 0) {
+            return 'không';
+        }
 
         $result = '';
         $number = (int) $number;
 
         if ($number >= 1000000) {
-            $result .= $ones[intval($number / 1000000)] . ' triệu ';
+            $result .= $ones[intval($number / 1000000)].' triệu ';
             $number %= 1000000;
         }
 
         if ($number >= 1000) {
-            $result .= $ones[intval($number / 1000)] . ' nghìn ';
+            $result .= $ones[intval($number / 1000)].' nghìn ';
             $number %= 1000;
         }
 
         if ($number >= 100) {
-            $result .= $ones[intval($number / 100)] . ' trăm ';
+            $result .= $ones[intval($number / 100)].' trăm ';
             $number %= 100;
         }
 
         if ($number >= 10) {
-            $result .= $tens[intval($number / 10)] . ' ';
+            $result .= $tens[intval($number / 10)].' ';
             $number %= 10;
         }
 
@@ -214,8 +218,8 @@ class TaxService
     public function getTaxRates(): array
     {
         return [
-            'default' => $this->defaultRate * 100 . '%',
-            'categories' => array_map(fn ($rate) => $rate * 100 . '%', $this->categoryRates),
+            'default' => $this->defaultRate * 100 .'%',
+            'categories' => array_map(fn ($rate) => $rate * 100 .'%', $this->categoryRates),
             'exempt' => $this->exemptCategories,
         ];
     }

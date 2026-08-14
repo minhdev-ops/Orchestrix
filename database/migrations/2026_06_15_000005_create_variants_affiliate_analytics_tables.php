@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // Product Attributes
-        if (!Schema::hasTable('product_attributes')) {
+        if (! Schema::hasTable('product_attributes')) {
             Schema::create('product_attributes', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -23,7 +23,7 @@ return new class extends Migration
         }
 
         // Product Variants
-        if (!Schema::hasTable('product_variants')) {
+        if (! Schema::hasTable('product_variants')) {
             Schema::create('product_variants', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('product_id')->constrained()->cascadeOnDelete();
@@ -43,7 +43,7 @@ return new class extends Migration
         }
 
         // Product Attribute Pivot
-        if (!Schema::hasTable('product_attribute_value')) {
+        if (! Schema::hasTable('product_attribute_value')) {
             Schema::create('product_attribute_value', function (Blueprint $table) {
                 $table->foreignId('product_id')->constrained()->cascadeOnDelete();
                 $table->foreignId('product_attribute_id')->constrained()->cascadeOnDelete();
@@ -53,7 +53,7 @@ return new class extends Migration
         }
 
         // Affiliates
-        if (!Schema::hasTable('affiliates')) {
+        if (! Schema::hasTable('affiliates')) {
             Schema::create('affiliates', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -71,7 +71,7 @@ return new class extends Migration
         }
 
         // Referrals
-        if (!Schema::hasTable('referrals')) {
+        if (! Schema::hasTable('referrals')) {
             Schema::create('referrals', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('affiliate_id')->constrained()->cascadeOnDelete();
@@ -88,7 +88,7 @@ return new class extends Migration
         }
 
         // Commissions
-        if (!Schema::hasTable('commissions')) {
+        if (! Schema::hasTable('commissions')) {
             Schema::create('commissions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('affiliate_id')->constrained()->cascadeOnDelete();
@@ -106,7 +106,7 @@ return new class extends Migration
         }
 
         // Analytics Events
-        if (!Schema::hasTable('analytics_events')) {
+        if (! Schema::hasTable('analytics_events')) {
             Schema::create('analytics_events', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
@@ -130,7 +130,7 @@ return new class extends Migration
         }
 
         // Recently Viewed
-        if (!Schema::hasTable('recently_viewed')) {
+        if (! Schema::hasTable('recently_viewed')) {
             Schema::create('recently_viewed', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();

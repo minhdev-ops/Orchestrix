@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
+use App\Modules\AgriVerse\Models\Contract;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Contract;
 
 class ContractController
 {
@@ -32,8 +32,20 @@ class ContractController
         ]);
     }
 
-    public function destroy(Contract $contract)
+    public function destroy(Request $request, Contract $contract)
     {
+        $order = $contract->order;
+
+        abort_unless($order, 404, 'Đơn hàng liên kết không tồn tại.');
+        abort_unless($order->store_id, 422, 'Hợp đồng không thuộc về cửa hàng nào.');
+
+        $user = auth()->user();
+        abort_unless(
+            $user->isAdmin() || $order->buyer_id === $user->id || $order->seller_id === $user->id,
+            403,
+            'Bạn không có quyền xóa hợp đồng này.'
+        );
+
         $contract->delete();
 
         return redirect()->route('admin.agriverse.contracts.index')

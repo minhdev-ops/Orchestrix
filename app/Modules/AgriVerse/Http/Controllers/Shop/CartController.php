@@ -2,10 +2,10 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Modules\AgriVerse\Models\Cart;
 use App\Modules\AgriVerse\Models\Product;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CartController
 {
@@ -54,6 +54,7 @@ class CartController
             if (request()->wantsJson()) {
                 return response()->json(['error' => 'Sản phẩm không khả dụng.'], 422);
             }
+
             return redirect()->back()->with('error', 'Sản phẩm không khả dụng.');
         }
 
@@ -66,14 +67,15 @@ class CartController
             ->where('product_id', $product->id)
             ->first();
 
-        $currentQty = $cart?->trashed() ? 0 : ($cart->quantity ?? 0);
-        $newQty = $cart?->trashed() ? $quantity : $currentQty + $quantity;
+        $currentQty = $cart ? ($cart->trashed() ? 0 : $cart->quantity) : 0;
+        $newQty = $cart ? ($cart->trashed() ? $quantity : $currentQty + $quantity) : $quantity;
 
         if ($newQty > $product->stock) {
             if (request()->wantsJson()) {
-                return response()->json(['error' => 'Số lượng vượt quá tồn kho (' . $product->stock . ').'], 422);
+                return response()->json(['error' => 'Số lượng vượt quá tồn kho ('.$product->stock.').'], 422);
             }
-            return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho (' . $product->stock . ').');
+
+            return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho ('.$product->stock.').');
         }
 
         if ($cart) {
@@ -100,21 +102,25 @@ class CartController
         return redirect()->back()->with('success', 'Đã thêm vào giỏ hàng.');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Cart $cart)
     {
-        $cart = Cart::with('product')->findOrFail($id);
+        $cart->load('product');
         $userId = $this->cartOwnerId();
 
         if ($userId) {
-            if ($cart->user_id !== $userId) abort(403);
+            if ($cart->user_id !== $userId) {
+                abort(403);
+            }
         } else {
-            if ($cart->session_id !== $this->cartSessionId()) abort(403);
+            if ($cart->session_id !== $this->cartSessionId()) {
+                abort(403);
+            }
         }
 
         $quantity = max(1, (int) $request->quantity);
 
         if ($cart->product && $quantity > $cart->product->stock) {
-            return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho (' . $cart->product->stock . ').');
+            return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho ('.$cart->product->stock.').');
         }
 
         $cart->update(['quantity' => $quantity]);
@@ -122,15 +128,18 @@ class CartController
         return redirect()->back()->with('success', 'Đã cập nhật số lượng.');
     }
 
-    public function remove($id)
+    public function remove(Cart $cart)
     {
-        $cart = Cart::findOrFail($id);
         $userId = $this->cartOwnerId();
 
         if ($userId) {
-            if ($cart->user_id !== $userId) abort(403);
+            if ($cart->user_id !== $userId) {
+                abort(403);
+            }
         } else {
-            if ($cart->session_id !== $this->cartSessionId()) abort(403);
+            if ($cart->session_id !== $this->cartSessionId()) {
+                abort(403);
+            }
         }
 
         $cart->delete();
@@ -138,10 +147,8 @@ class CartController
         return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ.');
     }
 
-    public function buyNow($id)
+    public function buyNow(Request $request, Product $product)
     {
-        $product = Product::findOrFail($id);
-
         if ($product->status !== 'published') {
             return redirect()->back()->with('error', 'Sản phẩm không khả dụng.');
         }
@@ -150,17 +157,30 @@ class CartController
             return redirect()->back()->with('error', 'Sản phẩm đã hết hàng.');
         }
 
+        $quantity = min((int) ($request->quantity ?? 1), $product->stock);
+
         $userId = $this->cartOwnerId();
         $sessionId = $this->cartSessionId();
 
-        $attrs = $userId
-            ? ['user_id' => $userId, 'product_id' => $product->id]
-            : ['session_id' => $sessionId, 'product_id' => $product->id];
+        $cart = Cart::withTrashed()
+            ->where($userId ? 'user_id' : 'session_id', $userId ?? $sessionId)
+            ->where('product_id', $product->id)
+            ->first();
 
-        Cart::updateOrCreate(
-            $attrs,
-            ['store_id' => $product->store_id, 'quantity' => 1]
-        );
+        if ($cart) {
+            if ($cart->trashed()) {
+                $cart->restore();
+            }
+            $cart->update(['quantity' => $quantity, 'store_id' => $product->store_id]);
+        } else {
+            Cart::create([
+                'user_id' => $userId,
+                'session_id' => $sessionId,
+                'product_id' => $product->id,
+                'store_id' => $product->store_id,
+                'quantity' => $quantity,
+            ]);
+        }
 
         return $userId
             ? redirect()->route('agriverse.shop.checkout.index')

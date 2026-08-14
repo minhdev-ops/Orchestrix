@@ -4,6 +4,7 @@ namespace App\Modules\AgriVerse\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ProductVariant extends Model
 {
@@ -33,24 +34,29 @@ class ProductVariant extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image) {
-            return $this->product->image_url;
+        if (! $this->image) {
+            return $this->product->image ? Storage::disk('public')->url($this->product->image) : null;
         }
+
         return Storage::disk('public')->url($this->image);
     }
 
     public function getDiscountPercentAttribute(): ?int
     {
-        if (!$this->compare_price || $this->compare_price <= $this->price) {
+        if (! $this->compare_price || $this->compare_price <= $this->price) {
             return null;
         }
+
         return round((1 - $this->price / $this->compare_price) * 100);
     }
 
     public function getAttributesDisplayAttribute(): string
     {
-        if (!$this->attributes) return '';
-        return collect($this->attributes)->map(fn($v, $k) => "{$k}: {$v}")->implode(', ');
+        if (! $this->attributes) {
+            return '';
+        }
+
+        return collect($this->attributes)->map(fn ($v, $k) => "{$k}: {$v}")->implode(', ');
     }
 
     public function scopeActive($query)

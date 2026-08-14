@@ -32,6 +32,7 @@
           <input ref="fileInput" type="file" accept=".glb,.gltf,.zip" @change="upload3dModel" class="text-xs text-stone-500 file:mr-3 file:h-8 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-50 file:text-emerald-700 file:text-xs file:font-semibold hover:file:bg-emerald-100">
           <span v-if="uploading" class="text-xs text-stone-500">Đang tải lên...</span>
         </div>
+        <div v-if="$page.props.errors.model" class="mt-2 text-xs text-red-500">{{ $page.props.errors.model }}</div>
       </div>
 
       <div class="flex gap-2 mt-4 pt-3 border-t border-stone-100">
@@ -77,7 +78,12 @@ function upload3dModel(event) {
   const formData = new FormData();
   formData.append('model', file);
   router.post(route('admin.agriverse.products.upload-3d-model', props.product.id), formData, {
-    onFinish: () => {
+    onError: (errors) => {
+      uploading.value = false;
+      alert(errors.model || 'File quá lớn hoặc không hợp lệ. Vui lòng kiểm tra lại cấu hình PHP (post_max_size, upload_max_filesize) hoặc chọn file nhỏ hơn 8MB.');
+      if (fileInput.value) fileInput.value.value = '';
+    },
+    onSuccess: () => {
       uploading.value = false;
       if (fileInput.value) fileInput.value.value = '';
     },

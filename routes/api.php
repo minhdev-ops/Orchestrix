@@ -1,20 +1,19 @@
 <?php
 
+use App\Http\Controllers\Api\AdminPermissionController;
 use App\Http\Controllers\api\auth\SocialAuthController;
 use App\Http\Controllers\api\AuthController;
-use App\Http\Controllers\Api\AdminPermissionController;
-
 use App\Modules\AgriVerse\Http\Controllers\Api\AuthBridgeController;
 
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 // Auth Bridge for JakartaEE token validation
 Route::post('auth/validate-token', [AuthBridgeController::class, 'validateToken']);
 Route::get('auth/public-key', [AuthBridgeController::class, 'publicKey']);
 Route::get('active/{email}/{key}', [AuthController::class, 'activeMail'])->name('active.mail');
 Route::get('re-active', [AuthController::class, 'reActive'])->name('reactive.mail');
-Route::post('forget-pass', [AuthController::class, 'forgetPass']);
+Route::post('forget-pass', [AuthController::class, 'forgetPass'])->middleware('throttle:3,60');
 Route::get('reset-pass/{email}/{key}', [AuthController::class, 'resetPass'])->name('reset.pass');
 Route::put('login/google', [SocialAuthController::class, 'checkGoogle'])->name('api.login.google');
 Route::put('login/facebook', [SocialAuthController::class, 'checkFacebook'])->name('api.login.facebook');

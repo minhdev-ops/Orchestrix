@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Modules\AgriVerse\Services\EmailVerificationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EmailVerificationController extends Controller

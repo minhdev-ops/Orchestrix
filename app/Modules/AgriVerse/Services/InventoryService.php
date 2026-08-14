@@ -2,10 +2,12 @@
 
 namespace App\Modules\AgriVerse\Services;
 
+use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\Product;
+use App\Notifications\LowStockNotification;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Models\Order;
 
 class InventoryService
 {
@@ -30,7 +32,7 @@ class InventoryService
      */
     public function decreaseStock(Product $product, int $quantity): bool
     {
-        if (!$this->isInStock($product->id, $quantity)) {
+        if (! $this->isInStock($product->id, $quantity)) {
             return false;
         }
 
@@ -77,7 +79,7 @@ class InventoryService
     public function reserveStock(int $productId, int $quantity, int $orderId): bool
     {
         $product = Product::find($productId);
-        if (!$product || !$this->isInStock($productId, $quantity)) {
+        if (! $product || ! $this->isInStock($productId, $quantity)) {
             return false;
         }
 
@@ -127,7 +129,7 @@ class InventoryService
     /**
      * Get low stock products
      */
-    public function getLowStockProducts(int $threshold = 10): \Illuminate\Database\Eloquent\Collection
+    public function getLowStockProducts(int $threshold = 10): Collection
     {
         return Product::where('stock', '<=', $threshold)
             ->where('stock', '>', 0)
@@ -140,7 +142,7 @@ class InventoryService
     /**
      * Get out of stock products
      */
-    public function getOutOfStockProducts(): \Illuminate\Database\Eloquent\Collection
+    public function getOutOfStockProducts(): Collection
     {
         return Product::where('stock', '<=', 0)
             ->where('is_active', true)
@@ -153,7 +155,7 @@ class InventoryService
      */
     public function getSummary(): array
     {
-        $products = Product::where('is_active', true);
+        $products = Product::published();
 
         return [
             'total_products' => (clone $products)->count(),
@@ -208,7 +210,7 @@ class InventoryService
 
             // Notify store owner
             if ($product->store && $product->store->owner) {
-                $product->store->owner->notify(new \App\Notifications\LowStockNotification($product));
+                $product->store->owner->notify(new LowStockNotification($product));
             }
         }
     }
@@ -223,9 +225,10 @@ class InventoryService
         foreach ($updates as $update) {
             try {
                 $product = Product::find($update['product_id']);
-                if (!$product) {
+                if (! $product) {
                     $results['failed']++;
                     $results['errors'][] = "Product #{$update['product_id']} not found";
+
                     continue;
                 }
 
