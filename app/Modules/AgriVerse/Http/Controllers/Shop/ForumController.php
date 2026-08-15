@@ -255,7 +255,61 @@ class ForumController
             ->with('success', 'Bài viết đã được xóa.');
     }
 
-    public function storeComment(Request $request, ForumPost $post)
+    public function getComments(ForumPost $post)
+    {
+        if ($post->status !== 'approved') {
+            abort(404);
+        }
+
+        $comments = ForumComment::with(['user:id,name', 'replies:user:id,name'])
+            ->where('post_id', $post->id)
+            ->whereNull('parent_id')
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'content' => $c->content,
+                'user' => ['id' => $c->user->id, 'name' => $c->user->name],
+                'created_at' => $c->created_at->diffForHumans(),
+                'replies' => $c->replies->map(fn ($r) => [
+                    'id' => $r->id,
+                    'content' => $r->content,
+                    'user' => ['id' => $r->user->id, 'name' => $r->user->name],
+                    'created_at' => $r->created_at->diffForHumans(),
+                ]),
+            ]);
+
+        return response()->json(['comments' => $comments]);
+    }
+
+    public function comments(ForumPost $post)
+    {
+        if ($post->status !== 'approved') {
+            abort(404);
+        }
+
+        $comments = ForumComment::with(['user:id,name', 'replies:user:id,name'])
+            ->where('post_id', $post->id)
+            ->whereNull('parent_id')
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'content' => $c->content,
+                'user' => ['id' => $c->user->id, 'name' => $c->user->name],
+                'created_at' => $c->created_at->diffForHumans(),
+                'replies' => $c->replies->map(fn ($r) => [
+                    'id' => $r->id,
+                    'content' => $r->content,
+                    'user' => ['id' => $r->user->id, 'name' => $r->user->name],
+                    'created_at' => $r->created_at->diffForHumans(),
+                ]),
+            ]);
+
+        return response()->json(['comments' => $comments]);
+    }
+
+        public function storeComment(Request $request, ForumPost $post)
     {
         if ($post->status !== 'approved') {
             abort(404);

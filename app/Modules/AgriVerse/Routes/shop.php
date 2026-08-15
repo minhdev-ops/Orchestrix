@@ -13,6 +13,8 @@ use App\Modules\AgriVerse\Http\Controllers\Shop\ForumController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\ForumUploadController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\GHTKAddressController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\HomeController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\MarketController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\OfferOrderController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\OrderController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\GardenController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\PageController;
@@ -75,6 +77,8 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
 
     // New feature pages (static / design preview)
     Route::get('tai-khoan/cai-dat', [PageController::class, 'accountSettings'])->name('account.settings')->middleware('auth');
+    Route::get('flash-sale', [MarketController::class, 'flashDealIndex'])->name('market.flash-deal')->middleware('auth');
+    Route::get('de-xuat-gia', [MarketController::class, 'offerIndex'])->name('market.offer')->middleware('auth');
     Route::get('dien-dan/tao-bai-viet', [ForumController::class, 'create'])->name('forum.create')->middleware('auth');
     Route::get('dien-dan/{post}', [ForumController::class, 'show'])->name('forum.show');
     Route::get('dien-dan', [ForumController::class, 'index'])->name('forum.index');
@@ -124,6 +128,7 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
     // Cart & notifications (auth required)
     Route::middleware('auth')->group(function () {
         Route::get('thong-bao', [PageController::class, 'notifications'])->name('notifications.index');
+        Route::get('chat/ws-token', [ChatController::class, 'wsToken'])->name('chat.ws-token');
         Route::get('gio-hang', [CartController::class, 'index'])->name('cart.index');
         Route::get('thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
         Route::get('thanh-toan/thanh-cong/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
@@ -137,6 +142,7 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
         Route::get('dien-dan/{post}/sua', [ForumController::class, 'edit'])->name('forum.edit');
         Route::match(['put', 'patch'], 'dien-dan/{post}', [ForumController::class, 'update'])->name('forum.update');
         Route::delete('dien-dan/{post}', [ForumController::class, 'destroy'])->name('forum.destroy');
+        Route::get('dien-dan/{post}/comments', [ForumController::class, 'getComments'])->name('forum.comments.get');
         Route::post('forum/{post}/comments', [ForumController::class, 'storeComment'])->name('forum.comment');
         Route::post('forum/{post}/like', [ForumController::class, 'toggleLike'])->name('forum.like');
 
@@ -254,6 +260,15 @@ Route::middleware('auth')->prefix('agriverse/api')->name('agriverse.api.')->grou
     Route::post('chat/groups/{group}/approve-member/{user}', [ChatController::class, 'approveMember'])->name('chat.groups.approve-member');
     Route::post('chat/groups/{group}/reject-member/{user}', [ChatController::class, 'rejectMember'])->name('chat.groups.reject-member');
     Route::get('chat/search-users', [ChatController::class, 'searchUsers'])->name('chat.search-users');
+
+    // Market: pickable products for offer (reuse authorizer for seller filtering)
+    Route::get('market/pickable-products', [MarketController::class, 'pickableProducts'])->name('market.pickable');
+
+    // Market: đơn hàng từ đề xuất giá (sau admin duyệt -> buyer xác nhận / 12h auto-hủy)
+    Route::post('offers/{offerId}/initialize-order', [OfferOrderController::class, 'initialize'])->name('offer.order.initialize');
+    Route::get('offers/{offerId}/order', [OfferOrderController::class, 'show'])->name('offer.order.show');
+    Route::post('orders/{order}/confirm-offer', [OfferOrderController::class, 'confirm'])->name('offer.order.confirm');
+    Route::post('orders/{order}/cancel-offer', [OfferOrderController::class, 'cancel'])->name('offer.order.cancel');
 
     // GHTK address lookup & shipping fee (thay thế GHN)
     Route::get('ghtk/provinces', [GHTKAddressController::class, 'provinces'])->name('ghtk.provinces');

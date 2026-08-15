@@ -13,12 +13,13 @@ class Order extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'uuid', 'product_id', 'buyer_id', 'seller_id', 'store_id',
+        'uuid', 'offer_id', 'product_id', 'buyer_id', 'seller_id', 'store_id',
         'coupon_id', 'quantity', 'unit_price', 'total_price',
         'discount_amount', 'total_amount',
         'commission_fee', 'status', 'shipping_address',
         'shipping_method', 'shipping_fee', 'tracking_number', 'tracking_url',
         'estimated_delivery', 'delivered_at',
+        'confirm_deadline', 'confirmed_at',
         'notes', 'cancel_reason', 'cancelled_at', 'metadata',
     ];
 
@@ -35,6 +36,8 @@ class Order extends Model
             'estimated_delivery' => 'date',
             'delivered_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'confirm_deadline' => 'datetime',
+            'confirmed_at' => 'datetime',
             'metadata' => 'array',
         ];
     }

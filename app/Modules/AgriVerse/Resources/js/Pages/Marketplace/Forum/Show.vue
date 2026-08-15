@@ -197,32 +197,60 @@ const canEdit = computed(() => {
   return hoursDiff <= 24;
 });
 
+// Polling fallback for WebSocket
+let pollTimer = null
+
+function startPolling() {
+  pollTimer = setInterval(loadComments, 5000)
+}
+
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
+}
+
+async function loadComments(pageNum = 1) {
+  try {
+    const { data } = await axios.get('/agriverse/api/forum/posts/' + props.post.id + '/comments')
+    if (data.comments) {
+      comments.value = data.comments
+    }
+  } catch {
+    // ignore
+  }
+}
+
+
 // Real-time via WebSocket — connect and listen for forum events
 onMounted(() => {
   useAuth().syncFromPageProps()
   connect()
   on('message', handleForumEvent)
+  startPolling()
 })
 
 onBeforeUnmount(() => {
   off('message', handleForumEvent)
+  stopPolling()
 })
 
+
 function handleForumEvent(data) {
-  if (!data || !data.content) return
+  if (!data || !data.event) return
   try {
-    const payload = JSON.parse(data.content)
-    if (payload.event === 'comment' && String(payload.post_id) === String(props.post.id)) {
+    if (data.event === 'comment' && String(data.post_id) === String(props.post.id)) {
       comments.value.push({
         id: 'ws-' + Date.now(),
-        content: payload.content,
-        user: { id: payload.user_id, name: payload.user_name },
+        content: data.content,
+        user: { id: data.user_id, name: data.user_name },
         created_at: 'Vừa xong',
       })
       post.comments_count++
     }
-    if (payload.event === 'like' && String(payload.post_id) === String(props.post.id)) {
-      post.likes_count = payload.like_count
+    if (data.event === 'like' && String(data.post_id) === String(props.post.id)) {
+      post.likes_count = data.like_count
     }
   } catch {
     // not a forum event
@@ -244,10 +272,9 @@ async function submitComment() {
   if (!text || submitting.value) return
   submitting.value = true
   try {
-    const { data } = await axios.post(route('agriverse.shop.forum.comment', props.post.id), { content: text })
-    comments.value.push(data.comment)
-    post.comments_count++
+    await axios.post(route('agriverse.shop.forum.comment', props.post.id), { content: text })
     newComment.value = ''
+    await loadComments()
   } catch (e) {
     console.error('Comment error:', e.response?.data || e.message)
     alert('Gửi bình luận thất bại. Vui lòng thử lại.')

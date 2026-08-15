@@ -22,3 +22,6 @@ Schedule::command('auth:clear-resets')->daily();
 
 // Every 5 minutes: run queue worker if not running
 Schedule::command('queue:work --stop-when-empty --max-time=300')->everyFiveMinutes()->withoutOverlapping();
+
+// Auto-cancel đơn đề xuất giá khi người mua không xác nhận trong 12h
+Schedule::command('offers:cancel-expired')->everyMinute()->withoutOverlapping();

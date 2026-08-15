@@ -256,7 +256,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useAuth } from '@agriverse/Composables/useAuth';
 import { useChat } from '@agriverse/Composables/useChat';
@@ -272,7 +272,7 @@ const props = defineProps({
 
 const { user, isAuthenticated, logout, syncFromPageProps } = useAuth();
 const { state: chatState, togglePanel: toggleChatPanel } = useChat();
-const { connect } = useChatSocket();
+const { connect, disconnect } = useChatSocket();
 
 const mobileOpen = ref(false);
 const scrolled = ref(false);
@@ -309,6 +309,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll);
   document.removeEventListener('click', onClickOutside);
+});
+
+// Khi đăng nhập/đổi user → tự kết nối (hoặc nối lại) WebSocket chat
+watch(isAuthenticated, (authed) => {
+  if (authed) connect();
 });
 
 const cartCount = computed(() => page.props.cartCount ?? 0);
@@ -356,6 +361,8 @@ function cancelCloseMore() {
 const userNav = [
   { label: 'Hồ sơ', icon: 'person', route: 'agriverse.shop.profile.index' },
   { label: 'Đơn hàng', icon: 'receipt', route: 'agriverse.shop.orders.index' },
+  { label: 'Flash Sale', icon: 'flash_on', route: 'agriverse.shop.market.flash-deal' },
+  { label: 'Đề xuất giá', icon: 'handshake', route: 'agriverse.shop.market.offer' },
   { label: 'Thông báo', icon: 'notifications', route: 'agriverse.shop.notifications.index' },
   { label: 'Theo dõi vận chuyển', icon: 'local_shipping', route: 'agriverse.shop.tracking.index' },
   { label: 'Affiliate', icon: 'loyalty', route: 'agriverse.shop.affiliate.index' },
@@ -402,6 +409,7 @@ function goToRegisterMobile() {
 }
 
 async function handleLogout() {
+  disconnect();
   await logout();
 }
 

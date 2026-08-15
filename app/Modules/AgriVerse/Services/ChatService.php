@@ -23,11 +23,28 @@ class ChatService
         ]);
     }
 
+    /**
+     * Ghi history vao Redis Stream (maxlen ~50) + publish realtime lên channel.
+     *
+     * Lưu ý: kết nối 'jakartaee' dùng driver PREDIS, KHÔNG có method xadd() theo cú
+     * pháp của phpredis. XADD stream bằng rawCommand để:
+     *   XADD chat:messages:stream MAXLEN ~50 * data <base64>
+     * Trước đây gọi $this->redis()->xadd(..., 4 tham số) -> PREDIS bắn 'XADD'
+     * Sai tham số -> "ERR wrong number of arguments" -> history KHÔNG ghi được,
+     * khiến JakartaEE (đọc stream lịch sử khi client connect) không lấy được tin.
+     */
+    private function streamAdd(string $key, string $payload): void
+    {
+        $client = $this->redis();
+        $args = ['xadd', $key, 'MAXLEN', '~', '50', '*', 'data', $payload];
+        $client->executeRaw($args);
+    }
+
     private function store(string $jsonMessage): void
     {
         try {
             $encoded = base64_encode($jsonMessage);
-            $this->redis()->xadd('chat:messages:stream', '*', ['data' => $encoded], 50);
+            $this->streamAdd('chat:messages:stream', $encoded);
             Redis::connection('jakartaee')->publish('chat', $jsonMessage);
         } catch (\Throwable $e) {
             Log::warning('Redis publish failed: '.$e->getMessage());
@@ -70,7 +87,7 @@ class ChatService
                 'content' => $content,
             ]);
             $encoded = base64_encode($json);
-            $this->redis()->xadd('chat:messages:stream', '*', ['data' => $encoded], 50);
+            $this->streamAdd('chat:messages:stream', $encoded);
             Redis::connection('jakartaee')->publish("chat:group:{$groupId}", $json);
         } catch (\Throwable $e) {
             Log::warning('Group message send failed: '.$e->getMessage());

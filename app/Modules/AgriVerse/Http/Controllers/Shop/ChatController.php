@@ -19,6 +19,27 @@ class ChatController
         protected ChatService $chatService,
     ) {}
 
+    /**
+     * Cấp lại Passport token mới (chạy bằng web session auth — không cần token cũ).
+     * Dùng khi WS bị chối vì token hết hạn; giúp realtime kéo dài như Messenger.
+     */
+    public function wsToken(Request $request)
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $user->tokens()->where('name', 'ws')->delete();
+
+        try {
+            $token = $user->createToken('ws')->accessToken;
+            return response()->json(['token' => $token]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Không thể cấp token'], 500);
+        }
+    }
+
     public function index(Request $request, Order $order)
     {
         if ($order->buyer_id !== auth()->id() && $order->seller_id !== auth()->id()) {

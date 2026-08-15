@@ -69,6 +69,7 @@
                 >
                   <div class="chat-avatar">
                     <span class="chat-avatar-text">{{ conv.other_user?.name?.charAt(0)?.toUpperCase() || '?' }}</span>
+                    <span v-if="isOnline(conv.other_user?.id)" class="chat-online-dot" title="Đang hoạt động"></span>
                   </div>
                   <div class="chat-conv-info">
                     <div class="chat-conv-top">
@@ -130,6 +131,7 @@
             <div class="chat-main-user">
               <div class="chat-avatar chat-avatar--sm">
                 <span class="chat-avatar-text">{{ activeConv?.other_user?.name?.charAt(0)?.toUpperCase() || '?' }}</span>
+                <span v-if="isOnline(activeConv?.other_user?.id)" class="chat-online-dot" title="Đang hoạt động"></span>
               </div>
               <div class="chat-main-user-info">
                 <span class="chat-main-user-name">{{ activeConv?.other_user?.name || 'Người dùng' }}</span>
@@ -403,7 +405,7 @@ if (token) {
 }
 
 const { state, closePanel, selectConversation, clearPendingMessage, setUnreadTotal } = useChat()
-const { connect, on, off, connected } = useChatSocket()
+const { connect, on, off, connected, onlineUserIds } = useChatSocket()
 const userId = document.querySelector('meta[name="user-id"]')?.getAttribute('content')
 
 const activeTab = ref('messages')
@@ -506,6 +508,7 @@ watch(activeChatId, (id) => {
 
 const handleIncomingMessage = async (data) => {
   if (!data) return
+
   if (data.type === 'private') {
     const otherId = String(data.from)
     const isOwn = otherId === String(userId)
@@ -520,40 +523,43 @@ const handleIncomingMessage = async (data) => {
       if (!isOwn && activeChatId.value !== 'c' + conv.id) {
         conv.unread = (conv.unread || 0) + 1
       }
-      const idx = conversations.value.indexOf(conv)
-      if (idx > 0) {
-        conversations.value.splice(idx, 1)
-        conversations.value.unshift(conv)
-      }
+      sortConversationToTop(conv)
     } else {
       fetchConversations()
     }
 
-    if (state.panelOpen && activeChatId.value === 'c' + conv?.id && !isOwn) {
-      chatMessages.value.push({
-        id: 'ws-' + Date.now(),
-        message: data.content,
-        is_mine: false,
-        created_at: new Date(data.timestamp || Date.now()).toISOString()
-      })
-      await nextTick()
-      scrollToBottom()
+    if (state.panelOpen && activeChatId.value === 'c' + conv?.id) {
+      if (!isOwn) {
+        appendSortedMessage(chatMessages, {
+          id: 'ws-' + (data.timestamp || Date.now()),
+          message: data.content,
+          from: data.from,
+          is_mine: false,
+          created_at: new Date(data.timestamp || Date.now()).toISOString()
+        })
+      }
+      await scrollToBottom()
     }
     recomputeUnread()
   }
+
   if (data.type === 'group' && state.panelOpen) {
     const isOwn = String(data.from) === userId
-    if (activeChatId.value === 'g' + data.to && !isOwn) {
-      const senderName = groupMembersMap.value[data.from] || 'Thành viên'
-      groupMessages.value.push({
-        id: 'ws-' + Date.now(),
-        message: data.content,
-        sender_name: senderName,
-        is_mine: false,
-        created_at: new Date(data.timestamp || Date.now()).toISOString()
-      })
-      await nextTick()
-      scrollToBottom()
+    if (activeChatId.value === 'g' + data.to) {
+      if (!isOwn) {
+        const senderName = groupMembersMap.value[data.from] || 'Thành viên'
+        appendSortedMessage(groupMessages, {
+          id: 'ws-' + (data.timestamp || Date.now()),
+          message: data.content,
+          from: data.from,
+          sender_name: senderName,
+          is_mine: false,
+          created_at: new Date(data.timestamp || Date.now()).toISOString()
+        })
+      }
+      await scrollToBottom()
+    } else {
+      fetchGroups()
     }
   }
 }
@@ -563,9 +569,21 @@ function recomputeUnread() {
   setUnreadTotal(total)
 }
 
+let onlineDirty = false
+function handlePresence(data) {
+  // onlineUserIds đã được cập nhật trong useChatSocket; chỉ cần trigger re-render
+  onlineDirty = true
+}
+
+function isOnline(otherUserId) {
+  if (!otherUserId) return false
+  return onlineUserIds.value.has(String(otherUserId))
+}
+
 onMounted(() => {
   connect()
   on('message', handleIncomingMessage)
+  on('presence', handlePresence)
   fetchConversations()
   fetchGroups()
 })
@@ -589,6 +607,7 @@ function stopGroupPolling() {
 
 onBeforeUnmount(() => {
   off('message', handleIncomingMessage)
+  off('presence', handlePresence)
   stopGroupPolling()
 })
 
@@ -652,7 +671,8 @@ async function fetchMessages() {
     const { data } = await axios.get(`/agriverse/api/chat/${convId}/messages`, {
       params: { page: page.value }
     })
-    chatMessages.value = data.messages || []
+    // Merge history vào mảng hiện có (nếu có tin realtime đến trong lúc load) — không replace/đè
+    mergeMessages(chatMessages, data.messages || [])
     hasMore.value = data.has_more ?? false
     await nextTick()
     scrollToBottom()
@@ -684,7 +704,10 @@ async function loadOlderMessages() {
     const msgs = data.messages || []
     hasMore.value = data.has_more ?? false
     if (msgs.length > 0) {
-      chatMessages.value = [...msgs, ...chatMessages.value]
+      // Gộp trang cũ lên đầu + dedup + sort, giữ scroll không nhảy qua trang mới
+      const prev = chatMessages.value
+      chatMessages.value = []
+      mergeMessages(chatMessages, [...msgs, ...prev])
       await nextTick()
       if (messageAreaRef.value?.scrollRef) {
         messageAreaRef.value.scrollRef.scrollTop = messageAreaRef.value.scrollRef.scrollHeight - prevScrollHeight
@@ -713,6 +736,18 @@ async function sendRawMessage(text) {
   inputRef.value?.focus()
 
   const convId = activeChatId.value.slice(1)
+  // Optimistic: cap nhat sidebar ngay lap tuc, khong cho den khi WS echo hay refetch
+  const conv = conversations.value.find(c => String(c.id) === String(convId))
+  if (conv) {
+    const hadUnread = (conv.unread || 0) > 0
+    conv.last_message = text
+    conv.last_message_at = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    if (hadUnread) {
+      conv.unread = 0
+    }
+    sortConversationToTop(conv)
+    recomputeUnread()
+  }
   sending.value = true
   try {
     const { data } = await axios.post(`/agriverse/api/chat/${convId}/send`, { message: text })
@@ -774,7 +809,7 @@ async function fetchGroupMessages() {
     const { data } = await axios.get(`/agriverse/api/chat/groups/${groupId}/messages`, {
       params: { page: groupPage.value }
     })
-    groupMessages.value = data.messages || []
+    mergeMessages(groupMessages, data.messages || [])
     groupHasMore.value = data.has_more ?? false
     await nextTick()
     scrollToBottom()
@@ -799,7 +834,9 @@ async function loadOlderGroupMessages() {
     const msgs = data.messages || []
     groupHasMore.value = data.has_more ?? false
     if (msgs.length > 0) {
-      groupMessages.value = [...msgs, ...groupMessages.value]
+      const prev = groupMessages.value
+      groupMessages.value = []
+      mergeMessages(groupMessages, [...msgs, ...prev])
       await nextTick()
       if (messageAreaRef.value?.scrollRef) {
         messageAreaRef.value.scrollRef.scrollTop = messageAreaRef.value.scrollRef.scrollHeight - prevScrollHeight
@@ -942,11 +979,70 @@ async function startConversation(product) {
 }
 
 const scrollToBottom = () => {
-  nextTick(() => {
-    if (messageAreaRef.value?.scrollRef) {
-      messageAreaRef.value.scrollRef.scrollTop = messageAreaRef.value.scrollRef.scrollHeight
-    }
+  return new Promise((resolve) => {
+    // Đợi DOM render xong (nhiều tick + rAF) rồi cuộn xuống tin mới nhất
+    nextTick(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const el = messageAreaRef.value?.scrollRef
+          if (el) {
+            el.scrollTop = el.scrollHeight
+          }
+          resolve()
+        })
+      })
+    })
   })
+}
+
+// Đưa 1 hội thoại lên đầu danh sách sau khi có activity mới (gửi/nhận)
+function sortConversationToTop(conv) {
+  const idx = conversations.value.indexOf(conv)
+  if (idx > 0) {
+    conversations.value.splice(idx, 1)
+    conversations.value.unshift(conv)
+  }
+}
+
+/**
+ * Hợp nhất mảng tin nhắn (history + realtime + load-older) thành 1 chuỗi liên tục:
+ * - concat (spread [...old, ...new]) chứ KHÔNG replace/overwrite từng mảng riêng
+ *   → tránh bị tách thành 2 cụm (cụm cũ / cụm realtime dạt đi chỗ khác).
+ * - Dedup theo (sender + nội dung + thời gian gần nhau <5s) để echo/retry không nhân đôi.
+ * - sort() lại toàn bộ theo timestamp ASC sau khi gộp → tin cũ trên, mới dưới.
+ */
+function mergeMessages(list, incoming) {
+  const merged = [...list.value, ...incoming]
+  const seen = new Map()
+  for (const m of merged) {
+    const key = `${m.sender_id || m.from || ''}:${m.message || m.content}`
+    const t = new Date(m.created_at || m.timestamp || 0).getTime()
+    const prev = seen.get(key)
+    if (!prev) {
+      seen.set(key, m)
+    } else {
+      const pt = new Date(prev.created_at || prev.timestamp || 0).getTime()
+      if (Math.abs(t - pt) < 5000) {
+        // trùng (echo/retry) → giữ bản ghi có đầy đủ id (bản từ DB) nếu có
+        if (!prev.id && m.id) seen.set(key, m)
+      } else {
+        seen.set(key, m)
+      }
+    }
+  }
+  list.value = Array.from(seen.values()).sort((a, b) => {
+    const ta = new Date(a.created_at || a.timestamp || 0).getTime()
+    const tb = new Date(b.created_at || b.timestamp || 0).getTime()
+    return ta - tb
+  })
+  return true
+}
+
+/**
+ * Nhét 1 tin nhắn (realtime) vào mảng theo đúng thứ tự + chống trùng.
+ */
+function appendSortedMessage(list, msg) {
+  return mergeMessages(list, [msg])
 }
 
 function formatTime(dateStr) {
@@ -1258,6 +1354,26 @@ function formatTime(dateStr) {
   font-weight: 700;
   font-size: 17px;
   flex-shrink: 0;
+  position: relative;
+}
+
+.chat-online-dot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+}
+
+.chat-avatar--sm .chat-online-dot {
+  width: 12px;
+  height: 12px;
+  bottom: 0px;
+  right: 0px;
 }
 
 .chat-avatar--sm {

@@ -61,6 +61,19 @@ return [
     | Search Configuration
     |--------------------------------------------------------------------------
     */
+    /*
+    |--------------------------------------------------------------------------
+    | WebSocket Configuration
+    |--------------------------------------------------------------------------
+    | ws_url: Day la base URL WS (khong gom "/ws/chat/...").
+    |   - Local:   ws://127.0.0.1:8080/JakartaEE-1.0-SNAPSHOT  (trỏ thẳng WildFly deploy qua IntelliJ)
+    |   - Production: de trong -> frontend tu dung window.location.host (nginx proxy /ws/ -> ROOT.war)
+    | Chi muon set trong .env khi can override; de nil de mac dinh.
+    */
+    'websocket' => [
+        'url' => env('WS_URL'),
+    ],
+
     'search' => [
         'min_query_length' => 2,
         'max_results' => 50,

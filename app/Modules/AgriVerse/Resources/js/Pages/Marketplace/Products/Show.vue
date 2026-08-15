@@ -93,6 +93,10 @@
                   <span class="material-symbols-outlined" style="font-size: 20px;">add_shopping_cart</span>
                   Thêm vào giỏ
                 </button>
+                <button v-if="canOffer" @click="goOffer" class="chat-btn"
+                  title="Đề xuất giá cho người bán">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">handshake</span>
+                </button>
                 <button @click="buyNow" class="buy-now-btn">
                   Mua ngay
                 </button>
@@ -504,6 +508,13 @@ async function addToCart() {
   } catch {
     toast.add({ severity: 'error', summary: 'Vui lòng đăng nhập', life: 2000 });
   }
+}
+
+const currentUserId = computed(() => page.props.auth?.user?.id ?? null);
+const canOffer = computed(() => isAuthenticated.value && props.product?.seller?.id != null && props.product.seller.id !== currentUserId.value);
+
+function goOffer() {
+  router.get('/agriverse/de-xuat-gia', { product: props.product.id }, { preserveState: true });
 }
 
 async function buyNow() {
