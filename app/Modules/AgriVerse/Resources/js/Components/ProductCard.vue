@@ -41,7 +41,15 @@
         <span v-if="product.compare_price" class="ag-price-original">{{ formatPrice(product.compare_price) }}₫</span>
       </div>
       <div class="flex items-center justify-between mt-3 pt-3" style="border-top: 1px solid color-mix(in srgb, var(--ag-border) 60%, transparent);">
-        <span class="text-xs font-medium" style="color: var(--ag-text-muted);">Đã bán {{ product.sold_count ?? 0 }}</span>
+        <div class="flex items-center gap-1">
+          <button @click.stop="toggleCompare"
+            class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200"
+            :style="{ color: isComparing ? 'var(--ag-primary-500)' : 'var(--ag-text-muted)', background: isComparing ? 'rgba(72,103,48,0.08)' : '' }"
+            :title="isComparing ? 'Bỏ so sánh' : 'Thêm so sánh'">
+            <span class="material-symbols-outlined text-sm">compare_arrows</span>
+          </button>
+          <span class="text-xs font-medium" style="color: var(--ag-text-muted);">Đã bán {{ product.sold_count ?? 0 }}</span>
+        </div>
         <button @click.stop="addToCart"
           class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90"
           style="border: 1px solid var(--ag-border); color: var(--ag-text-muted);"
@@ -59,8 +67,10 @@ import { computed } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { formatPrice } from '@agriverse/utils';
 import { useToast } from 'primevue/usetoast';
+import { useCompare } from '@agriverse/Composables/useCompare';
 
 const toast = useToast();
+const { isComparing, toggle } = useCompare();
 const props = defineProps({ product: Object });
 
 const discountPercent = computed(() => {
@@ -87,5 +97,9 @@ function toggleWishlist() {
       toast.add({ severity: 'error', summary: 'Vui lòng đăng nhập', life: 2000 });
     },
   });
+}
+
+function toggleCompare() {
+  toggle(props.product.id);
 }
 </script>

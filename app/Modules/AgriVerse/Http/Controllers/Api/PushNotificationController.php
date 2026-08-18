@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Modules\AgriVerse\Services\PushNotificationService;
+use Illuminate\Http\Request;
 
 class PushNotificationController extends Controller
 {
@@ -48,6 +48,12 @@ class PushNotificationController extends Controller
         $request->validate([
             'token' => 'required|string',
         ]);
+
+        $device = \App\Modules\AgriVerse\Models\DeviceToken::where('token', $request->token)->first();
+
+        if (! $device || $device->user_id !== $request->user()->id) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $deleted = $this->pushService->unregisterToken($request->token);
 
@@ -96,8 +102,12 @@ class PushNotificationController extends Controller
     /**
      * Get notification stats (admin)
      */
-    public function stats()
+    public function stats(Request $request)
     {
+        if (! $request->user()?->hasRole('admin')) {
+            abort(403);
+        }
+
         return response()->json($this->pushService->getStats());
     }
 }

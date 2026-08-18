@@ -2,14 +2,13 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Models\User;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Store;
 use App\Modules\AgriVerse\Models\Transaction;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ReportController
 {
@@ -37,7 +36,7 @@ class ReportController
 
         $topStores = Store::withCount(['products'])
             ->withCount(['products as total_revenue' => function ($q) {
-                $q->whereHas('orders', fn($o) => $o->whereIn('status', ['completed', 'delivered']));
+                $q->whereHas('orders', fn ($o) => $o->whereIn('status', ['completed', 'delivered']));
             }])
             ->orderByDesc('total_revenue')
             ->limit(10)
@@ -57,9 +56,7 @@ class ReportController
         // Top sellers by revenue
         $topSellers = User::whereHas('stores')
             ->withCount(['stores'])
-            ->withCount(['ordersAsSeller as seller_revenue' => function ($q) {
-                $q->whereIn('status', ['completed', 'delivered']);
-            }])
+            ->withSum(['ordersAsSeller as seller_revenue' => fn ($q) => $q->whereIn('status', ['completed', 'delivered'])], 'total_amount')
             ->orderByDesc('seller_revenue')
             ->limit(10)
             ->get();

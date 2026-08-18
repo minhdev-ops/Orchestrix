@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @deprecated Use App\Modules\AgriVerse\Http\Controllers\Admin\ProductController instead.
+ * This controller uses Blade views; the module version uses Inertia SPA.
+ * Kept for backward compatibility. Will be removed in next major version.
+ */
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -22,18 +28,20 @@ class ProductController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
             });
         }
 
         $products = $query->latest()->paginate(15);
+
         return view('admin.products.index', compact('products'));
     }
 
     public function edit(Product $product)
     {
         $product->load(['user', 'store']);
+
         return view('admin.products.edit', compact('product'));
     }
 
@@ -54,6 +62,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
     }
 }

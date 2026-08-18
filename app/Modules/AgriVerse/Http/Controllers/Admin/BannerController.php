@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
+use App\Modules\AgriVerse\Models\Banner;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Banner;
 
 class BannerController
 {

@@ -2,15 +2,16 @@
 
 namespace App\Notifications;
 
+use App\Modules\AgriVerse\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Modules\AgriVerse\Models\Product;
+use Illuminate\Queue\SerializesModels;
 
 class LowStockNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
     public function __construct(
         public Product $product
@@ -26,7 +27,7 @@ class LowStockNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject("Cảnh báo tồn kho thấp - {$this->product->name}")
             ->line("Sản phẩm **{$this->product->name}** chỉ còn **{$this->product->stock}** sản phẩm trong kho.")
-            ->line("Vui lòng bổ sung tồn kho để tránh mất doanh thu.")
+            ->line('Vui lòng bổ sung tồn kho để tránh mất doanh thu.')
             ->action('Xem sản phẩm', route('agriverse.shop.products.show', $this->product->id))
             ->line('Cảm ơn bạn đã sử dụng AgriVerse!');
     }

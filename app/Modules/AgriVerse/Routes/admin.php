@@ -1,26 +1,26 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Modules\AgriVerse\Http\Controllers\Admin\DashboardController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\ProductController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\StoreController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\OrderController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\AiScanningController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\BackupController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\BannerController;
 use App\Modules\AgriVerse\Http\Controllers\Admin\CategoryController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\SubscriptionPlanController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\ChatGroupController;
 use App\Modules\AgriVerse\Http\Controllers\Admin\ContractController;
 use App\Modules\AgriVerse\Http\Controllers\Admin\CouponController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\AiScanningController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\TransactionController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\ReportController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\RefundController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\UserController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\BannerController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\ForumController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\ForumCategoryController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\DashboardController;
 use App\Modules\AgriVerse\Http\Controllers\Admin\FileController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\ForumCategoryController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\ForumController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\OrderController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\ProductController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\RefundController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\ReportController;
 use App\Modules\AgriVerse\Http\Controllers\Admin\SellerController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\ChatGroupController;
-use App\Modules\AgriVerse\Http\Controllers\Admin\BackupController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\StoreController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\SubscriptionPlanController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\TransactionController;
+use App\Modules\AgriVerse\Http\Controllers\Admin\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'checkAdmin'])->prefix('admin/agriverse')->name('admin.agriverse.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

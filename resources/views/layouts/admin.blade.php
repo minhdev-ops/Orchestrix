@@ -119,11 +119,13 @@
                     <span>Module</span>
                 </a>
 
+                @if(Route::has('admin.agriverse.dashboard'))
                 <a href="{{ route('admin.agriverse.dashboard') }}"
                     class="sidebar-link {{ Request::routeIs('admin.agriverse.*') ? 'active' : '' }}">
                     <span class="material-symbols-outlined icon">eco</span>
                     <span>AgriVerse</span>
                 </a>
+                @endif
             </nav>
 
             {{-- Logout --}}

@@ -23,8 +23,14 @@
             style="width:100%;height:100%;background:transparent;"
           />
         </div>
-        <!-- Fallback background -->
-        <div v-else class="w-full h-full" style="background: linear-gradient(135deg, var(--ag-primary-800), var(--ag-primary-600)); display: flex; align-items: center; justify-content: center;">
+        <!-- Product Image -->
+        <div v-else-if="product.image" class="absolute inset-0 z-0">
+          <img :src="product.image" :alt="product.name"
+            class="w-full h-full object-cover"
+            style="object-position: center 30%;" />
+        </div>
+        <!-- Fallback: letter only -->
+        <div v-else class="w-full h-full" style="background: linear-gradient(135deg, var(--ag-primary-600), var(--ag-primary-600)); display: flex; align-items: center; justify-content: center;">
           <span style="font-family: var(--ag-font-display); font-size: 120px; color: rgba(255,255,255,0.1);">{{ product.name.charAt(0).toUpperCase() }}</span>
         </div>
         <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(252, 249, 248, 0) 0%, rgba(252, 249, 248, 0.3) 40%, rgba(252, 249, 248, 1) 100%); z-index: 1;"></div>
@@ -36,7 +42,13 @@
                 <span class="tag tag-primary">Nguồn gốc bền vững</span>
               </div>
               <h1 class="title-lg">{{ product.name }}</h1>
-              <p class="subtitle" v-if="product.category">{{ product.category }}</p>
+              <div class="flex items-center gap-3 mb-2">
+                <p class="subtitle" v-if="product.category">{{ product.category }}</p>
+                <div v-if="product.seller" class="flex items-center gap-1.5 bg-white/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/40 shadow-sm text-sm font-semibold text-[var(--ag-primary-600)]">
+                  <span class="material-symbols-outlined text-[16px]">person</span>
+                  Người bán: {{ product.seller.name }}
+                </div>
+              </div>
             </div>
             <div class="pricing-card">
               <div class="pricing-header">
@@ -44,6 +56,7 @@
                 <div class="pricing-main">
                   <span class="pricing-current">{{ formatPrice(product.price) }}<span style="font-size: 14px; text-decoration: underline;">₫</span></span>
                   <span v-if="product.compare_price" class="pricing-old">{{ formatPrice(product.compare_price) }}₫</span>
+                  <span v-if="product.compare_price && product.compare_price > product.price" class="pricing-badge">-{{ discountPercent }}%</span>
                 </div>
               </div>
               <p class="pricing-note">Miễn phí giao hàng cho đơn trên 200.000₫</p>
@@ -53,10 +66,6 @@
                   <span class="qty-value">{{ quantity }}</span>
                   <button @click="incrementQty" class="qty-btn">+</button>
                 </div>
-                <button @click="addToCart" class="add-btn">
-                  <span class="material-symbols-outlined" style="font-size: 20px;">add_shopping_cart</span>
-                  Thêm vào giỏ
-                </button>
                 <button @click="toggleWishlist"
                   class="wishlist-btn"
                   :title="product.wishlisted ? 'Bỏ yêu thích' : 'Thêm yêu thích'">
@@ -66,10 +75,30 @@
                     favorite
                   </span>
                 </button>
+                <button @click="toggleCompare"
+                  class="compare-btn"
+                  :title="isComparing ? 'Bỏ so sánh' : 'Thêm so sánh'">
+                  <span class="material-symbols-outlined"
+                    :class="isComparing ? 'text-[var(--ag-primary-500)]' : ''"
+                    :style="`font-variation-settings: 'FILL' ${isComparing ? 1 : 0}`">
+                    compare_arrows
+                  </span>
+                </button>
                 <button v-if="product.seller && isAuthenticated" @click="chatWithSeller"
                   class="chat-btn"
                   title="Nhắn tin với người bán">
                   <span class="material-symbols-outlined" style="font-size: 20px;">chat</span>
+                </button>
+                <button @click="addToCart" class="add-btn">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">add_shopping_cart</span>
+                  Thêm vào giỏ
+                </button>
+                <button v-if="canOffer" @click="goOffer" class="chat-btn"
+                  title="Đề xuất giá cho người bán">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">handshake</span>
+                </button>
+                <button @click="buyNow" class="buy-now-btn">
+                  Mua ngay
                 </button>
               </div>
               <button @click="openARViewer" class="ar-btn">
@@ -84,44 +113,45 @@
       <section class="content-section">
         <div class="content-grid">
           <div class="content-main">
-            <h2 class="section-title">Một Tác Phẩm Điêu Khắc Sống</h2>
-            <div class="narrative-text" v-if="product.description" v-html="product.description"></div>
-            <div class="narrative-text" v-else>
-              <p>Được tôn vinh bởi những tán lá hình vĩ cầm ấn tượng, đây là tác phẩm trung tâm hoàn hảo cho không gian nội thất hiện đại. Các mẫu vật của chúng tôi được canh tác trong 18 tháng dưới ánh sáng tự nhiên cường độ cao để đảm bảo sự phát triển thân cây khỏe mạnh và sắc tố xanh ngọc bích đậm đà.</p>
-              <p>Mỗi cây được chọn lọc thủ công bởi các nhà làm vườn bậc thầy của chúng tôi và được vận chuyển trong thùng Eco-Crate độc quyền, đảm bảo cây đến nơi trong tình trạng nguyên vẹn với không chất thải nhựa.</p>
+            <h2 class="section-title">Thông tin cây trồng</h2>
+
+            <!-- Identity card -->
+            <div v-if="identitySpecs.length" class="identity-grid">
+              <div v-for="spec in identitySpecs" :key="spec.label" class="identity-card">
+                <span class="material-symbols-outlined identity-icon">{{ spec.icon }}</span>
+                <div>
+                  <span class="identity-label">{{ spec.label }}</span>
+                  <span class="identity-value">{{ spec.value }}</span>
+                </div>
+              </div>
             </div>
 
-            <div class="bento-grid">
-              <div class="bento-card">
-                <span class="material-symbols-outlined bento-icon">light_mode</span>
-                <h4 class="bento-title">Ánh sáng</h4>
-                <p class="bento-desc">Ánh sáng gián tiếp, sáng. Tránh ánh nắng trực tiếp buổi chiều.</p>
+            <!-- Care guide cards -->
+            <div v-if="careSpecs.length" class="care-grid">
+              <h3 class="care-title">Hướng dẫn chăm sóc</h3>
+              <div class="care-cards">
+                <div v-for="spec in careSpecs" :key="spec.label" class="care-card">
+                  <span class="material-symbols-outlined care-icon">{{ spec.icon }}</span>
+                  <span class="care-label">{{ spec.label }}</span>
+                  <span class="care-value">{{ spec.value }}</span>
+                </div>
               </div>
-              <div class="bento-card">
-                <span class="material-symbols-outlined bento-icon" style="font-variation-settings: 'FILL' 1;">water_drop</span>
-                <h4 class="bento-title">Độ ẩm</h4>
-                <p class="bento-desc">Tưới hàng tuần. Để khô 5cm đất mặt trước khi tưới lại.</p>
+            </div>
+
+            <!-- Feng shui card -->
+            <div v-if="fengshui" class="fengshui-card">
+              <span class="material-symbols-outlined fengshui-icon">spa</span>
+              <div>
+                <span class="fengshui-label">Ý nghĩa phong thủy</span>
+                <span class="fengshui-value">{{ fengshui }}</span>
               </div>
-              <div class="bento-card">
-                <span class="material-symbols-outlined bento-icon">humidity_mid</span>
-                <h4 class="bento-title">Độ ẩm không khí</h4>
-                <p class="bento-desc">Trung bình đến cao. Phun sương lá hai lần mỗi tuần.</p>
-              </div>
-              <div class="bento-card">
-                <span class="material-symbols-outlined bento-icon">pets</span>
-                <h4 class="bento-title">An toàn thú cưng</h4>
-                <p class="bento-desc">Độc nhẹ. Để xa tầm với của thú cưng.</p>
-              </div>
-              <div class="bento-card">
-                <span class="material-symbols-outlined bento-icon">thermostat</span>
-                <h4 class="bento-title">Nhiệt độ</h4>
-                <p class="bento-desc">Ổn định 18-24°C. Tránh xa gió lùa.</p>
-              </div>
-              <div class="bento-card">
-                <span class="material-symbols-outlined bento-icon">eco</span>
-                <h4 class="bento-title">Kích thước chậu</h4>
-                <p class="bento-desc">Đi kèm chậu đất nung bền vững 25cm.</p>
-              </div>
+            </div>
+
+            <!-- Description (chỉ hiện khi không parse được card) -->
+            <div v-if="!identitySpecs.length && !careSpecs.length && cleanDescription" class="narrative-text">{{ cleanDescription }}</div>
+            <div v-else-if="!identitySpecs.length && !careSpecs.length && !cleanDescription" class="narrative-text">
+              <p>Được tôn vinh bởi những tán lá hình vĩ cầm ấn tượng, đây là tác phẩm trung tâm hoàn hảo cho không gian nội thất hiện đại. Các mẫu vật của chúng tôi được canh tác trong 18 tháng dưới ánh sáng tự nhiên cường độ cao để đảm bảo sự phát triển thân cây khỏe mạnh và sắc tố xanh ngọc bích đậm đà.</p>
+              <p>Mỗi cây được chọn lọc thủ công bởi các nhà làm vườn bậc thầy của chúng tôi và được vận chuyển trong thùng Eco-Crate độc quyền, đảm bảo cây đến nơi trong tình trạng nguyên vẹn với không chất thải nhựa.</p>
             </div>
           </div>
 
@@ -135,7 +165,7 @@
                     <span class="stat-value">{{ stat.level }}</span>
                   </div>
                   <div class="stat-bar">
-                    <div class="stat-fill" :style="{ width: stat.percent + '%' }"></div>
+                    <div class="stat-fill" :style="{ transform: 'scaleX(' + (stat.percent / 100) + ')' }"></div>
                   </div>
                 </div>
               </div>
@@ -148,28 +178,28 @@
                     <span class="stat-label">Độ cứng cáp</span>
                     <span class="stat-value">Cao</span>
                   </div>
-                  <div class="stat-bar"><div class="stat-fill" style="width: 85%;"></div></div>
+                  <div class="stat-bar"><div class="stat-fill" style="transform: scaleX(0.85);"></div></div>
                 </div>
                 <div class="stat-item">
                   <div class="stat-header">
                     <span class="stat-label">Tốc độ tăng trưởng</span>
                     <span class="stat-value">Trung bình</span>
                   </div>
-                  <div class="stat-bar"><div class="stat-fill" style="width: 55%;"></div></div>
+                  <div class="stat-bar"><div class="stat-fill" style="transform: scaleX(0.55);"></div></div>
                 </div>
                 <div class="stat-item">
                   <div class="stat-header">
                     <span class="stat-label">Lọc không khí</span>
                     <span class="stat-value">Xuất sắc</span>
                   </div>
-                  <div class="stat-bar"><div class="stat-fill" style="width: 95%;"></div></div>
+                  <div class="stat-bar"><div class="stat-fill" style="transform: scaleX(0.95);"></div></div>
                 </div>
               </div>
             </div>
             <div class="concierge-card">
               <span class="material-symbols-outlined" style="font-size: 32px; color: var(--ag-secondary-500);">verified</span>
               <div>
-                <h5 class="concierge-title">Tư vấn chăm sóc đi kèm</h5>
+                <h4 class="concierge-title">Tư vấn chăm sóc đi kèm</h4>
                 <p class="concierge-desc">Liên hệ với chuyên gia cây trồng 24/7 qua tin nhắn trong 90 ngày đầu. Chúng tôi luôn sẵn sàng đảm bảo cây của bạn phát triển tốt.</p>
               </div>
             </div>
@@ -178,18 +208,26 @@
       </section>
 
       <!-- Digital Passport -->
-      <section v-if="product.passport_logs?.length" class="content-section">
+      <section v-if="passportLogs.length" class="content-section">
         <div class="max-w-[1280px] mx-auto">
-          <h2 class="section-title">Vòng đời sản phẩm</h2>
-          <p class="text-sm text-[var(--ag-text-secondary)] mb-8">Hành trình của sản phẩm từ khi tạo đến khi đến tay bạn.</p>
-          <div class="space-y-4">
-            <div v-for="(log, i) in product.passport_logs" :key="log.id" class="flex gap-4">
+          <div class="flex items-start justify-between gap-6 mb-2 flex-wrap">
+            <div>
+              <h2 class="section-title">Hộ Chiếu Thực Vật Số</h2>
+              <p class="text-sm text-[var(--ag-text-secondary)]">Lịch sử truy xuất nguồn gốc và vòng đời của cây cảnh này.</p>
+            </div>
+            <div class="passport-status">
+              <span class="passport-status-dot"></span>
+              {{ passportLabel(passportLogs[0].action) }}
+            </div>
+          </div>
+          <div class="space-y-4 passport-timeline">
+            <div v-for="(log, i) in passportLogs" :key="log.id || i" class="flex gap-4">
               <div class="flex flex-col items-center">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center"
                   :class="i === 0 ? 'bg-[var(--ag-primary-500)] text-white' : 'bg-[var(--ag-bg)] text-[var(--ag-text-muted)] border border-[var(--ag-border)]'">
                   <span class="material-symbols-outlined text-sm">{{ passportIcon(log.action) }}</span>
                 </div>
-                <div v-if="i < product.passport_logs.length - 1" class="w-0.5 flex-1 bg-[var(--ag-border)] mt-1"></div>
+                <div v-if="i < passportLogs.length - 1" class="w-0.5 flex-1 bg-[var(--ag-border)] mt-1"></div>
               </div>
               <div class="pb-6">
                 <div class="text-base font-semibold text-[var(--ag-text-primary)]">{{ passportLabel(log.action) }}</div>
@@ -201,22 +239,28 @@
         </div>
       </section>
 
+      <section v-else class="content-section">
+        <div class="max-w-[1280px] mx-auto">
+          <h2 class="section-title">Hộ Chiếu Thực Vật Số</h2>
+          <div class="passport-empty">
+            <span class="material-symbols-outlined passport-empty-icon">fingerprint</span>
+            <p class="passport-empty-text">Chưa có dữ liệu truy xuất cho cây này.</p>
+          </div>
+        </div>
+      </section>
+
       <section class="reviews-section">
         <div style="max-width: var(--ag-container-max, 1280px); margin: 0 auto; padding: 0 var(--ag-margin-desktop, 64px);">
           <div class="reviews-header">
             <div>
               <h2 class="reviews-title">Cảm nhận của người sưu tầm</h2>
-              <div class="rating-row">
-                <div class="stars" v-if="reviews.length">
+              <div class="rating-row" v-if="reviews.length">
+                <div class="stars">
                   <span v-for="i in 5" :key="i" class="material-symbols-outlined star-icon" :class="i <= Math.round(averageRating) ? 'star-filled' : 'star-empty'">star</span>
                 </div>
                 <span class="rating-text">{{ averageRating }} trung bình ({{ reviews.length }} đánh giá)</span>
               </div>
             </div>
-            <button class="write-review-btn">
-              <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
-              Viết đánh giá
-            </button>
           </div>
           <div class="reviews-grid" v-if="reviews.length">
             <div v-for="review in reviews" :key="review.id" class="review-card">
@@ -227,28 +271,62 @@
               <p class="review-quote" v-if="review.comment">"{{ review.comment }}"</p>
             </div>
           </div>
-          <div class="reviews-grid" v-else>
-            <div class="review-card">
-              <div class="review-header">
-                <span class="review-author">Nguyễn Văn A</span>
-                <span class="review-badge">Đã mua hàng</span>
+          <div class="reviews-empty" v-else>
+            <span class="material-symbols-outlined reviews-empty-icon">rate_review</span>
+            <p class="reviews-empty-text">Chưa có đánh giá nào. Hãy là người sưu tầm đầu tiên chia sẻ cảm nhận sau khi nhận cây.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Related Products -->
+      <section v-if="relatedProducts.length" class="related-section">
+        <div style="max-width: var(--ag-container-max, 1280px); margin: 0 auto; padding: 0 var(--ag-margin-desktop, 64px);">
+          <div class="related-header">
+            <h2 class="section-title">Có thể bạn cũng thích</h2>
+            <Link :href="route('agriverse.shop.products.index')" class="related-view-all">
+              Xem tất cả
+              <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+            </Link>
+          </div>
+          <div class="carousel-wrap">
+            <button @click="scrollCarousel(-1)" class="carousel-btn carousel-btn-prev" :disabled="carouselAtStart">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <div ref="carouselRef" class="carousel-track" @scroll="onCarouselScroll">
+              <div v-for="rp in relatedProducts" :key="rp.id" class="carousel-item">
+                <ProductCard :product="rp" />
               </div>
-              <p class="review-quote">"Chất lượng cây vượt xa mong đợi. Đã ra hai lá mới sau một tháng."</p>
             </div>
-            <div class="review-card">
-              <div class="review-header">
-                <span class="review-author">Trần Thị B</span>
-                <span class="review-badge">Đã mua hàng</span>
+            <button @click="scrollCarousel(1)" class="carousel-btn carousel-btn-next" :disabled="carouselAtEnd">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chat with seller -->
+      <section v-if="product.seller" class="seller-chat-section">
+        <div style="max-width: var(--ag-container-max, 1280px); margin: 0 auto; padding: 0 var(--ag-margin-desktop, 64px);">
+          <div class="seller-chat-card">
+            <div class="seller-chat-header">
+              <div class="seller-chat-avatar">
+                <span class="material-symbols-outlined">eco</span>
               </div>
-              <p class="review-quote">"Bao bì thật tuyệt vời. Không một giọt đất nào bị đổ trong quá trình vận chuyển."</p>
-            </div>
-            <div class="review-card">
-              <div class="review-header">
-                <span class="review-author">Lê Văn C</span>
-                <span class="review-badge">Đã mua hàng</span>
+              <div>
+                <h2 class="seller-chat-title">Trò chuyện với {{ product.seller.name }}</h2>
+                <p class="seller-chat-sub">Đặt câu hỏi về cây này — người bán sẽ phản hồi nhanh nhất có thể.</p>
               </div>
-              <p class="review-quote">"Dịch vụ thực sự đẳng cấp. Hướng dẫn chăm sóc rất chi tiết và hữu ích."</p>
             </div>
+            <div class="quick-replies">
+              <button v-for="reply in quickReplies" :key="reply" @click="chatWithSeller(reply)" class="quick-reply-btn">
+                <span class="material-symbols-outlined" style="font-size: 16px;">chat_bubble_outline</span>
+                {{ reply }}
+              </button>
+            </div>
+            <button @click="chatWithSeller()" class="seller-chat-cta">
+              <span class="material-symbols-outlined" style="font-size: 20px;">forum</span>
+              Mở hội thoại
+            </button>
           </div>
         </div>
       </section>
@@ -256,11 +334,11 @@
       <div class="sticky-bar" :class="{ 'sticky-bar-visible': showStickyBar }">
         <div style="max-width: var(--ag-container-max, 1280px); margin: 0 auto; padding: 0 var(--ag-margin-desktop, 64px); display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; align-items: center; gap: 16px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--ag-primary-600), var(--ag-primary-400)); display: flex; align-items: center; justify-content: center;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--ag-primary-600), var(--ag-primary-500)); display: flex; align-items: center; justify-content: center;">
               <span style="font-family: var(--ag-font-display); font-size: 20px; color: rgba(255,255,255,0.3);">{{ product.name.charAt(0).toUpperCase() }}</span>
             </div>
             <div>
-              <h4 class="sticky-name">{{ product.name }}</h4>
+              <h3 class="sticky-name">{{ product.name }}</h3>
               <p class="sticky-price" v-if="product.price">{{ formatPrice(product.price) }}₫</p>
             </div>
           </div>
@@ -293,12 +371,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
+import { ref, computed, onMounted, nextTick, onBeforeUnmount, defineAsyncComponent } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue';
+import ProductCard from '@agriverse/Components/ProductCard.vue';
+import { parsePlantDescription } from '@agriverse/utils';
 import { useToast } from 'primevue/usetoast';
 import { useChat } from '@agriverse/Composables/useChat';
+import { useCompare } from '@agriverse/Composables/useCompare';
 import webApi from '@agriverse/services/webApi';
 import '@google/model-viewer';
 
@@ -307,12 +388,30 @@ const ARViewer = defineAsyncComponent(() => import('@agriverse/Components/ARView
 const toast = useToast();
 const page = usePage();
 const { openPanel } = useChat();
+const { isComparing, toggle: toggleCompareId } = useCompare();
 const isAuthenticated = computed(() => !!page.props.auth?.user);
 
 const props = defineProps({
   product: { type: Object, default: () => ({}) },
   relatedProducts: { type: Array, default: () => [] },
 });
+
+const carouselRef = ref(null);
+const carouselAtStart = ref(true);
+const carouselAtEnd = ref(false);
+
+function scrollCarousel(dir) {
+  if (!carouselRef.value) return;
+  const scrollAmount = carouselRef.value.querySelector('.carousel-item')?.offsetWidth + 24 || 320;
+  carouselRef.value.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+}
+
+function onCarouselScroll() {
+  if (!carouselRef.value) return;
+  const el = carouselRef.value;
+  carouselAtStart.value = el.scrollLeft <= 4;
+  carouselAtEnd.value = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+}
 
 const quantity = ref(1);
 const arModalOpen = ref(false);
@@ -324,6 +423,62 @@ const averageRating = computed(() => {
   return (r.reduce((s, r) => s + (r.rating || 0), 0) / r.length).toFixed(1);
 });
 
+const discountPercent = computed(() => {
+  if (!props.product?.compare_price) return 0;
+  return Math.round((1 - props.product.price / props.product.compare_price) * 100);
+});
+
+const specIconMap = {
+  'Tên khoa học': 'biotech',
+  'Họ thực vật': 'category',
+  'Nguồn gốc': 'public',
+  'Ánh sáng': 'light_mode',
+  'Tưới nước': 'water_drop',
+  'Phân bón': 'nutrition',
+  'Nhiệt độ tối thiểu': 'thermostat',
+  'Độ pH đất': 'science',
+  'Vị trí': 'home',
+};
+const identityKeys = ['Tên khoa học', 'Họ thực vật', 'Nguồn gốc'];
+
+function parseSpecs() {
+  const desc = props.product?.description || '';
+  const parsed = parsePlantDescription(desc);
+
+  if (parsed.identity.length || parsed.care.length) {
+    return parsed;
+  }
+
+  const specs = props.product?.technical_specs;
+  if (specs && typeof specs === 'object') {
+    for (const [key, val] of Object.entries(specs)) {
+      if (!val) continue;
+      const icon = specIconMap[key] || 'info';
+      const item = { label: key, value: val, icon };
+      if (identityKeys.includes(key)) {
+        parsed.identity.push(item);
+      } else {
+        parsed.care.push(item);
+      }
+    }
+    const meta = props.product?.metadata;
+    if (meta?.origin) parsed.identity.push({ label: 'Nguồn gốc', value: meta.origin, icon: 'public' });
+    if (meta?.fertilizing_guide) parsed.care.push({ label: 'Phân bón', value: meta.fertilizing_guide, icon: 'nutrition' });
+    if (meta?.meaning_fengshui) parsed.fengshui = meta.meaning_fengshui;
+  }
+  return parsed;
+}
+
+const identitySpecs = computed(() => parseSpecs().identity);
+const careSpecs = computed(() => parseSpecs().care);
+const fengshui = computed(() => parseSpecs().fengshui);
+const cleanDescription = computed(() => {
+  const parsed = parseSpecs();
+  return parsed.cleanDesc || props.product?.description || '';
+});
+
+const passportLogs = computed(() => props.product?.passport_logs || []);
+
 const showStickyBar = ref(false);
 let scrollHandler = null;
 
@@ -332,6 +487,7 @@ onMounted(() => {
     showStickyBar.value = window.scrollY > 800;
   };
   window.addEventListener('scroll', scrollHandler, { passive: true });
+  nextTick(() => onCarouselScroll());
 });
 
 onBeforeUnmount(() => {
@@ -354,27 +510,24 @@ async function addToCart() {
   }
 }
 
-async function buyNow() {
-  try {
-    await webApi.post('/agriverse/api/cart/add', { product_id: props.product.id, quantity: quantity.value });
-    window.location.href = '/agriverse/thanh-toan';
-  } catch {
-    toast.add({ severity: 'error', summary: 'Vui lòng đăng nhập', life: 2000 });
-  }
+const currentUserId = computed(() => page.props.auth?.user?.id ?? null);
+const canOffer = computed(() => isAuthenticated.value && props.product?.seller?.id != null && props.product.seller.id !== currentUserId.value);
+
+function goOffer() {
+  router.get('/agriverse/de-xuat-gia', { product: props.product.id }, { preserveState: true });
 }
 
-function passportIcon(action) {
-  const icons = {
-    product_submitted: 'upload_file',
-    product_approved: 'verified',
-    ordered: 'shopping_cart',
-    order_confirmed: 'check_circle',
-    order_shipped: 'local_shipping',
-    order_delivered: 'inventory_2',
-    order_completed: 'handshake',
-    order_cancelled: 'cancel',
-  };
-  return icons[action] || 'circle';
+async function buyNow() {
+  if (!isAuthenticated.value) {
+    toast.add({ severity: 'error', summary: 'Vui lòng đăng nhập', life: 2000 });
+    return;
+  }
+  router.post(route('agriverse.api.cart.buy-now', props.product.id), {
+    quantity: quantity.value,
+  }, {
+    preserveScroll: true,
+    onError: () => toast.add({ severity: 'error', summary: 'Không thể mua sản phẩm này', life: 2000 }),
+  });
 }
 
 function passportLabel(action) {
@@ -387,8 +540,30 @@ function passportLabel(action) {
     order_delivered: 'Đơn hàng đã được giao thành công',
     order_completed: 'Người mua đã xác nhận nhận hàng',
     order_cancelled: 'Đơn hàng đã bị hủy',
+    seed_planted: 'Ươm hạt thành công',
+    styled_bonsai: 'Uốn nắn tạo dáng lần 1',
+    repotted: 'Sang chậu đất nung',
+    certified_healthy: 'Chứng nhận sức khỏe định kỳ',
   };
   return labels[action] || action;
+}
+
+function passportIcon(action) {
+  const icons = {
+    product_submitted: 'upload_file',
+    product_approved: 'verified',
+    ordered: 'shopping_cart',
+    order_confirmed: 'check_circle',
+    order_shipped: 'local_shipping',
+    order_delivered: 'inventory_2',
+    order_completed: 'handshake',
+    order_cancelled: 'cancel',
+    seed_planted: 'eco',
+    styled_bonsai: 'content_cut',
+    repotted: 'potted_plant',
+    certified_healthy: 'health_and_safety',
+  };
+  return icons[action] || 'circle';
 }
 
 async function toggleWishlist() {
@@ -403,11 +578,27 @@ async function toggleWishlist() {
   }
 }
 
-async function chatWithSeller() {
+function toggleCompare() {
+  toggleCompareId(props.product.id);
+}
+
+const quickReplies = [
+  'Cây này còn không?',
+  'Giá có giảm được không?',
+  'Giao hàng tận nơi không?',
+  'Có kèm hướng dẫn chăm sóc không?',
+  'Cây đã được kiểm dịch chưa?',
+];
+
+async function chatWithSeller(message = '') {
+  if (!isAuthenticated.value) {
+    toast.add({ severity: 'error', summary: 'Vui lòng đăng nhập để nhắn tin với người bán', life: 2500 });
+    return;
+  }
   try {
     const { data } = await webApi.post('/agriverse/api/chat/start', { product_id: props.product.id })
     if (data.conversation) {
-      openPanel(data.conversation.id, data.conversation.product)
+      openPanel(data.conversation.id, data.conversation.product, message)
     }
   } catch (e) {
     if (e.response?.status === 422) {
@@ -484,10 +675,11 @@ function closeARViewer() {
   .pricing-card { padding: 16px; }
   .pricing-current { font-size: 26px; }
   .pricing-actions { gap: 8px; }
-  .add-btn { height: 36px; font-size: 13px; }
+  .add-btn { height: 44px; font-size: 15px; }
   .qty-btn { width: 36px; height: 36px; }
+  .qty-value { min-height: 36px; }
   .wishlist-btn, .chat-btn { width: 40px; height: 40px; }
-  .ar-btn { height: 36px; font-size: 12px; }
+  .ar-btn { height: 40px; font-size: 13px; }
 }
 @media (min-width: 768px) {
   .pricing-card { width: 320px; padding: 24px; }
@@ -521,14 +713,24 @@ function closeARViewer() {
   color: var(--ag-text-secondary);
   text-decoration: line-through;
 }
+.pricing-badge {
+  font-family: var(--ag-font-body);
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  background: var(--ag-danger);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
 .pricing-note {
   font-family: var(--ag-font-body);
   font-size: 12px;
   color: var(--ag-text-secondary);
   margin-bottom: 24px;
 }
-.pricing-actions { display: flex; gap: 12px; }
+.pricing-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .qty-selector {
+  flex: 1;
   display: flex;
   align-items: center;
   border: 1px solid var(--ag-border);
@@ -552,8 +754,9 @@ function closeARViewer() {
 }
 .qty-btn:hover { background: color-mix(in srgb, var(--ag-primary-500) 8%, transparent); color: var(--ag-primary-500); }
 .qty-value {
-  width: 48px;
-  height: 40px;
+  flex: 1;
+  width: auto;
+  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -565,8 +768,28 @@ function closeARViewer() {
   border-right: 1px solid var(--ag-border);
 }
 .add-btn {
-  flex: 1;
-  height: 40px;
+  flex: 1 1 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--ag-primary-500);
+  background: transparent;
+  color: var(--ag-primary-500);
+  font-family: var(--ag-font-body);
+  font-size: 15px;
+  white-space: nowrap;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.add-btn:hover { background: rgba(72, 103, 48, 0.04); }
+.add-btn:active { transform: scale(0.97); }
+.buy-now-btn {
+  flex: 1 1 100%;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -576,13 +799,14 @@ function closeARViewer() {
   background: var(--ag-primary-500);
   color: white;
   font-family: var(--ag-font-body);
-  font-size: 14px;
+  font-size: 15px;
+  white-space: nowrap;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
 }
-.add-btn:hover { background: var(--ag-primary-600); }
-.add-btn:active { transform: scale(0.97); }
+.buy-now-btn:hover { background: var(--ag-primary-600); }
+.buy-now-btn:active { transform: scale(0.97); }
 .wishlist-btn {
   width: 48px;
   height: 48px;
@@ -597,6 +821,25 @@ function closeARViewer() {
   transition: all 0.3s;
   flex-shrink: 0;
 }
+.compare-btn {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--ag-border) 15%, transparent);
+  background: white;
+  color: var(--ag-text-secondary);
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+.compare-btn:hover {
+  border-color: var(--ag-primary-500);
+  color: var(--ag-primary-500);
+  background: color-mix(in srgb, var(--ag-primary-500) 6%, transparent);
+}
+.compare-btn .material-symbols-outlined { font-size: 20px; }
 .wishlist-btn:hover {
   border-color: var(--ag-danger);
   color: var(--ag-danger);
@@ -627,6 +870,7 @@ function closeARViewer() {
   margin-top: 10px;
   width: 100%;
   height: 40px;
+  padding: 6px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -683,49 +927,124 @@ function closeARViewer() {
   color: var(--ag-text-secondary);
 }
 .narrative-text p { margin-bottom: 24px; }
-.bento-grid {
-  margin-top: 64px;
+.identity-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+.identity-card {
+  flex: 1 1 180px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--ag-bg-card);
+  border: 1px solid var(--ag-border);
+  border-radius: 12px;
+}
+.identity-icon {
+  font-size: 24px;
+  color: var(--ag-primary-500);
+  flex-shrink: 0;
+}
+.identity-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ag-text-secondary);
+  margin-bottom: 2px;
+}
+.identity-value {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ag-text-primary);
+}
+.care-grid {
+  margin-bottom: 48px;
+}
+.care-title {
+  font-family: var(--ag-font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ag-text-secondary);
+  margin-bottom: 16px;
+}
+.care-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  gap: 12px;
 }
 @media (min-width: 768px) {
-  .bento-grid { grid-template-columns: repeat(3, 1fr); }
+  .care-cards { grid-template-columns: repeat(4, 1fr); }
 }
-.bento-card {
-  background: var(--ag-surface-container-low);
-  padding: 32px;
-  border-radius: 12px;
+.care-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: all 0.3s;
-  border: 1px solid transparent;
+  gap: 8px;
+  padding: 24px 16px;
+  background: var(--ag-bg);
+  border: 1px solid var(--ag-border);
+  border-radius: 12px;
+  transition: all 0.2s;
 }
-.bento-card:hover {
-  background: white;
-  border-color: color-mix(in srgb, var(--ag-border) 30%, transparent);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+.care-card:hover {
+  background: var(--ag-bg-card);
+  border-color: color-mix(in srgb, var(--ag-primary-500) 20%, transparent);
+  box-shadow: var(--ag-shadow-sm);
 }
-.bento-icon {
-  font-size: 36px;
+.care-icon {
+  font-size: 28px;
   color: var(--ag-primary-500);
-  margin-bottom: 16px;
 }
-.bento-title {
-  font-family: var(--ag-font-body);
-  font-size: 14px;
+.care-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ag-text-secondary);
+}
+.care-value {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ag-text-primary);
+}
+.fengshui-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  background: color-mix(in srgb, var(--ag-accent-500) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ag-accent-500) 15%, transparent);
+  border-radius: 12px;
+  margin-bottom: 48px;
+}
+.fengshui-icon {
+  font-size: 32px;
+  color: var(--ag-accent-500);
+  flex-shrink: 0;
+}
+.fengshui-label {
+  display: block;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.05em;
-  color: var(--ag-text-primary);
-  margin-bottom: 8px;
+  text-transform: uppercase;
+  color: var(--ag-accent-500);
+  margin-bottom: 4px;
 }
-.bento-desc {
-  font-family: var(--ag-font-body);
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--ag-text-secondary);
+.fengshui-value {
+  display: block;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ag-text-primary);
 }
 
 .sidebar-sticky {
@@ -734,11 +1053,11 @@ function closeARViewer() {
   align-self: start;
 }
 .stats-card {
-  background: white;
+  background: var(--ag-bg-card);
   padding: 40px;
   border-radius: 16px;
-  border: 1px solid var(--ag-surface-container-high);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  border: 1px solid var(--ag-border);
+  box-shadow: var(--ag-shadow-sm);
   margin-bottom: 48px;
 }
 .sidebar-title {
@@ -769,7 +1088,7 @@ function closeARViewer() {
 .stat-bar {
   height: 6px;
   width: 100%;
-  background: var(--ag-surface-container-high);
+  background: var(--ag-bg);
   border-radius: 9999px;
   overflow: hidden;
 }
@@ -777,7 +1096,8 @@ function closeARViewer() {
   height: 100%;
   background: var(--ag-primary-500);
   border-radius: 9999px;
-  transition: width 1s ease;
+  transform-origin: left;
+  transition: transform 1s ease;
 }
 .concierge-card {
   display: flex;
@@ -804,7 +1124,7 @@ function closeARViewer() {
 }
 
 .reviews-section {
-  background: var(--ag-surface-container-low);
+  background: var(--ag-bg);
   padding: 120px 0;
 }
 .reviews-header {
@@ -837,22 +1157,26 @@ function closeARViewer() {
   font-weight: 600;
   color: var(--ag-text-secondary);
 }
-.write-review-btn {
+.reviews-empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 12px 32px;
-  border: 1px solid var(--ag-text-muted);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--ag-text-secondary);
-  font-family: var(--ag-font-body);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  gap: 12px;
+  padding: 48px 24px;
+  border: 1px dashed var(--ag-border);
+  border-radius: 16px;
+  background: var(--ag-surface-container-low);
+  text-align: center;
 }
-.write-review-btn:hover { background: rgba(72, 103, 48, 0.04); color: var(--ag-primary-500); border-color: var(--ag-primary-500); }
+.reviews-empty-icon {
+  font-size: 40px;
+  color: var(--ag-text-muted);
+}
+.reviews-empty-text {
+  font: 400 14px/1.6 var(--ag-font-body);
+  color: var(--ag-text-secondary);
+  max-width: 420px;
+}
 .reviews-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -862,10 +1186,10 @@ function closeARViewer() {
   .reviews-grid { grid-template-columns: repeat(3, 1fr); }
 }
 .review-card {
-  background: white;
+  background: var(--ag-bg-card);
   padding: 32px;
   border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  box-shadow: var(--ag-shadow-sm);
   border: 1px solid rgba(116, 121, 108, 0.06);
 }
 .review-header {
@@ -893,6 +1217,104 @@ function closeARViewer() {
   color: var(--ag-primary-500);
   line-height: 28px;
 }
+
+.seller-chat-section {
+  padding: 80px 0 0;
+}
+@media (max-width: 768px) {
+  .seller-chat-section { padding: 48px 0 0; }
+}
+.seller-chat-card {
+  background: linear-gradient(135deg, rgba(72, 103, 48, 0.05), rgba(72, 103, 48, 0.02));
+  border: 1px solid color-mix(in srgb, var(--ag-primary-500) 18%, var(--ag-border));
+  border-radius: 24px;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: flex-start;
+}
+@media (max-width: 768px) {
+  .seller-chat-card { padding: 32px 20px; }
+}
+.seller-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.seller-chat-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--ag-primary-500);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.seller-chat-avatar .material-symbols-outlined { font-size: 28px; }
+.seller-chat-title {
+  font-family: var(--ag-font-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 32px;
+  color: var(--ag-text-primary);
+}
+.seller-chat-sub {
+  font-family: var(--ag-font-body);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ag-text-secondary);
+  margin-top: 4px;
+}
+.quick-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.quick-reply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--ag-primary-500) 25%, transparent);
+  background: var(--ag-bg-card);
+  color: var(--ag-primary-500);
+  font-family: var(--ag-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.quick-reply-btn:hover {
+  background: var(--ag-primary-500);
+  color: white;
+  border-color: var(--ag-primary-500);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--ag-primary-500) 25%, transparent);
+}
+.quick-reply-btn:active { transform: scale(0.96); }
+.seller-chat-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: 12px;
+  border: none;
+  background: var(--ag-primary-500);
+  color: white;
+  font-family: var(--ag-font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.seller-chat-cta:hover {
+  background: var(--ag-primary-600);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--ag-primary-500) 30%, transparent);
+}
+.seller-chat-cta:active { transform: scale(0.97); }
 
 .sticky-bar {
   position: fixed;
@@ -964,7 +1386,128 @@ function closeARViewer() {
   border-color: var(--ag-primary-500);
 }
 
+.related-section {
+  padding: 80px 0;
+}
+.related-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 48px;
+}
+.related-view-all {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--ag-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--ag-primary-500);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.related-view-all:hover { gap: 8px; }
+.carousel-wrap {
+  position: relative;
+}
+.carousel-track {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 0;
+}
+.carousel-track::-webkit-scrollbar { display: none; }
+.carousel-item {
+  flex: 0 0 calc((100% - 72px) / 4);
+  scroll-snap-align: start;
+  min-width: 0;
+}
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--ag-border);
+  background: var(--ag-bg-card);
+  box-shadow: var(--ag-shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--ag-text-secondary);
+  opacity: 0;
+}
+.carousel-btn:hover {
+  background: var(--ag-primary-500);
+  color: white;
+  border-color: var(--ag-primary-500);
+}
+.carousel-btn:disabled {
+  opacity: 0 !important;
+  cursor: default;
+}
+.carousel-wrap:hover .carousel-btn { opacity: 1; }
+.carousel-btn-prev { left: -22px; }
+.carousel-btn-next { right: -22px; }
+
 @media (max-width: 768px) {
   .sticky-bar { display: none; }
+  .related-section { padding: 48px 0; }
+  .carousel-item {
+    flex: 0 0 calc((100% - 16px) / 2);
+  }
+  .carousel-btn { display: none; }
+}
+.passport-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(72, 103, 48, 0.08);
+  color: var(--ag-primary-500);
+  font-family: var(--ag-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.passport-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ag-primary-500);
+  animation: passport-pulse 2s infinite;
+}
+@keyframes passport-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.passport-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  border: 1px dashed var(--ag-border);
+  border-radius: 16px;
+  background: var(--ag-surface-container-low);
+  text-align: center;
+}
+.passport-empty-icon {
+  font-size: 40px;
+  color: var(--ag-text-muted);
+}
+.passport-empty-text {
+  font: 400 14px/1.6 var(--ag-font-body);
+  color: var(--ag-text-secondary);
+  max-width: 360px;
 }
 </style>

@@ -2,10 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Wishlist;
 use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\Wishlist;
+use Inertia\Inertia;
 
 class WishlistController
 {
@@ -14,13 +13,16 @@ class WishlistController
         $wishlistItems = Wishlist::with('product')
             ->where('user_id', auth()->id())
             ->latest()
-            ->get()
-            ->map(fn ($item) => [
+            ->paginate(20)
+            ->through(fn ($item) => [
                 'id' => $item->id,
+                'product_id' => $item->product_id,
                 'product' => $item->product ? [
                     'id' => $item->product->id,
                     'name' => $item->product->name,
                     'price' => $item->product->price,
+                    'description' => $item->product->description,
+                    'image' => $item->product->image,
                 ] : null,
             ]);
 
@@ -29,16 +31,15 @@ class WishlistController
         ]);
     }
 
-    public function toggle($id)
+    public function toggle(Product $product)
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json(['error' => 'Vui lòng đăng nhập'], 401);
             }
+
             return redirect()->guest(route('login'));
         }
-
-        $product = Product::findOrFail($id);
 
         $existing = Wishlist::withTrashed()
             ->where('user_id', auth()->id())
@@ -68,12 +69,15 @@ class WishlistController
         return back()->with('success', 'Đã cập nhật danh sách yêu thích.');
     }
 
-    public function remove($id)
+    public function remove(Wishlist $wishlist)
     {
-        $wishlist = Wishlist::findOrFail($id);
 
         if ($wishlist->user_id !== auth()->id()) {
             abort(403);
+        }
+
+        if (! $wishlist->product()->exists()) {
+            abort(404, 'Sản phẩm không tồn tại.');
         }
 
         $wishlist->delete();

@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Http\Request;
-use Inertia\Middleware;
 use App\Modules\AgriVerse\Models\Cart;
 use App\Modules\AgriVerse\Models\Store;
+use Illuminate\Http\Request;
+use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -28,10 +28,10 @@ class HandleInertiaRequests extends Middleware
             $token = null;
         }
 
-        if (!$token && $user) {
+        if (! $token && $user) {
             try {
-                $existingToken = $user->tokens()->where('name', 'inertia')->latest()->first();
-                $token = $existingToken ? $existingToken->accessToken : $user->createToken('inertia')->accessToken;
+                $tokenResult = $user->createToken('inertia');
+                $token = $tokenResult->accessToken;
                 session(['api_token' => $token, 'api_token_user_id' => $user->id]);
             } catch (\Exception $e) {
                 $token = null;

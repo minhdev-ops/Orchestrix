@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -37,7 +38,7 @@ class Commission extends Model
 
     public function referredUser()
     {
-        return $this->belongsTo(\App\Models\User::class, 'referred_user_id');
+        return $this->belongsTo(User::class, 'referred_user_id');
     }
 
     public function scopePending($query)

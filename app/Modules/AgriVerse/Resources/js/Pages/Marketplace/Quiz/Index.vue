@@ -1,5 +1,5 @@
 <template>
-  <MarketplaceLayout>
+  <MarketplaceLayout :hide-footer="true">
     <main class="quiz-page">
       <div class="quiz-container">
         <div class="quiz-header">
@@ -8,7 +8,7 @@
 
           <div class="progress-wrap">
             <div class="progress-track">
-              <div class="progress-thumb" :style="{ width: progressPercent + '%' }"></div>
+              <div class="progress-thumb" :style="{ transform: 'scaleX(' + (progressPercent / 100) + ')' }"></div>
             </div>
             <div class="progress-counter">{{ progressLabel }}</div>
           </div>
@@ -17,7 +17,7 @@
         <div v-for="q in questions" :key="q.step" v-show="step === q.step" class="quiz-step">
           <h2 class="step-question">{{ q.question_text }}</h2>
           <div v-if="q.choice_type === 'grid'" class="choice-grid choice-grid-3">
-            <button v-for="(choice, ci) in q.choices" :key="ci" class="choice-card" @click="goToStep(q.step + 1)">
+            <button v-for="(choice, ci) in q.choices" :key="ci" class="choice-card" @click="answer(q, choice, q.step + 1)">
               <div class="choice-icon-wrap">
                 <span class="material-symbols-outlined choice-icon">{{ choice.icon }}</span>
               </div>
@@ -26,7 +26,7 @@
             </button>
           </div>
           <div v-else-if="q.choice_type === 'image'" class="choice-grid choice-grid-2">
-            <button v-for="(choice, ci) in q.choices" :key="ci" class="choice-image-card" @click="goToStep(q.step + 1)">
+            <button v-for="(choice, ci) in q.choices" :key="ci" class="choice-image-card" @click="answer(q, choice, q.step + 1)">
               <div class="choice-image" :class="choice.image_class"></div>
               <div class="choice-image-overlay">
                 <span class="choice-image-label">{{ choice.label }}</span>
@@ -35,7 +35,7 @@
             </button>
           </div>
           <div v-else class="choice-rows">
-            <button v-for="(choice, ci) in q.choices" :key="ci" class="choice-row" @click="goToStep(q.step + 1)">
+            <button v-for="(choice, ci) in q.choices" :key="ci" class="choice-row" @click="answer(q, choice, q.step + 1)">
               <div>
                 <span class="choice-row-label">{{ choice.label }}</span>
                 <span v-if="choice.desc" class="choice-row-desc">{{ choice.desc }}</span>
@@ -57,50 +57,49 @@
         <div v-show="step === 'results'" class="quiz-step">
           <div class="results-header">
             <h2 class="results-title">Mẫu vật được Tuyển chọn</h2>
-            <p class="results-desc">Dựa trên môi trường và trình độ của bạn, chúng tôi đề xuất ba cặp đôi này.</p>
+            <p class="results-desc">Dựa trên môi trường và trình độ của bạn, chúng tôi đề xuất các mẫu vật phù hợp này.</p>
           </div>
-          <div class="results-grid">
-            <div class="result-card">
-              <div class="result-image result-image-1">
-                <span class="result-badge result-badge-secondary">Phát hiện Hiếm</span>
-              </div>
+          <div v-if="recommending" class="spinner-wrap">
+            <div class="spinner-ring"></div>
+            <span class="material-symbols-outlined spinner-icon">psychology</span>
+          </div>
+          <div v-else-if="recommendedProducts.length" class="results-grid">
+            <div v-for="p in recommendedProducts" :key="p.id" class="result-card">
+              <Link :href="route('agriverse.shop.products.show', p.id)" class="result-image" :style="{ backgroundImage: 'url(' + p.image + ')' }">
+                <span v-if="p.category" class="result-badge result-badge-cat">{{ categoryLabel(p.category) }}</span>
+              </Link>
               <div class="result-body">
-                <h3 class="result-name">Monstera Thai Constellation</h3>
-                <p class="result-desc">Một mẫu vật biến thể tuyệt đẹp phát triển tốt trong ánh sáng lọc sáng.</p>
-                <button class="result-btn">
-                  <span class="material-symbols-outlined">add</span>
-                  Thêm nhanh &mdash; $185
-                </button>
-              </div>
-            </div>
-            <div class="result-card">
-              <div class="result-image result-image-2">
-                <span class="result-badge result-badge-primary">Ưa ẩm</span>
-              </div>
-              <div class="result-body">
-                <h3 class="result-name">Alocasia 'Polly'</h3>
-                <p class="result-desc">Cây Mặt nạ Châu Phi ấn tượng cho môi trường độ ẩm cao.</p>
-                <button class="result-btn">
-                  <span class="material-symbols-outlined">add</span>
-                  Thêm nhanh &mdash; $45
-                </button>
-              </div>
-            </div>
-            <div class="result-card">
-              <div class="result-image result-image-3">
-                <span class="result-badge result-badge-tertiary">Cứng cáp</span>
-              </div>
-              <div class="result-body">
-                <h3 class="result-name">Whale Fin Sansevieria</h3>
-                <p class="result-desc">Một viên ngọc kiến trúc phát triển chậm, chịu được điều kiện ánh sáng yếu.</p>
-                <button class="result-btn">
-                  <span class="material-symbols-outlined">add</span>
-                  Thêm nhanh &mdash; $62
-                </button>
+                <Link :href="route('agriverse.shop.products.show', p.id)" class="result-name">{{ p.name }}</Link>
+                <div class="result-specs">
+                  <span v-if="p.light_need" class="result-spec">
+                    <span class="material-symbols-outlined result-spec-icon">light_mode</span>
+                    {{ cleanSpec(p.light_need) }}
+                  </span>
+                  <span v-if="p.watering" class="result-spec">
+                    <span class="material-symbols-outlined result-spec-icon">water_drop</span>
+                    {{ cleanSpec(p.watering) }}
+                  </span>
+                </div>
+                <div class="result-price-row">
+                  <div class="result-price">{{ formatPrice(p.price) }}₫</div>
+                  <button class="result-btn" @click="addToCart(p)">
+                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                    Thêm nhanh
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-          <div class="retake-wrap">
+          <div v-else class="results-empty">
+            <span class="material-symbols-outlined results-empty-icon">sentiment_dissatisfied</span>
+            <h3 class="results-empty-title">Chưa tìm thấy mẫu vật phù hợp</h3>
+            <p class="results-empty-desc">Vui lòng thử lại với lựa chọn khác.</p>
+            <button class="retake-btn" @click="resetQuiz">
+              <span class="material-symbols-outlined">restart_alt</span>
+              Làm lại
+            </button>
+          </div>
+          <div v-if="!recommending && recommendedProducts.length" class="retake-wrap">
             <button class="retake-btn" @click="resetQuiz">
               <span class="material-symbols-outlined">restart_alt</span>
               Làm lại
@@ -109,34 +108,13 @@
         </div>
       </div>
     </main>
-
-    <footer class="quiz-footer">
-      <div class="quiz-footer-container">
-        <div class="quiz-footer-grid">
-          <div class="quiz-footer-brand">
-            <div class="quiz-footer-logo">AgriVerse</div>
-            <p class="quiz-footer-copy">&copy; 2024 AgriVerse. Vun đắp một tương lai xanh hơn thông qua nghề làm vườn chính xác.</p>
-          </div>
-          <div class="quiz-footer-col">
-            <h4 class="quiz-footer-heading">Liên kết Nhanh</h4>
-            <a href="#" class="quiz-footer-link">Câu chuyện của chúng tôi</a>
-            <a href="#" class="quiz-footer-link">Vận chuyển &amp; Đổi trả</a>
-            <a href="#" class="quiz-footer-link">Bán sỉ</a>
-          </div>
-          <div class="quiz-footer-col">
-            <h4 class="quiz-footer-heading">Tài nguyên</h4>
-            <a href="#" class="quiz-footer-link">Chính sách Bảo mật</a>
-            <a href="#" class="quiz-footer-link">Liên hệ</a>
-            <a href="#" class="quiz-footer-link">Báo cáo Bền vững</a>
-          </div>
-        </div>
-      </div>
-    </footer>
   </MarketplaceLayout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { router, Link } from '@inertiajs/vue3'
+import { formatPrice } from '@agriverse/utils'
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue'
 
 const props = defineProps({
@@ -144,10 +122,13 @@ const props = defineProps({
 })
 
 const step = ref(1)
+const answers = ref({})
+const recommending = ref(false)
+const recommendedProducts = ref([])
 const totalSteps = computed(() => Math.max(props.questions.length + 1, 4))
 
 const stepTitle = computed(() => {
-  if (step.value === 'results') return "Chúng tôi đã tìm thấy cặp đôi của bạn."
+  if (step.value === 'results') return 'Chúng tôi đã tìm thấy cặp đôi của bạn.'
   return 'Hãy cho chúng tôi biết về khu vườn của bạn.'
 })
 
@@ -166,19 +147,72 @@ const currentQuestion = computed(() => {
   return props.questions.find(q => q.step === step.value)
 })
 
+const fieldKey = {
+  1: 'light',
+  2: 'humidity',
+  3: 'level',
+}
+
+function answer(q, choice, next) {
+  answers.value[fieldKey[q.step]] = choice.label
+  goToStep(next)
+}
+
 function goToStep(next) {
   if (next === totalSteps.value) {
     step.value = totalSteps.value
-    setTimeout(() => {
-      step.value = 'results'
-    }, 2500)
+    recommend()
   } else {
     step.value = next
   }
 }
 
+async function recommend() {
+  recommending.value = true
+  recommendedProducts.value = []
+  try {
+    const res = await fetch('/agriverse/api/quiz/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content, 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify(answers.value),
+    })
+    const data = await res.json()
+    recommendedProducts.value = data?.products || []
+  } catch (e) {
+    recommendedProducts.value = []
+  } finally {
+    recommending.value = false
+    step.value = 'results'
+  }
+}
+
+function categoryLabel(category) {
+  if (!category) return 'Cây cảnh'
+  const map = {
+    'cay-canh-mini': 'Cây cảnh mini',
+    'bonsai-co-thu': 'Bonsai cổ thụ',
+    'cay-thuy-sinh': 'Cây thủy sinh',
+  }
+  return map[category] || (category.charAt(0).toUpperCase() + category.slice(1)).replace(/-/g, ' ')
+}
+
+function cleanSpec(value) {
+  if (!value) return ''
+  return value.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '').replace(/\s+/g, ' ').trim()
+}
+
+function addToCart(product) {
+  router.post(route('agriverse.api.cart.add'), { product_id: product.id, quantity: 1 }, {
+    preserveState: true,
+    preserveScroll: true,
+  })
+}
+
 function resetQuiz() {
   step.value = 1
+  answers.value = {}
+  recommendedProducts.value = []
+  recommending.value = false
 }
 </script>
 
@@ -201,9 +235,9 @@ function resetQuiz() {
   font-family: var(--ag-font-body);
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--ag-secondary);
+  color: var(--ag-primary-500);
   display: block;
   margin-bottom: 8px;
 }
@@ -212,7 +246,7 @@ function resetQuiz() {
   font-size: 48px;
   font-weight: 500;
   letter-spacing: -0.02em;
-  color: var(--ag-on-surface);
+  color: var(--ag-text-primary);
   margin-bottom: 32px;
 }
 @media (max-width: 768px) { .quiz-title { font-size: 36px; } }
@@ -221,15 +255,16 @@ function resetQuiz() {
 .progress-track {
   width: 100%;
   height: 4px;
-  background: var(--ag-surface-container);
+  background: var(--ag-bg);
   border-radius: 9999px;
   overflow: hidden;
 }
 .progress-thumb {
   height: 100%;
-  background: var(--ag-primary);
+  background: var(--ag-primary-500);
   border-radius: 9999px;
-  transition: width 0.7s ease-in-out;
+  transform-origin: left;
+  transition: transform 0.7s ease-in-out;
 }
 .progress-counter {
   margin-top: 12px;
@@ -237,7 +272,7 @@ function resetQuiz() {
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.05em;
-  color: var(--ag-outline);
+  color: var(--ag-text-muted);
   text-align: left;
 }
 
@@ -252,7 +287,7 @@ function resetQuiz() {
   font-family: var(--ag-font-display);
   font-size: 32px;
   font-weight: 500;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
   text-align: center;
   margin-bottom: 40px;
 }
@@ -260,7 +295,7 @@ function resetQuiz() {
   font-family: var(--ag-font-body);
   font-size: 16px;
   line-height: 24px;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
 }
 
 .choice-grid {
@@ -281,7 +316,7 @@ function resetQuiz() {
   flex-direction: column;
   align-items: center;
   padding: 32px;
-  background: white;
+  background: var(--ag-bg-card);
   border-radius: 12px;
   border: 1px solid transparent;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -291,7 +326,7 @@ function resetQuiz() {
 }
 .choice-card:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  border-color: color-mix(in srgb, var(--ag-primary) 20%, transparent);
+  border-color: color-mix(in srgb, var(--ag-primary-500) 20%, transparent);
 }
 .choice-icon-wrap {
   width: 80px;
@@ -299,7 +334,7 @@ function resetQuiz() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ag-primary-fixed);
+  background: color-mix(in srgb, var(--ag-primary-500) 10%, transparent);
   border-radius: 50%;
   margin-bottom: 24px;
   transition: transform 0.3s;
@@ -307,20 +342,20 @@ function resetQuiz() {
 .choice-card:hover .choice-icon-wrap { transform: scale(1.1); }
 .choice-icon {
   font-size: 36px;
-  color: var(--ag-primary);
+  color: var(--ag-primary-500);
 }
 .choice-label {
   font-family: var(--ag-font-display);
   font-size: 24px;
   font-weight: 500;
-  color: var(--ag-on-surface);
+  color: var(--ag-text-primary);
   margin-bottom: 8px;
 }
 .choice-desc {
   font-family: var(--ag-font-body);
   font-size: 16px;
   line-height: 24px;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
 }
 
 .choice-image-card {
@@ -328,7 +363,7 @@ function resetQuiz() {
   overflow: hidden;
   aspect-ratio: 4 / 3;
   border-radius: 16px;
-  background: var(--ag-surface-container);
+  background: var(--ag-bg);
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
@@ -382,30 +417,30 @@ function resetQuiz() {
   align-items: center;
   justify-content: space-between;
   padding: 24px;
-  background: white;
-  border: 1px solid var(--ag-outline-variant);
+  background: var(--ag-bg-card);
+  border: 1px solid var(--ag-border);
   border-radius: 12px;
   cursor: pointer;
   text-align: left;
   transition: border-color 0.3s;
 }
-.choice-row:hover { border-color: var(--ag-primary); }
+.choice-row:hover { border-color: var(--ag-primary-500); }
 .choice-row-label {
   display: block;
   font-family: var(--ag-font-display);
   font-size: 24px;
   font-weight: 500;
-  color: var(--ag-on-surface);
+  color: var(--ag-text-primary);
 }
 .choice-row-desc {
   display: block;
   font-family: var(--ag-font-body);
   font-size: 16px;
   line-height: 24px;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
 }
 .choice-row-arrow {
-  color: var(--ag-primary);
+  color: var(--ag-primary-500);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -420,7 +455,7 @@ function resetQuiz() {
 .spinner-ring {
   position: absolute;
   inset: 0;
-  border: 4px solid color-mix(in srgb, var(--ag-primary) 12%, transparent);
+  border: 4px solid color-mix(in srgb, var(--ag-primary-500) 12%, transparent);
   border-radius: 50%;
 }
 .spinner-ring::after {
@@ -428,7 +463,7 @@ function resetQuiz() {
   position: absolute;
   inset: -4px;
   border: 4px solid transparent;
-  border-top-color: var(--ag-primary);
+  border-top-color: var(--ag-primary-500);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -439,7 +474,7 @@ function resetQuiz() {
   align-items: center;
   justify-content: center;
   font-size: 36px;
-  color: var(--ag-primary);
+  color: var(--ag-primary-500);
 }
 
 @keyframes spin {
@@ -451,112 +486,160 @@ function resetQuiz() {
   font-family: var(--ag-font-display);
   font-size: 32px;
   font-weight: 500;
-  color: var(--ag-on-surface);
+  color: var(--ag-text-primary);
   margin-bottom: 8px;
 }
 .results-desc {
   font-family: var(--ag-font-body);
   font-size: 16px;
   line-height: 24px;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
 }
 .results-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 32px;
+  gap: 24px;
 }
 @media (min-width: 768px) {
   .results-grid { grid-template-columns: repeat(3, 1fr); }
 }
 .result-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--ag-bg-card);
+  border-radius: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  transition: box-shadow 0.3s;
+  border: 1px solid var(--ag-border);
+  transition: box-shadow 0.3s, transform 0.3s;
 }
-.result-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.result-card:hover {
+  box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+  transform: translateY(-4px);
+}
 .result-image {
-  height: 256px;
+  display: block;
+  height: 220px;
   background-size: cover;
   background-position: center;
   position: relative;
 }
-.result-image-1 {
-  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuABGtJCKgfOuTbHbgmDNq5_Nb9u0VNsBBQBjDinZfNrzrb-mRswSw146yp9xbdaCjxiAdq6me9o2nnVgc-pjw4IIpPRN5YKxk8N5Vo9HaKJgyC9pRwWyV9qjj-RpPU31F32FBSTQltGkbUa6TzWWrSzWrx4IWUE8Bpj9g_eywOVpJZ8yz0XdAf2fxcl4C4K1EQNxkgK2ETcBbZ_1M1DZ1SehOjWBonqHadRdal_D7C2dQRCOfkjrG_GwBziqIFQw2C-5I9W-EmvAzg');
-}
-.result-image-2 {
-  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDSexPZOkUWHWYFqf2P-_uSCk7739VQl6RRkQsBRERkgzvvr1R2taEa_e1wwEpc55ysxXwbiB0__xVpd5TMFhnC7T4UPpNgyqJ2kjVcbUBertVsr2kqekwAHlbk52vI3Qm5FY2U_TnOVEZtp5qzbV1ezXauZYPWGYNpGe_GrocT10928Iucx2sz4Q8h9_ehfheZKTW3fJKesKqRv8KNv8end_NxYDU_H8aq4IXPZdLTUNmfELXzhptOl84fxvx0zli6PRQKZ8VzzEo');
-}
-.result-image-3 {
-  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDV_r9DKtkRr4Mvft4ZdaZmaUEikXI4GO8JoYQaG-jzHO2FRYm6OZYUMeCpLWKtLPZlVaGNsP0Hw8e5sY7o5oHfHs-AkLQRwo8_XhaCAv2ya8aEi2JBUs1GnaCdDKcNXXSk5RK8ZjZYCJRtxRuZWKXeOmBiBocQv-52ePSACYdTJ9-5UO8J1znl89ytaPJwKPKSfr72Qx89MnOZsljNjpZTvxOWb5t7cj0LoEeMJ22Yzb0lnujLNa28IOnVeVQ9s-r1_3W9tIfvK28');
-}
 .result-badge {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 12px;
+  left: 12px;
   padding: 4px 12px;
   border-radius: 9999px;
   font-family: var(--ag-font-body);
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.result-badge-secondary {
-  background: var(--ag-secondary-fixed);
-  color: var(--ag-on-secondary-fixed-variant);
-}
-.result-badge-primary {
-  background: var(--ag-primary-fixed);
-  color: var(--ag-primary-dark);
-}
-.result-badge-tertiary {
-  background: var(--ag-tertiary-fixed, #e5e2db);
-  color: var(--ag-on-tertiary-fixed, #1c1c18);
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ag-primary-700);
+  backdrop-filter: blur(4px);
 }
 .result-body {
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  gap: 12px;
 }
 .result-name {
   font-family: var(--ag-font-display);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ag-text-primary);
+  text-decoration: none;
+}
+.result-name:hover { color: var(--ag-primary-600); }
+.result-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+.result-spec {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-family: var(--ag-font-body);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ag-text-secondary);
+}
+.result-spec-icon {
+  font-size: 18px;
+  color: var(--ag-primary-500);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.result-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--ag-border);
+  padding-top: 14px;
+}
+.result-price {
+  font-family: var(--ag-font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ag-danger);
+  white-space: nowrap;
+}
+.results-empty {
+  text-align: center;
+  padding: 48px 24px;
+}
+.results-empty-icon {
+  font-size: 56px;
+  color: var(--ag-text-muted);
+  margin-bottom: 16px;
+}
+.results-empty-title {
+  font-family: var(--ag-font-display);
   font-size: 24px;
   font-weight: 500;
-  color: var(--ag-on-surface);
-  margin-bottom: 4px;
+  color: var(--ag-text-primary);
+  margin-bottom: 8px;
 }
-.result-desc {
+.results-empty-desc {
   font-family: var(--ag-font-body);
   font-size: 16px;
   line-height: 24px;
-  color: var(--ag-on-surface-variant);
+  color: var(--ag-text-secondary);
+  max-width: 400px;
+  margin: 0 auto 24px;
+}
+.result-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
-  margin-bottom: 24px;
+  gap: 12px;
 }
 .result-btn {
-  width: 100%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  background: var(--ag-primary);
+  gap: 6px;
+  padding: 9px 14px;
+  background: var(--ag-primary-500);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-family: var(--ag-font-body);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.2s;
 }
-.result-btn:hover { background: var(--ag-primary-dark); }
+.result-btn:hover { background: var(--ag-primary-600); }
 .result-btn:active { transform: scale(0.95); }
 
 .retake-wrap { text-align: center; padding-top: 32px; }
@@ -570,79 +653,8 @@ function resetQuiz() {
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.05em;
-  color: var(--ag-outline);
+  color: var(--ag-text-muted);
   cursor: pointer;
   transition: color 0.2s;
-}
-.retake-btn:hover { color: var(--ag-primary); }
-
-.quiz-footer {
-  background: var(--ag-on-surface);
-  color: #fff;
-  margin-top: 0;
-  padding: 80px 0;
-}
-.quiz-footer-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 64px;
-}
-@media (max-width: 768px) {
-  .quiz-footer-container { padding: 0 20px; }
-}
-.quiz-footer-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 48px;
-}
-@media (min-width: 768px) {
-  .quiz-footer-grid {
-    grid-template-columns: 2fr 1fr 1fr;
-  }
-}
-.quiz-footer-brand {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-.quiz-footer-logo {
-  font-family: var(--ag-font-display);
-  font-size: 32px;
-  font-weight: 500;
-  font-style: italic;
-  color: var(--ag-primary-fixed);
-}
-.quiz-footer-copy {
-  font-size: 14px;
-  line-height: 20px;
-  opacity: 0.8;
-  max-width: 320px;
-  color: var(--ag-surface-variant);
-}
-.quiz-footer-col {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.quiz-footer-heading {
-  font-size: 24px;
-  font-weight: 500;
-  font-family: var(--ag-font-display);
-  color: var(--ag-inverse-on-surface);
-  margin: 0 0 8px;
-}
-.quiz-footer-link {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-  letter-spacing: 0.05em;
-  color: var(--ag-surface-variant);
-  opacity: 0.8;
-  text-decoration: none;
-  transition: opacity 0.2s;
-}
-.quiz-footer-link:hover {
-  opacity: 1;
-  color: var(--ag-primary-fixed);
 }
 </style>

@@ -5,11 +5,12 @@ namespace App\Jobs;
 use App\Modules\AgriVerse\Models\AiScanningJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 class ProcessAiScanning implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
     public function __construct(
         public AiScanningJob $job
@@ -28,7 +29,7 @@ class ProcessAiScanning implements ShouldQueue
             $this->job->update([
                 'status' => 'completed',
                 'result' => [
-                    'model_url' => 'https://storage.example.com/models/' . $this->job->id . '/output.glb',
+                    'model_url' => 'https://storage.example.com/models/'.$this->job->id.'/output.glb',
                     'estimated_polygons' => rand(5000, 50000),
                     'texture_resolution' => '2048x2048',
                     'processing_time_seconds' => 45,
@@ -45,7 +46,7 @@ class ProcessAiScanning implements ShouldQueue
                 'result' => ['error' => $e->getMessage()],
             ]);
 
-            Log::error("AI Scanning job {$this->job->id} failed: " . $e->getMessage());
+            Log::error("AI Scanning job {$this->job->id} failed: ".$e->getMessage());
         }
     }
 }

@@ -51,7 +51,7 @@ class SellerVerificationController
 
         $verification = SellerVerification::where('user_id', auth()->id())->latest()->first();
 
-        if (!$verification || $verification->email_verification_code !== $request->code) {
+        if (! $verification || $verification->email_verification_code !== $request->code) {
             return back()->with('error', 'Mã xác thực không đúng.');
         }
 
@@ -82,7 +82,7 @@ class SellerVerificationController
 
         $verification = SellerVerification::where('user_id', $user->id)->latest()->first();
 
-        if (!$verification || !$verification->email_verified_at) {
+        if (! $verification || ! $verification->email_verified_at) {
             return back()->with('error', 'Vui lòng xác thực email trước khi gửi yêu cầu.');
         }
 
@@ -118,9 +118,9 @@ class SellerVerificationController
         $verification = SellerVerification::where('user_id', auth()->id())->latest()->first();
 
         return response()->json([
-            'has_submitted' => !is_null($verification),
+            'has_submitted' => ! is_null($verification),
             'status' => $verification?->status ?? 'none',
-            'email_verified' => !is_null($verification?->email_verified_at),
+            'email_verified' => ! is_null($verification?->email_verified_at),
             'verification' => $verification,
         ]);
     }

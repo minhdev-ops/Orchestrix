@@ -2,9 +2,10 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Modules\AgriVerse\Http\Requests\Shop\StoreAddressRequest;
+use App\Modules\AgriVerse\Models\Province;
 use App\Modules\AgriVerse\Models\UserAddress;
+use Inertia\Inertia;
 
 class AddressController
 {
@@ -22,28 +23,17 @@ class AddressController
 
     public function create()
     {
+        $provinces = Province::orderBy('province_name')->get(['province_id', 'province_name', 'code']);
+
         return Inertia::render('Account/Addresses/Form', [
             'address' => null,
+            'provinces' => $provinces,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreAddressRequest $request)
     {
-        $data = $request->validate([
-            'label' => 'required|string|max:50',
-            'recipient_name' => 'required|string|max:100',
-            'phone' => 'required|string|max:20',
-            'province' => 'required|string|max:100',
-            'province_id' => 'nullable|integer',
-            'district' => 'required|string|max:100',
-            'district_id' => 'nullable|integer',
-            'ghn_district_id' => 'nullable|integer',
-            'ward' => 'required|string|max:100',
-            'ward_code' => 'nullable|string|max:20',
-            'ghn_ward_code' => 'nullable|string|max:20',
-            'address_detail' => 'required|string|max:500',
-            'is_default' => 'boolean',
-        ]);
+        $data = $request->validated();
 
         $data['user_id'] = auth()->id();
 
@@ -59,32 +49,25 @@ class AddressController
 
     public function edit(UserAddress $address)
     {
-        if ($address->user_id !== auth()->id()) abort(403);
+        if ($address->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $provinces = Province::orderBy('province_name')->get(['province_id', 'province_name', 'code']);
 
         return Inertia::render('Account/Addresses/Form', [
             'address' => $address,
+            'provinces' => $provinces,
         ]);
     }
 
-    public function update(Request $request, UserAddress $address)
+    public function update(StoreAddressRequest $request, UserAddress $address)
     {
-        if ($address->user_id !== auth()->id()) abort(403);
+        if ($address->user_id !== auth()->id()) {
+            abort(403);
+        }
 
-        $data = $request->validate([
-            'label' => 'required|string|max:50',
-            'recipient_name' => 'required|string|max:100',
-            'phone' => 'required|string|max:20',
-            'province' => 'required|string|max:100',
-            'province_id' => 'nullable|integer',
-            'district' => 'required|string|max:100',
-            'district_id' => 'nullable|integer',
-            'ghn_district_id' => 'nullable|integer',
-            'ward' => 'required|string|max:100',
-            'ward_code' => 'nullable|string|max:20',
-            'ghn_ward_code' => 'nullable|string|max:20',
-            'address_detail' => 'required|string|max:500',
-            'is_default' => 'boolean',
-        ]);
+        $data = $request->validated();
 
         if ($data['is_default'] ?? false) {
             UserAddress::where('user_id', auth()->id())->where('id', '!=', $address->id)->update(['is_default' => false]);
@@ -98,7 +81,9 @@ class AddressController
 
     public function destroy(UserAddress $address)
     {
-        if ($address->user_id !== auth()->id()) abort(403);
+        if ($address->user_id !== auth()->id()) {
+            abort(403);
+        }
 
         $address->delete();
 
@@ -108,7 +93,9 @@ class AddressController
 
     public function setDefault(UserAddress $address)
     {
-        if ($address->user_id !== auth()->id()) abort(403);
+        if ($address->user_id !== auth()->id()) {
+            abort(403);
+        }
 
         UserAddress::where('user_id', auth()->id())->update(['is_default' => false]);
         $address->update(['is_default' => true]);

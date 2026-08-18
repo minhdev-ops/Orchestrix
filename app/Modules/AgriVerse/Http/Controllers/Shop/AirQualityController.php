@@ -2,8 +2,8 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
 use App\Modules\AgriVerse\Services\WAQIService;
+use Illuminate\Http\Request;
 
 class AirQualityController
 {

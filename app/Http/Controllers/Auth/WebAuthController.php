@@ -41,7 +41,7 @@ class WebAuthController extends Controller
             return $this->withErrors($request, $validator->errors()->toArray());
         }
 
-        if ($captcha->isEnabled() && !$captcha->verify($request->captcha_token ?? '', $request->ip())) {
+        if ($captcha->isEnabled() && ! $captcha->verify($request->captcha_token ?? '', $request->ip())) {
             return $this->withErrors($request, ['captcha' => ['Xác minh bảo mật thất bại. Vui lòng thử lại.']]);
         }
 
@@ -49,14 +49,15 @@ class WebAuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (! $user || ! Auth::attempt($credentials, $request->boolean('remember'))) {
             return $this->withErrors($request, ['email' => ['Tài khoản hoặc mật khẩu chưa đúng']]);
         }
 
         $user = Auth::user();
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             Auth::logout();
+
             return $this->withErrors($request, ['email' => ['Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email.']]);
         }
 
@@ -91,13 +92,13 @@ class WebAuthController extends Controller
             return $this->withErrors($request, $validator->errors()->toArray());
         }
 
-        if ($captcha->isEnabled() && !$captcha->verify($request->captcha_token ?? '', $request->ip())) {
+        if ($captcha->isEnabled() && ! $captcha->verify($request->captcha_token ?? '', $request->ip())) {
             return $this->withErrors($request, ['captcha' => ['Xác minh bảo mật thất bại. Vui lòng thử lại.']]);
         }
 
         $key = Str::random(200);
         $timeString = now()->toDateTimeString();
-        $hash = md5($key . $timeString);
+        $hash = md5($key.$timeString);
 
         Log::info("User Registration Hash for {$request->email}: {$hash}");
 
@@ -116,7 +117,7 @@ class WebAuthController extends Controller
         try {
             Mail::to($user->email)->send(new ActiveMail($user->email, $hash, $user->name));
         } catch (\Exception $e) {
-            Log::warning('Failed to send activation email: ' . $e->getMessage());
+            Log::warning('Failed to send activation email: '.$e->getMessage());
         }
 
         Auth::login($user, true);
@@ -130,6 +131,7 @@ class WebAuthController extends Controller
     {
         if ($request->header('X-Inertia')) {
             $view = str_contains($request->path(), 'login') ? 'Auth/Login' : 'Auth/Register';
+
             return Inertia::render($view, ['errors' => $errors]);
         }
 

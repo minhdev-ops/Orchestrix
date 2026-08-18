@@ -2,8 +2,8 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 
 class RateLimitService
 {
@@ -55,7 +55,7 @@ class RateLimitService
         $userId = $request->user()?->id;
         $ip = $request->ip();
 
-        return "{$key}:" . ($userId ?: $ip);
+        return "{$key}:".($userId ?: $ip);
     }
 
     /**

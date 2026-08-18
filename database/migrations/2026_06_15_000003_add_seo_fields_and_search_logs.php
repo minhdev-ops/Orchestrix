@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('seo_keywords')->nullable()->after('seo_description');
         });
 
-        if (!Schema::hasTable('search_logs')) {
+        if (! Schema::hasTable('search_logs')) {
             Schema::create('search_logs', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();

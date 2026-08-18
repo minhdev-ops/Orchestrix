@@ -11,7 +11,9 @@ class ActiveMail extends Mailable
     use Queueable, SerializesModels;
 
     public $email;
+
     public $hash;
+
     public $name;
 
     public function __construct($email, $hash, $name)

@@ -1,11 +1,16 @@
 <?php
 
+/**
+ * @deprecated Use App\Modules\AgriVerse\Http\Controllers\Admin\OrderController instead.
+ * This controller uses Blade views; the module version uses Inertia SPA.
+ * Kept for backward compatibility. Will be removed in next major version.
+ */
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\OrderStatus;
-use App\Modules\AgriVerse\Models\Transaction;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -20,9 +25,9 @@ class OrderController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->whereHas('product', fn($p) => $p->where('name', 'like', "%{$request->search}%"))
-                  ->orWhereHas('buyer', fn($u) => $u->where('name', 'like', "%{$request->search}%"))
-                  ->orWhere('uuid', 'like', "%{$request->search}%");
+                $q->whereHas('product', fn ($p) => $p->where('name', 'like', "%{$request->search}%"))
+                    ->orWhereHas('buyer', fn ($u) => $u->where('name', 'like', "%{$request->search}%"))
+                    ->orWhere('uuid', 'like', "%{$request->search}%");
             });
         }
 
@@ -34,6 +39,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->load(['product', 'buyer', 'seller', 'store', 'contract', 'transaction', 'statuses.user']);
+
         return view('admin.orders.show', compact('order'));
     }
 
@@ -59,6 +65,7 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         $order->delete();
+
         return redirect()->route('admin.orders.index')->with('success', 'Order deleted.');
     }
 }

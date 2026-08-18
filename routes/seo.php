@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Response;
 use App\Modules\AgriVerse\Services\SeoService;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/sitemap.xml', function (SeoService $seoService) {
     $sitemap = $seoService->generateSitemap();
@@ -12,10 +11,10 @@ Route::get('/sitemap.xml', function (SeoService $seoService) {
 
     foreach ($sitemap as $item) {
         $xml .= '<url>';
-        $xml .= '<loc>' . e($item['url']) . '</loc>';
-        $xml .= '<lastmod>' . e($item['lastmod']) . '</lastmod>';
-        $xml .= '<changefreq>' . e($item['changefreq']) . '</changefreq>';
-        $xml .= '<priority>' . e($item['priority']) . '</priority>';
+        $xml .= '<loc>'.e($item['url']).'</loc>';
+        $xml .= '<lastmod>'.e($item['lastmod']).'</lastmod>';
+        $xml .= '<changefreq>'.e($item['changefreq']).'</changefreq>';
+        $xml .= '<priority>'.e($item['priority']).'</priority>';
         $xml .= '</url>';
     }
 

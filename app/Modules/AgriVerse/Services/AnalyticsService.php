@@ -2,28 +2,33 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use App\Modules\AgriVerse\Models\AnalyticsEvent;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 class AnalyticsService
 {
     /**
      * Track an event
      */
-    public function track(string $eventType, string $eventName = null, array $properties = []): AnalyticsEvent
+    public function track(string $eventType, ?string $eventName = null, array $properties = []): ?AnalyticsEvent
     {
+        if (! app()->runningInConsole() && ! Request::hasHeader('User-Agent')) {
+            return null;
+        }
+
         $data = [
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'session_id' => session()->getId(),
             'event_type' => $eventType,
             'event_name' => $eventName,
             'properties' => $properties,
-            'page_url' => request()->url(),
-            'referrer_url' => request()->header('referer'),
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
+            'page_url' => Request::url(),
+            'referrer_url' => Request::header('referer'),
+            'ip_address' => Request::ip(),
+            'user_agent' => Request::userAgent(),
             'device_type' => $this->detectDeviceType(),
             'browser' => $this->detectBrowser(),
         ];
@@ -122,7 +127,7 @@ class AnalyticsService
     /**
      * Get recently viewed products
      */
-    public function getRecentlyViewed(int $limit = 20): \Illuminate\Database\Eloquent\Collection
+    public function getRecentlyViewed(int $limit = 20): Collection
     {
         $userId = auth()->id();
         $sessionId = session()->getId();
@@ -136,7 +141,7 @@ class AnalyticsService
                 }
             })
             ->join('products', 'recently_viewed.product_id', '=', 'products.id')
-            ->where('products.is_active', true)
+            ->where('products.status', 'published')
             ->select('recently_viewed.*', 'products.name', 'products.price', 'products.image')
             ->orderByDesc('recently_viewed.viewed_at')
             ->limit($limit)
@@ -202,7 +207,9 @@ class AnalyticsService
             ->distinct('session_id')
             ->count('session_id');
 
-        if ($visits === 0) return 0;
+        if ($visits === 0) {
+            return 0;
+        }
 
         return round(($purchases / $visits) * 100, 2);
     }
@@ -290,6 +297,7 @@ class AnalyticsService
         if (strpos($ua, 'tablet') !== false || strpos($ua, 'ipad') !== false) {
             return 'tablet';
         }
+
         return 'desktop';
     }
 
@@ -299,10 +307,19 @@ class AnalyticsService
     protected function detectBrowser(): string
     {
         $ua = request()->userAgent();
-        if (strpos($ua, 'Firefox') !== false) return 'Firefox';
-        if (strpos($ua, 'Edg') !== false) return 'Edge';
-        if (strpos($ua, 'Chrome') !== false) return 'Chrome';
-        if (strpos($ua, 'Safari') !== false) return 'Safari';
+        if (strpos($ua, 'Firefox') !== false) {
+            return 'Firefox';
+        }
+        if (strpos($ua, 'Edg') !== false) {
+            return 'Edge';
+        }
+        if (strpos($ua, 'Chrome') !== false) {
+            return 'Chrome';
+        }
+        if (strpos($ua, 'Safari') !== false) {
+            return 'Safari';
+        }
+
         return 'Other';
     }
 }

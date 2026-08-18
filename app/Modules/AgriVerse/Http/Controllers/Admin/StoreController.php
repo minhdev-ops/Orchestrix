@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
+use App\Modules\AgriVerse\Models\Store;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Store;
 
 class StoreController
 {
@@ -42,7 +42,7 @@ class StoreController
             'status' => 'required|in:active,inactive,suspended',
         ]);
 
-        $validated['owner_id'] = auth()->id();
+        $validated['owner_id'] = $request->input('owner_id', auth()->id());
 
         Store::create($validated);
 

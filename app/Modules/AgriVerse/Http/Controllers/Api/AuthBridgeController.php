@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Laravel\Passport\Token;
 use Laravel\Passport\TokenRepository;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
@@ -22,12 +23,15 @@ class AuthBridgeController
     {
         $token = $request->bearerToken();
 
-        if (!$token) {
+        if (! $token) {
             return response()->json([
                 'valid' => false,
                 'error' => 'No bearer token provided',
             ], 401);
         }
+
+        $request->merge(['bearer_token' => $token]);
+        $request->validate(['bearer_token' => 'required|string']);
 
         try {
             $psr = (new Psr17Factory)->createServerRequest('GET', '/');
@@ -43,9 +47,9 @@ class AuthBridgeController
             $userId = $psrRequest->getAttribute('oauth_user_id');
             $scopes = $psrRequest->getAttribute('oauth_scopes', []);
 
-            $tokenModel = $this->tokens->find($tokenId);
+            $tokenModel = Token::find($tokenId);
 
-            if (!$tokenModel || $tokenModel->revoked) {
+            if (! $tokenModel || $tokenModel->revoked) {
                 return response()->json([
                     'valid' => false,
                     'error' => 'Token has been revoked',
@@ -54,7 +58,7 @@ class AuthBridgeController
 
             $user = User::find($userId);
 
-            if (!$user || !$user->is_active) {
+            if (! $user || ! $user->is_active) {
                 return response()->json([
                     'valid' => false,
                     'error' => 'User not found or inactive',
@@ -85,7 +89,8 @@ class AuthBridgeController
                 'error' => $e->getMessage(),
             ], 401);
         } catch (\Throwable $e) {
-            Log::error('Token validation error: ' . $e->getMessage());
+            Log::error('Token validation error: '.$e->getMessage());
+
             return response()->json([
                 'valid' => false,
                 'error' => 'Token validation failed',
@@ -96,8 +101,11 @@ class AuthBridgeController
     public function publicKey(): JsonResponse
     {
         $keyPath = config('passport.public_key');
+        if (! $keyPath) {
+            abort(500, 'Passport public key not configured.');
+        }
 
-        if (!file_exists($keyPath)) {
+        if (! file_exists($keyPath)) {
             return response()->json([
                 'error' => 'Public key not found',
             ], 500);

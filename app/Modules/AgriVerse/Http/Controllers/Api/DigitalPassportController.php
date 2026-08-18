@@ -5,8 +5,8 @@ namespace App\Modules\AgriVerse\Http\Controllers\Api;
 use App\Modules\AgriVerse\Models\DigitalPassportLog;
 use App\Modules\AgriVerse\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class DigitalPassportController
 {
@@ -15,7 +15,7 @@ class DigitalPassportController
         $logs = DigitalPassportLog::with('performer')
             ->where('product_id', $product->id)
             ->latest()
-            ->get();
+            ->paginate(20);
 
         return JsonResource::collection($logs);
     }
@@ -41,20 +41,29 @@ class DigitalPassportController
 
     public function update(Request $request, DigitalPassportLog $passport): JsonResource
     {
+        if ($request->user()->cannot('update', $passport)) {
+            abort(403);
+        }
+
         $data = $request->validate([
             'action' => 'nullable|string|max:255',
             'data' => 'nullable|array',
         ]);
 
-        $passport->update(array_filter($data, fn($v) => !is_null($v)));
+        $passport->update(array_filter($data, fn ($v) => ! is_null($v)));
         $passport->load('performer');
 
         return JsonResource::make($passport);
     }
 
-    public function destroy(DigitalPassportLog $passport)
+    public function destroy(Request $request, DigitalPassportLog $passport)
     {
+        if ($request->user()->cannot('delete', $passport)) {
+            abort(403);
+        }
+
         $passport->delete();
+
         return response()->json(['message' => 'Passport log deleted.']);
     }
 

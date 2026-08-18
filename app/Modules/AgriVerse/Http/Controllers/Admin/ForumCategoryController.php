@@ -2,10 +2,10 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Modules\AgriVerse\Models\ForumCategory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ForumCategoryController
 {
@@ -47,7 +47,7 @@ class ForumCategoryController
     public function update(Request $request, ForumCategory $category)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:100|unique:forum_categories,name,' . $category->id,
+            'name' => 'required|string|max:100|unique:forum_categories,name,'.$category->id,
             'description' => 'nullable|string|max:255',
             'is_active' => 'boolean',
         ]);

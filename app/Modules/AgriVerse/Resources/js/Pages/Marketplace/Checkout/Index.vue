@@ -35,7 +35,7 @@
             <div class="checkout-progress">
               <div class="checkout-progress-bar">
                 <div class="checkout-progress-line"></div>
-                <div class="checkout-progress-fill" :style="{ width: progressWidth }"></div>
+                <div class="checkout-progress-fill" :style="{ transform: 'translateX(-60px) scaleX(' + (currentStep / totalSteps) + ')' }"></div>
                 <div class="checkout-step" :class="currentStep >= 1 ? 'checkout-step-active' : ''">
                   <div class="checkout-step-icon">
                     <span class="material-symbols-outlined" style="font-size: 14px;">local_shipping</span>
@@ -54,6 +54,10 @@
             <div class="checkout-content">
               <div v-show="currentStep === 1" class="step-transition">
                 <h2 class="checkout-step-title">Địa chỉ giao hàng</h2>
+                <div v-if="!addresses.length && !showNewAddress" class="checkout-address-empty">
+                  <span class="material-symbols-outlined">location_off</span>
+                  <p>Bạn chưa có địa chỉ nào được lưu. Vui lòng thêm địa chỉ giao hàng mới bên dưới.</p>
+                </div>
                 <div v-if="addresses.length" class="checkout-address-list">
                   <label v-for="addr in addresses" :key="addr.id"
                     class="checkout-address-item"
@@ -72,7 +76,7 @@
                 <div class="checkout-address-actions">
                   <button type="button" @click="showNewAddress = !showNewAddress" class="checkout-address-toggle">
                     <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
-                    {{ showNewAddress ? 'Đóng' : 'Địa chỉ mới' }}
+                    {{ showNewAddress ? 'Đóng' : (addresses.length ? 'Địa chỉ mới' : 'Thêm địa chỉ') }}
                   </button>
                 </div>
                 <div v-if="showNewAddress" class="checkout-new-address">
@@ -89,21 +93,21 @@
                   <div class="checkout-form-grid checkout-form-grid-3">
                     <div>
                       <label class="checkout-label">Tỉnh/Thành *</label>
-                      <select v-model="newProvince" @change="onProvinceChange" class="checkout-input">
+                      <select v-model="newProvince" @change="onProvinceChange" class="checkout-input" :disabled="addressLoading">
                         <option value="">Chọn</option>
                         <option v-for="p in provinces" :key="p.province_id" :value="p.province_id">{{ p.province_name }}</option>
                       </select>
                     </div>
                     <div>
                       <label class="checkout-label">Quận/Huyện *</label>
-                      <select v-model="newDistrict" @change="onDistrictChange" class="checkout-input" :disabled="!newProvince">
+                      <select v-model="newDistrict" @change="onDistrictChange" class="checkout-input" :disabled="!newProvince || addressLoading">
                         <option value="">Chọn</option>
                         <option v-for="d in newDistricts" :key="d.district_id" :value="d.district_id">{{ d.district_name }}</option>
                       </select>
                     </div>
                     <div>
                       <label class="checkout-label">Phường/Xã *</label>
-                      <select v-model="newWard" class="checkout-input" :disabled="!newDistrict">
+                      <select v-model="newWard" class="checkout-input" :disabled="!newDistrict || addressLoading">
                         <option value="">Chọn</option>
                         <option v-for="w in newWards" :key="w.ward_code" :value="w.ward_code">{{ w.ward_name }}</option>
                       </select>
@@ -115,20 +119,14 @@
                   </div>
                 </div>
 
-                <div v-if="shippingServices.length" class="checkout-shipping-section">
-                  <h3 class="checkout-step-subtitle">Dịch vụ vận chuyển</h3>
-                  <div class="checkout-shipping-list">
-                    <label v-for="svc in shippingServices" :key="svc.service_id"
-                      class="checkout-shipping-item"
-                      :class="{ 'checkout-shipping-selected': selectedService?.service_id === svc.service_id }"
-                      @click="selectService(svc)">
-                      <input type="radio" :value="svc" :checked="selectedService?.service_id === svc.service_id"
-                        class="checkout-radio" name="shipping_service" />
-                      <div class="checkout-shipping-info">
-                        <span class="checkout-shipping-name">{{ svc.short_name }}</span>
-                        <span class="checkout-shipping-fee">{{ formatPrice(svc.fee) }}₫</span>
-                      </div>
-                    </label>
+                <div v-if="shippingFee > 0" class="checkout-shipping-section">
+                  <h3 class="checkout-step-subtitle">Đơn vị vận chuyển</h3>
+                  <div class="checkout-shipping-card">
+                    <img src="/images/ghtk-logo.svg" alt="Giao hàng tiết kiệm" class="checkout-shipping-logo" />
+                    <div class="checkout-shipping-card-info">
+                      <span class="checkout-shipping-card-name">Giao hàng tiết kiệm</span>
+                      <span class="checkout-shipping-card-fee">{{ formatPrice(shippingFee) }}₫</span>
+                    </div>
                   </div>
                 </div>
 
@@ -147,7 +145,7 @@
                   </div>
                   <div class="checkout-review-row">
                     <span class="checkout-review-label">Vận chuyển</span>
-                    <span class="checkout-review-value">{{ selectedService?.short_name || '—' }}</span>
+                    <span class="checkout-review-value">Giao hàng tiết kiệm</span>
                   </div>
                   <div v-if="form.notes" class="checkout-review-row">
                     <span class="checkout-review-label">Ghi chú</span>
@@ -212,10 +210,11 @@ const totalSteps = 2;
 const processing = ref(false);
 const selectedAddrId = ref(null);
 const showNewAddress = ref(false);
+const addressLoading = ref(false);
 
 const form = reactive({ shipping_address: '', notes: '', shipping_method: '', shipping_fee: 0 });
 
-const newAddr = reactive({ recipient_name: '', phone: '', address_detail: '' });
+const newAddr = reactive({ recipient_name: '', phone: '', address_detail: '', province: '', district: '', ward: '' });
 
 const newDistricts = ref([]);
 const newWards = ref([]);
@@ -235,16 +234,21 @@ const buttonText = computed(() => {
 });
 
 const subtotal = computed(() =>
-  props.cartItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
+  props.cartItems.reduce((sum, item) => sum + (Number(item.product?.price) || 0) * (item.quantity || 0), 0)
 );
 
-const total = computed(() => Math.max(0, subtotal.value + shippingFee.value));
+const total = computed(() => {
+  const s = Number(subtotal.value) || 0;
+  const f = Number(shippingFee.value) || 0;
+  return Math.max(0, s + f);
+});
 
 const addressDisplay = computed(() => {
   const addr = props.addresses?.find(a => a.id === selectedAddrId.value);
   if (addr) return `${addr.recipient_name}, ${addr.address_detail}, ${addr.ward}, ${addr.district}, ${addr.province}`;
   if (showNewAddress.value && newAddr.recipient_name) {
-    return `${newAddr.recipient_name}, ${newAddr.address_detail || '...'}`;
+    const parts = [newAddr.address_detail, newAddr.ward, newAddr.district, newAddr.province].filter(Boolean);
+    return `${newAddr.recipient_name}, ${parts.join(', ') || '...'}`;
   }
   return 'Chưa chọn địa chỉ';
 });
@@ -257,6 +261,7 @@ onMounted(() => {
   const def = props.addresses?.find(a => a.is_default);
   if (def) selectedAddrId.value = def.id;
   else if (props.addresses?.length) selectedAddrId.value = props.addresses[0].id;
+  else showNewAddress.value = true;
 });
 
 watch(selectedAddrId, () => {
@@ -265,48 +270,88 @@ watch(selectedAddrId, () => {
 });
 
 watch(newWard, (val) => {
+  const w = newWards.value?.find(x => String(x.ward_code) === String(val));
+  newAddr.ward = w?.ward_name || '';
   if (val) fetchShippingServices();
 });
 
+watch(newProvince, (val) => {
+  const p = props.provinces?.find(x => String(x.province_id) === String(val));
+  newAddr.province = p?.province_name || '';
+});
+
+watch(newDistrict, (val) => {
+  const d = newDistricts.value?.find(x => String(x.district_id) === String(val));
+  newAddr.district = d?.district_name || '';
+});
+
+function getProvinceName() {
+  // Lấy tên tỉnh từ địa chỉ đã chọn
+  const addr = props.addresses?.find(a => a.id === selectedAddrId.value);
+  if (addr?.province) return addr.province;
+  // Fallback: tìm từ provinces list theo province_id
+  if (newProvince.value) {
+    const found = props.provinces?.find(p => String(p.province_id) === String(newProvince.value));
+    if (found) return found.province_name;
+  }
+  return 'Hồ Chí Minh';
+}
+
+function getDistrictName(districtId) {
+  if (!districtId) return 'Quận 1';
+  const addr = props.addresses?.find(a => a.id === selectedAddrId.value);
+  if (addr?.district) return addr.district;
+  const found = newDistricts.value?.find(d => d.district_id === districtId);
+  return found?.district_name || 'Quận 1';
+}
+
 function fetchShippingServices() {
   let districtId = null;
-  let wardCode = null;
 
   if (selectedAddrId.value) {
     const addr = props.addresses.find(a => a.id === selectedAddrId.value);
-    if (addr?.ghn_district_id) districtId = addr.ghn_district_id;
-    if (addr?.ghn_ward_code) wardCode = addr.ghn_ward_code;
+    if (addr?.ghn_district_id) districtId = parseInt(addr.ghn_district_id);
   }
 
   if (showNewAddress.value) {
     districtId = newDistrict.value ? parseInt(newDistrict.value) : null;
-    wardCode = newWard.value || null;
   }
 
-  if (!districtId || !wardCode) return;
+  if (!districtId || isNaN(districtId)) {
+    shippingFee.value = 35000;
+    form.shipping_method = 'ghtk';
+    form.shipping_fee = 35000;
+    return;
+  }
 
-  window.axios.post('/agriverse/api/ghn/shipping-fee', {
-    to_district_id: districtId,
-    to_ward_code: wardCode,
-    weight: totalQty.value * 500,
-    amount: subtotal.value,
+  const weight = Math.max(1, Math.round(Number(totalQty.value) || 1) * 500);
+  const amount = Math.max(0, Math.round(Number(subtotal.value) || 0));
+
+  window.axios.post('/agriverse/api/ghtk/shipping-fee', {
+    pick_province: 'Hồ Chí Minh',
+    deliver_province_name: getProvinceName(),
+    deliver_district_name: getDistrictName(districtId),
+    weight,
+    amount,
   }).then(({ data }) => {
-    shippingServices.value = data.data || [];
-    if (!shippingServices.value.length) {
-      shippingServices.value = [{ service_id: 0, short_name: 'Giao hàng tiêu chuẩn', fee: 0 }];
-    }
-    selectService(shippingServices.value[0]);
+    const list = Array.isArray(data?.data) ? data.data : [];
+    const first = list[0];
+    const fee = Number(first?.fee) || 35000;
+    shippingFee.value = fee;
+    form.shipping_method = 'ghtk';
+    form.shipping_fee = fee;
   }).catch(() => {
-    shippingServices.value = [{ service_id: 0, short_name: 'Giao hàng tiêu chuẩn', fee: 0 }];
-    selectService(shippingServices.value[0]);
+    shippingFee.value = 35000;
+    form.shipping_method = 'ghtk';
+    form.shipping_fee = 35000;
   });
 }
 
 function selectService(svc) {
   selectedService.value = svc;
-  shippingFee.value = svc.fee || 0;
+  shippingFee.value = Number(svc.fee) || 0;
   form.shipping_method = String(svc.service_id);
-  form.shipping_fee = svc.fee || 0;
+  form.shipping_fee = Number(svc.fee) || 0;
 }
 
 async function onProvinceChange() {
@@ -314,20 +359,28 @@ async function onProvinceChange() {
   newWard.value = '';
   newDistricts.value = [];
   newWards.value = [];
+  const p = props.provinces?.find(x => String(x.province_id) === String(newProvince.value));
+  newAddr.province = p?.province_name || '';
   if (!newProvince.value) return;
+  addressLoading.value = true;
   try {
-    const { data } = await window.axios.post('/agriverse/api/ghn/districts', { province_id: newProvince.value });
+    const { data } = await window.axios.post('/agriverse/api/ghtk/districts', { province_id: newProvince.value });
     newDistricts.value = data.data || [];
   } catch { newDistricts.value = []; }
+  finally { addressLoading.value = false; }
 }
 async function onDistrictChange() {
   newWard.value = '';
   newWards.value = [];
+  const d = newDistricts.value?.find(x => String(x.district_id) === String(newDistrict.value));
+  newAddr.district = d?.district_name || '';
   if (!newDistrict.value) return;
+  addressLoading.value = true;
   try {
-    const { data } = await window.axios.post('/agriverse/api/ghn/wards', { district_id: newDistrict.value });
+    const { data } = await window.axios.post('/agriverse/api/ghtk/wards', { district_id: newDistrict.value });
     newWards.value = data.data || [];
   } catch { newWards.value = []; }
+  finally { addressLoading.value = false; }
 }
 
 function handleNext() {
@@ -338,12 +391,14 @@ function handleNext() {
       toast.add({ severity: 'error', summary: 'Vui lòng chọn hoặc nhập địa chỉ giao hàng', life: 3000 });
       return;
     }
-    if (showNewAddress.value && (!newAddr.recipient_name || !newAddr.phone || !newAddr.address_detail)) {
-      toast.add({ severity: 'error', summary: 'Vui lòng điền đầy đủ thông tin địa chỉ mới', life: 3000 });
-      return;
+    if (showNewAddress.value) {
+      if (!newAddr.recipient_name || !newAddr.phone || !newAddr.address_detail || !newProvince || !newDistrict || !newWard) {
+        toast.add({ severity: 'error', summary: 'Vui lòng điền đầy đủ thông tin địa chỉ mới', life: 3000 });
+        return;
+      }
     }
-    if (!selectedService.value) {
-      toast.add({ severity: 'error', summary: 'Vui lòng chọn dịch vụ vận chuyển', life: 3000 });
+    if (!shippingFee.value) {
+      toast.add({ severity: 'error', summary: 'Đang tính phí vận chuyển, vui lòng đợi...', life: 3000 });
       return;
     }
     currentStep.value++;
@@ -354,16 +409,41 @@ function handleNext() {
 }
 
 function submitOrder() {
+  if (processing.value) return;
   processing.value = true;
   form.shipping_address = addressDisplay.value;
-  router.post(route('agriverse.api.checkout.process'), {
+
+  const pVal = String(newProvince.value || '');
+  const dVal = String(newDistrict.value || '');
+  const wVal = String(newWard.value || '');
+
+  console.log('DEBUG submitOrder:', { pVal, dVal, wVal, showNew: showNewAddress.value, province: newAddr.province, district: newAddr.district, ward: newAddr.ward });
+
+  const payload = {
     shipping_address: form.shipping_address,
-    shipping_method: form.shipping_method,
-    shipping_fee: form.shipping_fee,
-    notes: form.notes,
-  }, {
-    onError: () => { processing.value = false; },
-    onSuccess: () => { processing.value = false; },
+    shipping_method: form.shipping_method || 'ghtk',
+    shipping_fee: form.shipping_fee || 0,
+    notes: form.notes || '',
+  };
+
+  if (showNewAddress.value && (pVal || newAddr.recipient_name)) {
+    payload.new_address = {
+      recipient_name: newAddr.recipient_name,
+      phone: newAddr.phone,
+      province_id: parseInt(pVal) || 0,
+      province_name: newAddr.province || '',
+      district_id: parseInt(dVal) || 0,
+      district_name: newAddr.district || '',
+      ward_code: wVal,
+      ward_name: newAddr.ward || '',
+      address_detail: newAddr.address_detail,
+    };
+  }
+
+  console.log('DEBUG payload:', payload);
+
+  router.post(route('agriverse.api.checkout.process'), payload, {
+    onFinish: () => { processing.value = false; },
   });
 }
 </script>
@@ -497,7 +577,7 @@ function submitOrder() {
 @media (max-width: 640px) {
   .checkout-progress-bar { gap: 40px; padding: 0 16px; }
   .checkout-progress-line { width: 60px; transform: translateX(-30px); }
-  .checkout-progress-fill { transform: translateX(-30px); }
+  .checkout-progress-fill { transform: translateX(-30px) scaleX(0); }
 }
 .checkout-progress-line {
   position: absolute;
@@ -513,11 +593,13 @@ function submitOrder() {
   position: absolute;
   top: 20px;
   left: 50%;
+  width: 120px;
   height: 2px;
   background: var(--ag-primary-500);
   z-index: 0;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateX(-60px);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-60px) scaleX(0);
 }
 .checkout-step {
   display: flex;
@@ -582,6 +664,26 @@ function submitOrder() {
 }
 
 .checkout-address-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.checkout-address-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px dashed color-mix(in srgb, var(--ag-text-muted) 40%, transparent);
+  background: var(--ag-surface-container-low);
+  color: var(--ag-text-secondary);
+  font-family: var(--ag-font-body);
+  font-size: 13px;
+  line-height: 20px;
+  margin-bottom: 16px;
+}
+.checkout-address-empty .material-symbols-outlined {
+  color: var(--ag-text-muted);
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.checkout-address-empty p { margin: 0; }
 .checkout-address-item {
   display: flex;
   align-items: flex-start;
@@ -685,27 +787,24 @@ select.checkout-input {
 }
 
 .checkout-shipping-section { margin-top: 8px; }
-.checkout-shipping-list { display: flex; flex-direction: column; gap: 8px; }
-.checkout-shipping-item {
+.checkout-shipping-card {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 14px 16px;
   border-radius: 12px;
-  border: 2px solid color-mix(in srgb, var(--ag-border) 12%, transparent);
-  cursor: pointer;
-  transition: all 0.2s;
+  border: 2px solid var(--ag-primary-500);
+  background: rgba(72, 103, 48, 0.04);
 }
-.checkout-shipping-item:hover { border-color: color-mix(in srgb, var(--ag-border) 25%, transparent); }
-.checkout-shipping-selected { border-color: var(--ag-primary-500); background: rgba(72, 103, 48, 0.04); }
-.checkout-shipping-info {
+.checkout-shipping-logo { height: 28px; width: auto; }
+.checkout-shipping-card-info {
   flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.checkout-shipping-name { font-size: 14px; font-weight: 600; color: var(--ag-text-primary); font-family: var(--ag-font-body); }
-.checkout-shipping-fee { font-size: 14px; font-weight: 700; color: var(--ag-primary-500); font-family: var(--ag-font-body); }
+.checkout-shipping-card-name { font-size: 14px; font-weight: 600; color: var(--ag-text-primary); font-family: var(--ag-font-body); }
+.checkout-shipping-card-fee { font-size: 14px; font-weight: 700; color: var(--ag-primary-500); font-family: var(--ag-font-body); }
 
 .checkout-notes-section { margin-bottom: 8px; }
 .checkout-textarea {

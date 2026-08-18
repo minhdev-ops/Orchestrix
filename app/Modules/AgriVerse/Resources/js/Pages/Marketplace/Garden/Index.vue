@@ -6,15 +6,23 @@
           <div class="hero-content">
             <span class="hero-label">Bảng điều khiển Làm vườn</span>
             <h1 class="hero-title">Tình trạng Khu vườn của Bạn</h1>
-            <p class="hero-desc">Chào mừng trở lại, {{ heroStats.userName }}. Khu vườn của bạn hiện có {{ heroStats.activeSpecimens }} mẫu vật đang được theo dõi.</p>
+            <p class="hero-desc">
+              Chào mừng trở lại, {{ userName }}. Khu vườn của bạn hiện có
+              <strong>{{ stats.totalPlants }}</strong> mẫu vật đang được theo dõi
+              trên <strong>{{ zones.length }}</strong> khu vực.
+            </p>
             <div class="hero-badges">
               <div class="badge badge-green">
                 <span class="material-symbols-outlined badge-icon">eco</span>
-                <span class="badge-text">Ngón tay xanh: {{ heroStats.greenFingers }}%</span>
+                <span class="badge-text">Điểm vườn: {{ stats.healthScore }}/100</span>
               </div>
-              <div class="badge badge-terracotta">
-                <span class="material-symbols-outlined badge-icon">calendar_today</span>
-                <span class="badge-text">{{ heroStats.activeSpecimens }} Mẫu vật Đang hoạt động</span>
+              <div class="badge" :class="careNeeded.length > 0 ? 'badge-terracotta' : 'badge-green'">
+                <span class="material-symbols-outlined badge-icon">
+                  {{ careNeeded.length > 0 ? 'priority_high' : 'check_circle' }}
+                </span>
+                <span class="badge-text">
+                  {{ careNeeded.length > 0 ? `${careNeeded.length} cây cần chăm sóc` : 'Tất cả đều khỏe mạnh' }}
+                </span>
               </div>
             </div>
           </div>
@@ -22,13 +30,27 @@
             <svg class="ring-svg" viewBox="0 0 100 100">
               <circle class="ring-bg" cx="50" cy="50" r="45" />
               <circle class="ring-progress" cx="50" cy="50" r="45"
+                :style="{ stroke: ringColor }"
                 :stroke-dashoffset="ringOffset" />
             </svg>
             <div class="ring-label">
-              <span class="ring-grade">{{ heroStats.grade }}</span>
-              <span class="ring-tier">{{ heroStats.tier }}</span>
+              <span class="ring-grade" :style="{ color: ringColor }">{{ stats.grade }}</span>
+              <span class="ring-tier">{{ stageDistributionLabel }}</span>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section v-if="careNeeded.length > 0" class="alert-section">
+        <div class="alert-banner">
+          <span class="material-symbols-outlined alert-icon">warning</span>
+          <div class="alert-content">
+            <strong class="alert-title">{{ careNeeded.length }} cây cần chú ý ngay</strong>
+            <p class="alert-desc">Một số cây trong vườn có chỉ số hydration hoặc dinh dưỡng thấp. Hãy tưới nước hoặc bón phân kịp thời.</p>
+          </div>
+          <button class="alert-close" @click="dismissAlert">
+            <span class="material-symbols-outlined">close</span>
+          </button>
         </div>
       </section>
 
@@ -36,74 +58,146 @@
         <div class="main-col">
           <div class="section-header">
             <div>
-              <h2 class="section-title">Theo dõi Mẫu vật</h2>
-              <p class="section-subtitle">Chỉ số sức sống thời gian thực cho bộ sưu tập của bạn.</p>
+              <h2 class="section-title">Khu vực & Mẫu vật</h2>
+              <p class="section-subtitle">Bộ sưu tập cây của bạn theo từng khu vực trong vườn.</p>
             </div>
-            <button class="btn-primary">
+            <Link :href="route('agriverse.shop.products.index')" class="btn-primary">
               <span class="material-symbols-outlined">add</span>
-              Mẫu vật Mới
+              Thêm cây mới
+            </Link>
+          </div>
+
+          <div class="zone-tabs">
+            <button
+              v-for="zone in zones"
+              :key="zone.id"
+              class="zone-tab"
+              :class="{ 'zone-tab-active': activeZone === zone.id }"
+              @click="activeZone = zone.id"
+            >
+              <span class="zone-tab-emoji">{{ zone.icon }}</span>
+              <span class="zone-tab-name">{{ zone.name }}</span>
+              <span class="zone-tab-count">{{ zone.plant_count }}</span>
+            </button>
+            <button
+              class="zone-tab"
+              :class="{ 'zone-tab-active': activeZone === null }"
+              @click="activeZone = null"
+            >
+              <span class="zone-tab-emoji">🌱</span>
+              <span class="zone-tab-name">Tất cả</span>
+              <span class="zone-tab-count">{{ stats.totalPlants }}</span>
             </button>
           </div>
 
-          <div class="specimen-grid">
-            <div v-for="(specimen, index) in specimens" :key="specimen.id" class="specimen-card">
+          <div v-if="filteredPlants.length === 0" class="empty-state">
+            <span class="material-symbols-outlined empty-icon">yard</span>
+            <h3 class="empty-title">Chưa có cây nào</h3>
+            <p class="empty-desc">Khu vực này chưa có cây. Hãy mua cây giống từ cửa hàng để thêm vào vườn.</p>
+            <Link :href="route('agriverse.shop.products.index')" class="btn-primary">
+              Khám phá cây giống
+            </Link>
+          </div>
+
+          <div v-else class="specimen-grid">
+            <div v-for="(plant) in filteredPlants" :key="plant.id" class="specimen-card" :class="'stage-' + plant.stage">
               <div class="specimen-image-wrap">
-                <img :src="specimen.image" :alt="specimen.name" class="specimen-image" />
-                <div class="specimen-badge" :class="specimen.status === 'hydrated' ? 'badge-hydrated' : 'badge-thirsty'">
-                  <span class="material-symbols-outlined">{{ specimen.status === 'hydrated' ? 'water_drop' : 'priority_high' }}</span>
-                  <span>{{ specimen.status === 'hydrated' ? 'Đủ nước' : 'Khát nước' }}</span>
+                <img :src="plant.image_url || '/images/placeholder-plant.svg'" :alt="plant.name" class="specimen-image" />
+                <div class="specimen-badge" :class="'badge-' + plant.health_status">
+                  <span class="material-symbols-outlined">
+                    {{ plant.health_status === 'healthy' ? 'check_circle' : 'warning' }}
+                  </span>
+                  <span>{{ stageLabels[plant.stage] || plant.stage }}</span>
+                </div>
+                <div class="specimen-actions" v-if="plant.health_status !== 'harvested'">
+                  <button class="action-btn action-water" title="Tưới nước"
+                    @click="waterPlant(plant)"
+                    :disabled="plant.hydration_value >= 100 || loading[plant.id + '-water']">
+                    <span v-if="loading[plant.id + '-water']" class="loading-spinner"></span>
+                    <span v-else class="material-symbols-outlined">water_drop</span>
+                  </button>
+                  <button class="action-btn action-fertilize" title="Bón phân"
+                    @click="fertilizePlant(plant)"
+                    :disabled="plant.nutrient_value >= 100 || loading[plant.id + '-fertilize']">
+                    <span v-if="loading[plant.id + '-fertilize']" class="loading-spinner"></span>
+                    <span v-else class="material-symbols-outlined">spa</span>
+                  </button>
                 </div>
               </div>
-              <h3 class="specimen-name">{{ specimen.name }}</h3>
-              <p class="specimen-id">Mã số: {{ specimen.code }} &bull; {{ specimen.location }}</p>
-              <div class="progress-list">
-                <div class="progress-item">
-                  <div class="progress-header">
-                    <span>Đếm ngược Tưới nước</span>
-                    <span class="progress-value" :class="{ 'progress-value-error': specimen.hydration.error }">{{ specimen.hydration.label }}</span>
+              <div class="specimen-info">
+                <h3 class="specimen-name">{{ plant.name }}</h3>
+                <p class="specimen-species">{{ plant.species }}</p>
+                <div class="specimen-meta">
+                  <span class="meta-chip">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    {{ formatDate(plant.planted_at) }}
+                  </span>
+                  <span v-if="plant.last_watered_at" class="meta-chip">
+                    <span class="material-symbols-outlined">water_drop</span>
+                    {{ timeAgo(plant.last_watered_at) }}
+                  </span>
+                </div>
+                <div class="progress-list">
+                  <div class="progress-item">
+                    <div class="progress-header">
+                      <span>Độ ẩm</span>
+                      <span class="progress-value" :class="{ 'progress-low': plant.hydration_value < 30 }">
+                        {{ plant.hydration_value }}%
+                      </span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" :class="hydrationBarClass(plant.hydration_value)"
+                        :style="{ transform: 'scaleX(' + (plant.hydration_value / 100) + ')' }"></div>
+                    </div>
                   </div>
-                  <div class="progress-bar">
-                    <div class="progress-fill" :class="specimen.hydration.error ? 'progress-fill-error' : 'progress-fill-primary'"
-                      :style="{ width: displayHydration[index] + '%' }"></div>
+                  <div class="progress-item">
+                    <div class="progress-header">
+                      <span>Dinh dưỡng</span>
+                      <span class="progress-value" :class="{ 'progress-low': plant.nutrient_value < 30 }">
+                        {{ plant.nutrient_value }}%
+                      </span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" :class="nutrientBarClass(plant.nutrient_value)"
+                        :style="{ transform: 'scaleX(' + (plant.nutrient_value / 100) + ')' }"></div>
+                    </div>
                   </div>
                 </div>
-                <div class="progress-item">
-                  <div class="progress-header">
-                    <span>Chu kỳ Dinh dưỡng</span>
-                    <span class="progress-value" :class="{ 'progress-value-secondary': !specimen.nutrient.muted && !specimen.nutrient.error }">{{ specimen.nutrient.label }}</span>
-                  </div>
-                  <div class="progress-bar">
-                    <div class="progress-fill" :class="specimen.nutrient.muted ? 'progress-fill-muted' : 'progress-fill-secondary'"
-                      :style="{ width: displayNutrient[index] + '%' }"></div>
+                <div class="specimen-stage-bar">
+                  <div
+                    v-for="s in stages"
+                    :key="s.key"
+                    class="stage-dot"
+                    :class="{ 'stage-active': stageOrder.indexOf(s.key) <= stageOrder.indexOf(plant.stage), 'stage-current': s.key === plant.stage }"
+                    :title="s.label"
+                  >
+                    <span class="material-symbols-outlined">{{ s.icon }}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <section class="wishlist-section">
+          <section v-if="suggestions.length > 0" class="suggestions-section">
             <div class="section-header">
-              <h2 class="section-title">Danh sách Mong muốn Mẫu vật</h2>
-              <Link :href="route('agriverse.shop.wishlist.index')" class="section-link">Xem tất cả Yêu thích</Link>
-            </div>
-            <div class="wishlist-grid" v-if="wishlist.length">
-              <div v-for="item in wishlist" :key="item.id" class="wishlist-item">
-                <div class="wishlist-img-wrap">
-                  <img :src="item.image" :alt="item.name" class="wishlist-img" />
-                  <div class="wishlist-overlay">
-                    <span>Mua ngay</span>
-                  </div>
-                </div>
+              <div>
+                <h2 class="section-title">Gợi ý cho vườn của bạn</h2>
+                <p class="section-subtitle">Những cây giống phù hợp để bổ sung vào bộ sưu tập.</p>
               </div>
-              <Link :href="route('agriverse.shop.products.index')" class="wishlist-add">
-                <span class="material-symbols-outlined wishlist-add-icon">add_circle</span>
-                <span class="wishlist-add-text">Duyệt Vườn ươm</span>
-              </Link>
+              <Link :href="route('agriverse.shop.products.index')" class="section-link">Xem tất cả</Link>
             </div>
-            <div v-else class="wishlist-grid">
-              <Link :href="route('agriverse.shop.products.index')" class="wishlist-add">
-                <span class="material-symbols-outlined wishlist-add-icon">add_circle</span>
-                <span class="wishlist-add-text">Thêm sản phẩm yêu thích</span>
+            <div class="suggestions-grid">
+              <Link v-for="product in suggestions" :key="product.id"
+                :href="route('agriverse.shop.products.show', { product: product.id })"
+                class="suggestion-card"
+              >
+                <div class="suggestion-img-wrap">
+                  <img :src="product.image || '/images/placeholder-plant.svg'" :alt="product.name" class="suggestion-img" />
+                </div>
+                <div class="suggestion-info">
+                  <h4 class="suggestion-name">{{ product.name }}</h4>
+                  <p class="suggestion-price">{{ formatPrice(product.price) }}</p>
+                </div>
               </Link>
             </div>
           </section>
@@ -114,30 +208,60 @@
             <div class="sidebar-card">
               <div class="sidebar-card-header">
                 <span class="material-symbols-outlined">auto_awesome</span>
-                <h3 class="sidebar-card-title">Thông tin Khí hậu</h3>
+                <h3 class="sidebar-card-title">Tổng quan vườn</h3>
               </div>
-
-              <div class="climate-banner" v-if="climateInfo">
-                <div class="climate-location">
-                  <span class="material-symbols-outlined">location_on</span>
-                  <span class="climate-location-text">{{ climateInfo.location }}</span>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <span class="stat-value green">{{ stats.avgHydration }}%</span>
+                  <span class="stat-label">Độ ẩm TB</span>
                 </div>
-                <p class="climate-desc">{{ climateInfo.description }}</p>
+                <div class="stat-item">
+                  <span class="stat-value orange">{{ stats.avgNutrient }}%</span>
+                  <span class="stat-label">Dinh dưỡng TB</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value blue">{{ stats.healthyCount }}/{{ stats.totalPlants }}</span>
+                  <span class="stat-label">Khỏe mạnh</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value purple">{{ stats.careNeededCount }}</span>
+                  <span class="stat-label">Cần chăm sóc</span>
+                </div>
               </div>
+            </div>
 
-              <div class="advice-list">
-                <div v-for="insight in climateInsightsList" :key="insight.title" class="advice-item">
-                  <div class="advice-icon" :class="'advice-icon-' + insight.iconStyle">
-                    <span class="material-symbols-outlined">{{ insight.icon }}</span>
+            <div class="sidebar-card">
+              <div class="sidebar-card-header">
+                <span class="material-symbols-outlined">equalizer</span>
+                <h3 class="sidebar-card-title">Phân bố giai đoạn</h3>
+              </div>
+              <div class="stage-list">
+                <div v-for="s in stages" :key="s.key" class="stage-item">
+                  <span class="stage-item-icon">{{ s.icon }}</span>
+                  <span class="stage-item-label">{{ s.label }}</span>
+                  <span class="stage-item-count">{{ stageDistribution[s.key] || 0 }}</span>
+                  <div class="stage-item-bar">
+                    <div class="stage-item-fill" :style="{ transform: 'scaleX(' + (stagePercent(s.key) / 100) + ')' }"></div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sidebar-card">
+              <div class="sidebar-card-header">
+                <span class="material-symbols-outlined">psychology</span>
+                <h3 class="sidebar-card-title">AI Chăm sóc</h3>
+              </div>
+              <div class="ai-insights">
+                <div v-for="(insight, i) in aiInsights" :key="i" class="insight-item">
+                  <span class="material-symbols-outlined insight-icon" :class="insight.type">{{ insight.icon }}</span>
                   <div>
-                    <h4 class="advice-title">{{ insight.title }}</h4>
-                    <p class="advice-desc">{{ insight.desc }}</p>
+                    <p class="insight-title">{{ insight.title }}</p>
+                    <p class="insight-desc">{{ insight.desc }}</p>
                   </div>
                 </div>
               </div>
-
-              <button class="btn-chat">
+              <button class="btn-chat" @click="openAIChat">
                 Trò chuyện với Botanist AI
                 <span class="material-symbols-outlined">arrow_forward</span>
               </button>
@@ -151,104 +275,157 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import { route } from 'ziggy-js'
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue'
 
 const props = defineProps({
-  specimens: { type: Array, default: () => [] },
-  wishlist: { type: Array, default: () => [] },
-  heroStats: {
+  garden: Object,
+  zones: { type: Array, default: () => [] },
+  plants: { type: Array, default: () => [] },
+  stats: {
     type: Object,
-    default: () => ({
-      greenFingers: 0,
-      activeSpecimens: 0,
-      grade: 'C',
-      tier: 'Cấp Mới',
-      userName: 'Bạn',
-    }),
+    default: () => ({ totalPlants: 0, healthScore: 0, grade: 'D', avgHydration: 0, avgNutrient: 0, healthyCount: 0, careNeededCount: 0 }),
   },
+  stageDistribution: { type: Object, default: () => ({}) },
+  careNeeded: { type: Array, default: () => [] },
+  suggestions: { type: Array, default: () => [] },
 })
 
-const defaultSpecimens = computed(() => {
-  if (props.specimens.length > 0) {
-    return props.specimens.map(s => ({
-      ...s,
-      image: s.image_url || s.image,
-      hydration: {
-        value: s.hydration_value,
-        label: s.hydration_label,
-        error: Boolean(s.hydration_error),
-      },
-      nutrient: {
-        value: s.nutrient_value,
-        label: s.nutrient_label,
-        error: Boolean(s.nutrient_error),
-        muted: Boolean(s.nutrient_muted),
-      },
-    }))
-  }
-  return [
-    {
-      id: 1, name: 'Monstera Deliciosa', code: 'BH-09224', location: 'Living Room',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC9WLTKhlaWjBjifoYvcYy_yUtwhxrR2W3v1Hs-gPcHkLJ6PtEoJ2RkQJ3D6Jbvly0Sgro7DxT4l7eIpi9o8YeqhPWqZon25fr_UlySezGrzLjsE-6dvQLdVVgsqd7DBt4aHszsN3L2U1UXjkmDq85U1IWQ3HhoT9S76ppTUY1uHu77vvOi3C-WFRJwsTsX0Rru43spRcoxhtHmQbcbqRdZqDdU-NleSR-QW2MpdjAnPe-6hcF_qzX2ocNxmPeQUHisDy7Cg4MzHdQ',
-      status: 'hydrated', hydration: { value: 65, label: '48h còn lại', error: false }, nutrient: { value: 82, label: '12 ngày còn lại', error: false, muted: false },
-    },
-    {
-      id: 2, name: 'Ficus Lyrata', code: 'BH-11054', location: 'Studio',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBg2GAi60_R3IKCF553FTQeHBhyF6ZK6cFvEIpr6g_FSccxpZS6sac28gKTY-aw2XucW1W-CC3Y4ezT0eFnLZ_03uwFGfmijYaoCBodfEiH78QVmx-73gO5-0THH307IAKwubK-d-cKujLKMqkraItbocGrF9kSw9br7bNg4g3RhsxixUHFeTFSmdLFPl1jNcDvg4x0vbbvxNxFcctfklTogjBeqKBWe2iKWBXCOVja0iqP9ss_oSZjBZBsbSF8BQNh2clNKZAFa4o',
-      status: 'thirsty', hydration: { value: 100, label: 'Quá hạn: 4h', error: true }, nutrient: { value: 15, label: 'Sẵn sàng Bón phân', error: false, muted: true },
-    },
-  ]
+const activeZone = ref(null)
+const showAlert = ref(true)
+const loading = ref({})
+
+const ringCircumference = 283
+const stages = [
+  { key: 'seedling', label: 'Cây con', icon: '🌱' },
+  { key: 'growing', label: 'Đang lớn', icon: '🌿' },
+  { key: 'mature', label: 'Trưởng thành', icon: '🌳' },
+  { key: 'flowering', label: 'Ra hoa', icon: '🌸' },
+  { key: 'fruiting', label: 'Kết trái', icon: '🍎' },
+  { key: 'harvested', label: 'Thu hoạch', icon: '🎉' },
+]
+const stageOrder = stages.map(s => s.key)
+const stageLabels = Object.fromEntries(stages.map(s => [s.key, s.label]))
+
+const userName = computed(() => props.garden?.name?.replace('Vườn của ', '') || 'Bạn')
+const filteredPlants = computed(() => {
+  return props.plants.filter(p => activeZone.value === null || p.zone_id === activeZone.value)
 })
-
-const specimens = defaultSpecimens
-
-
-
-const climateInsights = ref([
-  { icon: 'light_mode', iconStyle: 'green', title: 'Tối ưu Sương sáng', desc: 'Phát hiện mức ánh sáng khí quyển thấp. Di chuyển cây Ficus của bạn đến gần cửa sổ hướng nam hôm nay.' },
-  { icon: 'thermostat', iconStyle: 'terracotta', title: 'Cảnh báo Ngủ đông', desc: 'Nhiệt độ bên ngoài giảm xuống 8°C.' },
-  { icon: 'psychology', iconStyle: 'muted', title: 'Mẹo AI Chăm sóc', desc: 'Cây Monstera của bạn đang phát triển nhanh hơn 15%.' },
-])
-
-const climateInfo = computed(() => {
-  if (props.heroStats.activeSpecimens === 0) return null
-  return {
-    location: 'Việt Nam',
-    description: props.heroStats.greenFingers >= 70
-      ? 'Điều kiện lý tưởng cho cây xanh. Tiếp tục duy trì chế độ chăm sóc hiện tại.'
-      : props.heroStats.greenFingers >= 40
-        ? 'Một số mẫu vật cần được chú ý hơn. Kiểm tra lịch tưới nước và dinh dưỡng.'
-        : 'Nhiều mẫu vật cần được chăm sóc ngay. Hãy kiểm tra từng mẫu vật trong danh sách.',
-  }
+const ringOffset = ref(ringCircumference)
+const ringColor = computed(() => {
+  const s = props.stats.healthScore
+  if (s >= 85) return '#2e7d32'
+  if (s >= 70) return '#43a047'
+  if (s >= 50) return '#f9a825'
+  if (s >= 30) return '#ef6c00'
+  return '#c62828'
 })
-
-const climateInsightsList = computed(() => {
+const stageDistributionLabel = computed(() => {
+  const entries = Object.entries(props.stageDistribution)
+  if (entries.length === 0) return 'Chưa có dữ liệu'
+  const total = entries.reduce((a, [, c]) => a + c, 0)
+  const top = entries.sort((a, b) => b[1] - a[1])[0]
+  return `${stageLabels[top[0]] || top[0]}: ${Math.round(top[1] / total * 100)}%`
+})
+const aiInsights = computed(() => {
   const insights = []
-  if (props.heroStats.activeSpecimens > 0) {
-    const thirstyCount = props.specimens.filter(s => s.status === 'thirsty' || s.hydration_error).length
-    if (thirstyCount > 0) {
-      insights.push({ icon: 'water_drop', iconStyle: 'terracotta', title: `${thirstyCount} Mẫu vật Khát nước`, desc: `${thirstyCount} mẫu vật cần được tưới nước ngay lập tức.` })
-    }
-    if (props.heroStats.greenFingers >= 80) {
-      insights.push({ icon: 'eco', iconStyle: 'green', title: 'Vườn khỏe mạnh', desc: 'Điểm số ngón tay xanh của bạn rất tốt. Tiếp tục duy trì!' })
-    }
+  const thirstyCount = props.plants.filter(p => p.hydration_value < 30).length
+  const hungryCount = props.plants.filter(p => p.nutrient_value < 30).length
+  if (thirstyCount > 0) insights.push({
+    type: 'warning', icon: 'water_drop',
+    title: `${thirstyCount} cây thiếu nước`,
+    desc: 'Cần tưới nước ngay để tránh héo úa.',
+  })
+  if (hungryCount > 0) insights.push({
+    type: 'warning', icon: 'spa',
+    title: `${hungryCount} cây thiếu dinh dưỡng`,
+    desc: 'Bón phân bổ sung để cây phát triển tốt.',
+  })
+  if (props.stats.healthyCount === props.stats.totalPlants && props.stats.totalPlants > 0) {
+    insights.push({
+      type: 'success', icon: 'emoji_events',
+      title: 'Vườn khỏe mạnh!',
+      desc: 'Tất cả cây đều trong tình trạng tốt. Hãy duy trì chế độ chăm sóc hiện tại.',
+    })
   }
-  insights.push({ icon: 'psychology', iconStyle: 'muted', title: 'Mẹo AI Chăm sóc', desc: `Bạn đang theo dõi ${props.heroStats.activeSpecimens} mẫu vật. Kiểm tra định kỳ mỗi tuần.` })
+  if (props.stats.totalPlants > 0 && insights.length === 0) {
+    insights.push({
+      type: 'info', icon: 'eco',
+      title: 'Vườn ổn định',
+      desc: 'Các chỉ số đều ở mức chấp nhận được. Kiểm tra định kỳ để đảm bảo cây luôn khỏe.',
+    })
+  }
+  if (props.stats.totalPlants === 0) {
+    insights.push({
+      type: 'info', icon: 'yard',
+      title: 'Bắt đầu trồng cây',
+      desc: 'Mua cây giống từ cửa hàng và chúng sẽ tự động được thêm vào vườn khi đơn hàng được giao.',
+    })
+  }
   return insights
 })
 
-const ringCircumference = 283
-const ringOffset = ref(ringCircumference)
-const displayHydration = ref([])
-const displayNutrient = ref([])
+function hydrationBarClass(v) {
+  if (v < 30) return 'progress-fill-error'
+  if (v < 50) return 'progress-fill-warning'
+  return 'progress-fill-primary'
+}
+function nutrientBarClass(v) {
+  if (v < 30) return 'progress-fill-error'
+  if (v < 50) return 'progress-fill-warning'
+  return 'progress-fill-secondary'
+}
+function stagePercent(key) {
+  const total = props.stats.totalPlants
+  if (!total) return 0
+  return ((props.stageDistribution[key] || 0) / total) * 100
+}
+function formatDate(d) {
+  if (!d) return ''
+  const date = new Date(d)
+  return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+function timeAgo(d) {
+  if (!d) return ''
+  const now = new Date()
+  const date = new Date(d)
+  const diff = Math.floor((now - date) / (1000 * 60 * 60))
+  if (diff < 1) return 'Vừa xong'
+  if (diff < 24) return `${diff} giờ trước`
+  const days = Math.floor(diff / 24)
+  return `${days} ngày trước`
+}
+function formatPrice(p) {
+  if (!p) return ''
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p)
+}
+function waterPlant(plant) {
+  loading.value[plant.id + '-water'] = true
+  router.post(route('agriverse.shop.garden.plants.water', { plant: plant.id }), {}, {
+    preserveScroll: true,
+    onFinish: () => { loading.value[plant.id + '-water'] = false },
+  })
+}
+function fertilizePlant(plant) {
+  loading.value[plant.id + '-fertilize'] = true
+  router.post(route('agriverse.shop.garden.plants.fertilize', { plant: plant.id }), {}, {
+    preserveScroll: true,
+    onFinish: () => { loading.value[plant.id + '-fertilize'] = false },
+  })
+}
+function dismissAlert() {
+  showAlert.value = false
+}
+function openAIChat() {
+  if (window.__agriverse_open_chat) {
+    window.__agriverse_open_chat('botanist')
+  }
+}
 
 onMounted(() => {
   setTimeout(() => {
-    ringOffset.value = ringCircumference - (ringCircumference * props.heroStats.greenFingers / 100)
-    displayHydration.value = specimens.value.map(s => s.hydration.value)
-    displayNutrient.value = specimens.value.map(s => s.nutrient.value)
+    ringOffset.value = ringCircumference - (ringCircumference * props.stats.healthScore / 100)
   }, 300)
 })
 </script>
@@ -259,13 +436,13 @@ onMounted(() => {
   margin: 0 auto;
   padding: 0 64px;
   padding-top: 120px;
-  padding-bottom: 0;
+  padding-bottom: 80px;
 }
 @media (max-width: 768px) {
-  .garden-page { padding: 80px 24px 0; }
+  .garden-page { padding: 80px 24px 40px; }
 }
 
-.hero-section { margin-bottom: 64px; }
+.hero-section { margin-bottom: 32px; }
 .hero-card {
   background: var(--ag-bg-card, #ffffff);
   border-radius: var(--ag-radius-xl);
@@ -282,7 +459,6 @@ onMounted(() => {
 }
 .hero-content { max-width: 520px; }
 .hero-label {
-  font-family: var(--ag-font-body);
   font-size: 12px;
   font-weight: 700;
   color: var(--ag-primary);
@@ -292,7 +468,6 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 .hero-title {
-  font-family: var(--ag-font-display);
   font-size: 48px;
   line-height: 1.1;
   color: var(--ag-on-surface);
@@ -300,12 +475,12 @@ onMounted(() => {
 }
 @media (max-width: 768px) { .hero-title { font-size: 36px; } }
 .hero-desc {
-  font-family: var(--ag-font-body);
   font-size: 18px;
   line-height: 1.6;
   color: var(--ag-on-surface-variant);
   margin-bottom: 32px;
 }
+.hero-desc strong { color: var(--ag-on-surface); }
 .hero-badges { display: flex; flex-wrap: wrap; gap: 16px; }
 .badge {
   display: inline-flex;
@@ -313,22 +488,19 @@ onMounted(() => {
   gap: 12px;
   padding: 12px 24px;
   border-radius: var(--ag-radius-full);
-  font-family: var(--ag-font-body);
   font-size: 14px;
   font-weight: 600;
 }
 .badge-green {
   background: color-mix(in srgb, var(--ag-primary) 5%, transparent);
   border: 1px solid color-mix(in srgb, var(--ag-primary) 10%, transparent);
+  color: var(--ag-primary);
 }
-.badge-green .badge-icon,
-.badge-green .badge-text { color: var(--ag-primary); }
 .badge-terracotta {
   background: color-mix(in srgb, var(--ag-secondary) 5%, transparent);
   border: 1px solid color-mix(in srgb, var(--ag-secondary) 10%, transparent);
+  color: var(--ag-secondary);
 }
-.badge-terracotta .badge-icon,
-.badge-terracotta .badge-text { color: var(--ag-secondary); }
 .badge-icon { font-size: 20px; font-variation-settings: 'FILL' 1; }
 .badge-text { font-size: 14px; font-weight: 600; }
 
@@ -353,11 +525,10 @@ onMounted(() => {
 }
 .ring-progress {
   fill: transparent;
-  stroke: var(--ag-primary);
   stroke-width: 10;
   stroke-linecap: round;
   stroke-dasharray: 283;
-  transition: stroke-dashoffset 1s ease-out;
+  transition: stroke-dashoffset 1s ease-out, stroke 0.3s;
 }
 .ring-label {
   position: absolute;
@@ -369,15 +540,12 @@ onMounted(() => {
   text-align: center;
 }
 .ring-grade {
-  font-family: var(--ag-font-display);
   font-size: 48px;
   font-style: italic;
   font-weight: 500;
-  color: var(--ag-primary);
   line-height: 1;
 }
 .ring-tier {
-  font-family: var(--ag-font-body);
   font-size: 12px;
   font-weight: 600;
   color: var(--ag-on-surface-variant);
@@ -385,6 +553,38 @@ onMounted(() => {
   letter-spacing: 0.1em;
   margin-top: 4px;
 }
+
+.alert-section { margin-bottom: 32px; }
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background: color-mix(in srgb, var(--ag-secondary) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ag-secondary) 15%, transparent);
+  border-radius: var(--ag-radius-lg);
+}
+.alert-icon { color: var(--ag-secondary); font-variation-settings: 'FILL' 1; }
+.alert-content { flex: 1; }
+.alert-title {
+  font-size: 14px;
+  color: var(--ag-on-surface);
+  display: block;
+  margin-bottom: 4px;
+}
+.alert-desc {
+  font-size: 12px;
+  color: var(--ag-on-surface-variant);
+  margin: 0;
+}
+.alert-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ag-on-surface-variant);
+  padding: 4px;
+}
+.alert-close:hover { color: var(--ag-on-surface); }
 
 .page-grid {
   display: grid;
@@ -399,27 +599,25 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 .section-title {
-  font-family: var(--ag-font-display);
   font-size: 30px;
   color: var(--ag-on-surface);
+  margin: 0;
 }
 .section-subtitle {
-  font-family: var(--ag-font-body);
   font-size: 14px;
   color: var(--ag-on-surface-variant);
   margin-top: 4px;
 }
 .section-link {
-  font-family: var(--ag-font-body);
   font-size: 14px;
   font-weight: 600;
   color: var(--ag-primary);
   text-decoration: none;
 }
-.section-link:hover { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--ag-primary) 30%, transparent); }
+.section-link:hover { text-decoration: underline; }
 
 .btn-primary {
   display: inline-flex;
@@ -430,19 +628,84 @@ onMounted(() => {
   color: white;
   border: none;
   border-radius: 8px;
-  font-family: var(--ag-font-body);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  text-decoration: none;
   box-shadow: var(--ag-shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
 }
 .btn-primary:hover { background: color-mix(in srgb, var(--ag-primary) 90%, black); }
 
+.zone-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 32px;
+  scrollbar-width: none;
+}
+.zone-tabs::-webkit-scrollbar { display: none; }
+.zone-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-full);
+  background: var(--ag-bg-card, #ffffff);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.zone-tab:hover { border-color: var(--ag-primary); }
+.zone-tab-active {
+  background: var(--ag-primary);
+  border-color: var(--ag-primary);
+  color: white;
+}
+.zone-tab-emoji { font-size: 18px; }
+.zone-tab-name { font-weight: 600; }
+.zone-tab-count {
+  font-size: 11px;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--ag-border) 20%, transparent);
+  padding: 2px 8px;
+  border-radius: var(--ag-radius-full);
+}
+.zone-tab-active .zone-tab-count {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+}
+.empty-icon {
+  font-size: 64px;
+  color: var(--ag-border);
+  margin-bottom: 24px;
+}
+.empty-title {
+  font-size: 24px;
+  color: var(--ag-on-surface);
+  margin-bottom: 12px;
+}
+.empty-desc {
+  font-size: 14px;
+  color: var(--ag-on-surface-variant);
+  margin-bottom: 24px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .specimen-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 32px;
+  gap: 24px;
 }
 @media (min-width: 768px) {
   .specimen-grid { grid-template-columns: 1fr 1fr; }
@@ -450,18 +713,16 @@ onMounted(() => {
 .specimen-card {
   background: var(--ag-bg-card, #ffffff);
   border-radius: var(--ag-radius-xl);
-  padding: 24px;
+  overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--ag-border) 30%, transparent);
-  transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s, transform 0.2s;
 }
 .specimen-card:hover { box-shadow: var(--ag-shadow-md, 0 4px 12px rgba(0,0,0,0.06)); }
 .specimen-image-wrap {
-  height: 224px;
-  margin-bottom: 24px;
-  border-radius: 8px;
+  height: 200px;
+  position: relative;
   overflow: hidden;
   background: var(--ag-surface-container);
-  position: relative;
 }
 .specimen-image {
   width: 100%;
@@ -473,8 +734,8 @@ onMounted(() => {
 .specimen-card:hover .specimen-image { transform: scale(1.05); }
 .specimen-badge {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 12px;
+  left: 12px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -484,52 +745,98 @@ onMounted(() => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  box-shadow: var(--ag-shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
+  box-shadow: var(--ag-shadow-sm);
   backdrop-filter: blur(4px);
 }
-.badge-hydrated {
+.badge-healthy {
+  background: color-mix(in srgb, var(--ag-primary) 90%, white);
+  color: white;
+  border: none;
+}
+.badge-stressed {
+  background: color-mix(in srgb, var(--ag-secondary) 90%, white);
+  color: white;
+  border: none;
+}
+.badge-diseased {
+  background: color-mix(in srgb, var(--ag-error, #c62828) 90%, white);
+  color: white;
+  border: none;
+}
+.specimen-actions {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: var(--ag-shadow-sm, 0 1px 3px rgba(0,0,0,0.12));
+  backdrop-filter: blur(4px);
+}
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.action-water {
   background: rgba(255,255,255,0.95);
-  color: var(--ag-primary);
-  border: 1px solid color-mix(in srgb, var(--ag-primary) 10%, transparent);
+  color: #1565c0;
 }
-.badge-thirsty {
-  background: rgba(255,218,214,0.95);
-  color: var(--ag-danger);
-  border: 1px solid color-mix(in srgb, var(--ag-error) 10%, transparent);
+.action-water:hover:not(:disabled) { background: #1565c0; color: white; }
+.action-fertilize {
+  background: rgba(255,255,255,0.95);
+  color: #2e7d32;
 }
-.specimen-name {
-  font-family: var(--ag-font-display);
-  font-size: 24px;
-  color: var(--ag-on-surface);
-  margin-bottom: 4px;
-}
-.specimen-id {
-  font-family: var(--ag-font-body);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ag-on-surface-variant);
-  opacity: 0.7;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-}
+.action-fertilize:hover:not(:disabled) { background: #2e7d32; color: white; }
+.action-btn .material-symbols-outlined { font-size: 20px; font-variation-settings: 'FILL' 1; }
 
-.progress-list { display: flex; flex-direction: column; gap: 20px; }
+.specimen-info { padding: 20px; }
+.specimen-name {
+  font-size: 20px;
+  color: var(--ag-on-surface);
+  margin: 0 0 4px;
+}
+.specimen-species {
+  font-size: 12px;
+  color: var(--ag-on-surface-variant);
+  font-style: italic;
+  margin: 0 0 12px;
+}
+.specimen-meta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--ag-on-surface-variant);
+  background: var(--ag-surface-container);
+  padding: 4px 10px;
+  border-radius: var(--ag-radius-full);
+}
+.meta-chip .material-symbols-outlined { font-size: 14px; }
+
+.progress-list { display: flex; flex-direction: column; gap: 16px; }
 .progress-header {
   display: flex;
   justify-content: space-between;
-  font-family: var(--ag-font-body);
   font-size: 12px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .progress-header span:first-child { color: var(--ag-on-surface-variant); }
-.progress-value {
-  font-style: italic;
-  color: var(--ag-primary);
-}
-.progress-value-secondary { color: var(--ag-secondary); }
-.progress-value-error { color: var(--ag-error); font-weight: 700; }
+.progress-value { color: var(--ag-primary); }
+.progress-low { color: var(--ag-error, #c62828) !important; font-weight: 700; }
 .progress-bar {
   height: 6px;
   width: 100%;
@@ -540,96 +847,110 @@ onMounted(() => {
 .progress-fill {
   height: 100%;
   border-radius: var(--ag-radius-full);
-  transition: width 0.6s ease;
+  transform-origin: left;
+  transition: transform 0.5s ease;
 }
 .progress-fill-primary { background: var(--ag-primary); }
 .progress-fill-secondary { background: var(--ag-secondary); }
-.progress-fill-error { background: var(--ag-error); }
-.progress-fill-muted { background: var(--ag-on-surface-variant); opacity: 0.3; }
+.progress-fill-warning { background: #f9a825; }
+.progress-fill-error { background: var(--ag-error, #c62828); }
 
-.wishlist-section { margin-top: 64px; }
-.wishlist-grid {
+.specimen-stage-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ag-border);
+}
+.stage-dot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
+  border-radius: 6px;
+  background: var(--ag-surface-container);
+  transition: all 0.3s;
+}
+.stage-dot .material-symbols-outlined { font-size: 16px; opacity: 0.3; }
+.stage-active { background: color-mix(in srgb, var(--ag-primary) 8%, transparent); }
+.stage-active .material-symbols-outlined { opacity: 0.5; color: var(--ag-primary); }
+.stage-current {
+  background: color-mix(in srgb, var(--ag-primary) 15%, transparent);
+  box-shadow: inset 0 0 0 2px var(--ag-primary);
+}
+.stage-current .material-symbols-outlined { opacity: 1; color: var(--ag-primary); }
+
+.suggestions-section { margin-top: 64px; }
+.suggestions-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  gap: 16px;
 }
 @media (min-width: 640px) {
-  .wishlist-grid { grid-template-columns: repeat(3, 1fr); }
+  .suggestions-grid { grid-template-columns: repeat(3, 1fr); }
 }
-.wishlist-item {
-  aspect-ratio: 1;
-  border-radius: var(--ag-radius-xl);
+.suggestion-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--ag-radius-lg);
+  border: 1px solid var(--ag-border);
+  background: var(--ag-bg-card, #ffffff);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.suggestion-card:hover {
+  border-color: var(--ag-primary);
+  box-shadow: var(--ag-shadow-sm);
+}
+.suggestion-img-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
   overflow: hidden;
-  position: relative;
+  flex-shrink: 0;
   background: var(--ag-surface-container);
 }
-.wishlist-img-wrap {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-}
-.wishlist-img {
+.suggestion-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 1s;
-  display: block;
 }
-.wishlist-item:hover .wishlist-img { transform: scale(1.1); }
-.wishlist-overlay {
-  position: absolute;
-  inset: 0;
-  background: color-mix(in srgb, var(--ag-primary) 20%, transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(2px);
-}
-.wishlist-item:hover .wishlist-overlay { opacity: 1; }
-.wishlist-overlay span {
-  color: white;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-}
-.wishlist-add {
-  aspect-ratio: 1;
-  border: 2px dashed var(--ag-border);
+.suggestion-info {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  cursor: pointer;
-  border-radius: var(--ag-radius-xl);
-  transition: background 0.3s;
+  min-width: 0;
 }
-.wishlist-add:hover { background: var(--ag-surface-container); }
-.wishlist-add-icon {
-  font-size: 32px;
-  color: var(--ag-border);
-  margin-bottom: 12px;
+.suggestion-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ag-on-surface);
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.wishlist-add-text {
-  font-family: var(--ag-font-body);
-  font-size: 12px;
+.suggestion-price {
+  font-size: 14px;
   font-weight: 700;
-  color: var(--ag-on-surface-variant);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-align: center;
-  padding: 0 16px;
+  color: var(--ag-primary);
+  margin: 0;
 }
 
 .sidebar-col { position: relative; }
-.sidebar-sticky { position: sticky; top: 112px; }
+.sidebar-sticky {
+  position: sticky;
+  top: 112px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 .sidebar-card {
   background: var(--ag-bg-card, #ffffff);
   border-radius: var(--ag-radius-xl);
-  padding: 32px;
+  padding: 24px;
   border: 1px solid color-mix(in srgb, var(--ag-border) 30%, transparent);
   box-shadow: var(--ag-shadow-sm, 0 1px 3px rgba(0,0,0,0.04));
 }
@@ -637,7 +958,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 .sidebar-card-header .material-symbols-outlined {
   color: var(--ag-primary);
@@ -645,93 +966,114 @@ onMounted(() => {
   font-variation-settings: 'FILL' 1;
 }
 .sidebar-card-title {
-  font-family: var(--ag-font-display);
-  font-size: 24px;
+  font-size: 20px;
   font-style: italic;
   color: var(--ag-on-surface);
+  margin: 0;
 }
 
-.climate-banner {
-  padding: 20px;
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.stat-item {
+  text-align: center;
+  padding: 12px;
   background: var(--ag-bg);
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--ag-border) 20%, transparent);
-  margin-bottom: 32px;
 }
-.climate-location {
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  display: block;
+}
+.stat-value.green { color: var(--ag-primary); }
+.stat-value.orange { color: #ef6c00; }
+.stat-value.blue { color: #1565c0; }
+.stat-value.purple { color: #6a1b9a; }
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ag-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  display: block;
+}
+
+.stage-list { display: flex; flex-direction: column; gap: 12px; }
+.stage-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
 }
-.climate-location .material-symbols-outlined {
-  color: var(--ag-primary);
-  font-size: 16px;
-}
-.climate-location-text {
-  font-family: var(--ag-font-body);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ag-on-surface);
-}
-.climate-desc {
-  font-family: var(--ag-font-body);
+.stage-item-icon { font-size: 16px; width: 24px; text-align: center; }
+.stage-item-label {
   font-size: 12px;
-  font-style: italic;
-  color: var(--ag-on-surface-variant);
-  line-height: 1.5;
+  font-weight: 600;
+  color: var(--ag-on-surface);
+  min-width: 80px;
+}
+.stage-item-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ag-primary);
+  min-width: 24px;
+  text-align: right;
+}
+.stage-item-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--ag-surface-container);
+  border-radius: var(--ag-radius-full);
+  overflow: hidden;
+}
+.stage-item-fill {
+  height: 100%;
+  background: var(--ag-primary);
+  border-radius: var(--ag-radius-full);
+  transform-origin: left;
+  transition: transform 0.5s ease;
 }
 
-.advice-list { display: flex; flex-direction: column; gap: 32px; }
-.advice-item { display: flex; gap: 16px; }
-.advice-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.ai-insights { display: flex; flex-direction: column; gap: 16px; }
+.insight-item {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--ag-bg);
+  border-radius: 8px;
+}
+.insight-icon {
+  font-size: 20px;
   flex-shrink: 0;
+  margin-top: 2px;
 }
-.advice-icon .material-symbols-outlined { font-size: 20px; }
-.advice-icon-green {
-  background: color-mix(in srgb, var(--ag-primary) 5%, transparent);
-  color: var(--ag-primary);
-  border: 1px solid color-mix(in srgb, var(--ag-primary) 10%, transparent);
-}
-.advice-icon-terracotta {
-  background: color-mix(in srgb, var(--ag-secondary) 5%, transparent);
-  color: var(--ag-secondary);
-  border: 1px solid color-mix(in srgb, var(--ag-secondary) 10%, transparent);
-}
-.advice-icon-muted {
-  background: color-mix(in srgb, var(--ag-on-surface-variant) 5%, transparent);
-  color: var(--ag-on-surface-variant);
-  border: 1px solid color-mix(in srgb, var(--ag-on-surface-variant) 10%, transparent);
-}
-.advice-title {
-  font-family: var(--ag-font-body);
-  font-size: 14px;
+.insight-icon.warning { color: var(--ag-secondary); }
+.insight-icon.success { color: var(--ag-primary); }
+.insight-icon.info { color: #1565c0; }
+.insight-title {
+  font-size: 13px;
   font-weight: 700;
   color: var(--ag-on-surface);
-  margin-bottom: 4px;
+  margin: 0 0 2px;
 }
-.advice-desc {
-  font-family: var(--ag-font-body);
-  font-size: 12px;
+.insight-desc {
+  font-size: 11px;
   color: var(--ag-on-surface-variant);
-  line-height: 1.5;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .btn-chat {
   width: 100%;
-  margin-top: 40px;
-  padding: 16px;
+  margin-top: 24px;
+  padding: 14px;
   background: var(--ag-primary);
   color: white;
   border: none;
   border-radius: 8px;
-  font-family: var(--ag-font-body);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -740,7 +1082,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   transition: all 0.2s;
   box-shadow: var(--ag-shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
 }
@@ -750,4 +1092,16 @@ onMounted(() => {
   transition: transform 0.3s;
 }
 .btn-chat:hover .material-symbols-outlined { transform: translateX(4px); }
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--ag-border);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 </style>

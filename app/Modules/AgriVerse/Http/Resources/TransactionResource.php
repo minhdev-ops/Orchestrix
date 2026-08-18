@@ -12,7 +12,7 @@ class TransactionResource extends JsonResource
         return [
             'id' => $this->id,
             'transaction_id' => $this->transaction_id,
-            'order' => $this->whenLoaded('order', fn() => [
+            'order' => $this->whenLoaded('order', fn () => [
                 'id' => $this->order->id,
                 'uuid' => $this->order->uuid,
                 'product' => $this->order->product?->name,

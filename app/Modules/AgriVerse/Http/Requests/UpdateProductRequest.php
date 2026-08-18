@@ -8,7 +8,7 @@ class UpdateProductRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return auth()->check();
     }
 
     public function rules(): array
@@ -32,7 +32,7 @@ class UpdateProductRequest extends FormRequest
             'technical_specs.certifications' => 'nullable|array',
             'technical_specs.certifications.*' => 'string|max:255',
             'technical_specs.warranty_months' => 'nullable|integer|min:0|max:600',
-            'technical_specs.year_of_manufacture' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'technical_specs.year_of_manufacture' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
             'store_id' => 'nullable|integer|exists:stores,id',
             'stock' => 'nullable|integer|min:0',
         ];

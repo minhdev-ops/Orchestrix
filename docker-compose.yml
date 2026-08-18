@@ -1,10 +1,7 @@
-version: '3.8'
-
 services:
-  # Nginx Web Server
   nginx:
     image: nginx:alpine
-    container_name: agriverse-nginx
+    container_name: orchestrix-nginx
     restart: unless-stopped
     ports:
       - "80:80"
@@ -13,41 +10,46 @@ services:
       - .:/var/www
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
       - ./docker/ssl:/etc/nginx/ssl
+      - nginx_logs:/var/log/nginx
     depends_on:
       - php
-      - redis
+      - wildfly
     networks:
       - agriverse
 
-  # PHP-FPM
   php:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: agriverse-php
+    container_name: orchestrix-php
     restart: unless-stopped
     volumes:
       - .:/var/www
+      - ./docker/php/conf.d/sys_temp.ini:/usr/local/etc/php/conf.d/sys_temp.ini
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-agriverse}
+      - DB_USERNAME=${DB_USERNAME:-agriverse}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
       - REDIS_HOST=redis
+      - APP_ENV=production
+      - APP_DEBUG=false
     networks:
       - agriverse
 
-  # MySQL Database
   mysql:
     image: mysql:8.0
-    container_name: agriverse-mysql
+    container_name: orchestrix-mysql
     restart: unless-stopped
-    ports:
-      - "3306:3306"
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-agriverse}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
       MYSQL_USER: ${DB_USERNAME:-agriverse}
       MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
@@ -55,46 +57,53 @@ services:
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
     networks:
       - agriverse
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Redis
   redis:
     image: redis:alpine
-    container_name: agriverse-redis
+    container_name: orchestrix-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     networks:
       - agriverse
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Queue Worker
   queue:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: agriverse-queue
+    container_name: orchestrix-queue
     restart: unless-stopped
     command: php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
     volumes:
       - .:/var/www
+      - ./docker/php/conf.d/sys_temp.ini:/usr/local/etc/php/conf.d/sys_temp.ini
     depends_on:
       - php
       - redis
     networks:
       - agriverse
 
-  # Scheduler
   scheduler:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: agriverse-scheduler
+    container_name: orchestrix-scheduler
     restart: unless-stopped
-    command: >
-      sh -c "while true; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"
+    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"
     volumes:
       - .:/var/www
+      - ./docker/php/conf.d/sys_temp.ini:/usr/local/etc/php/conf.d/sys_temp.ini
     depends_on:
       - php
     networks:
@@ -143,12 +152,40 @@ services:
     networks:
       - agriverse
 
+  wildfly:
+    build:
+      context: ${JAKARTA_PATH:-../03.JakartaEE/JakartaEE}
+      dockerfile: deploy/wildfly/Dockerfile
+    container_name: orchestrix-wildfly
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: jdbc:mysql://mysql:3306/${DB_DATABASE:-agriverse}?useSSL=false&serverTimezone=UTC
+      DATABASE_USER: ${DB_USERNAME:-agriverse}
+      DATABASE_PASSWORD: ${DB_PASSWORD:-secret}
+      JAVA_OPTS: -Xms512m -Xmx1024m -Djava.net.preferIPv4Stack=true
+    ports:
+      - "127.0.0.1:9990:9990"
+    volumes:
+      - wildfly_logs:/opt/wildfly/standalone/log
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - agriverse
+
 volumes:
   mysql_data:
     driver: local
   redis_data:
     driver: local
+  nginx_logs:
+    driver: local
+  wildfly_logs:
+    driver: local
 
 networks:
   agriverse:
     driver: bridge
+    name: agriverse

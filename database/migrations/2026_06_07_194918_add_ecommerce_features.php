@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. REFUNDS TABLE
-        if (!Schema::hasTable('refunds')) {
+        if (! Schema::hasTable('refunds')) {
             Schema::create('refunds', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('order_id')->constrained()->cascadeOnDelete();
@@ -31,59 +31,59 @@ return new class extends Migration
 
         // 2. MISSING COLUMNS ON ORDERS
         Schema::table('orders', function (Blueprint $table) {
-            if (!Schema::hasColumn('orders', 'coupon_id')) {
+            if (! Schema::hasColumn('orders', 'coupon_id')) {
                 $table->foreignId('coupon_id')->nullable()->constrained()->nullOnDelete()->after('store_id');
             }
-            if (!Schema::hasColumn('orders', 'discount_amount')) {
+            if (! Schema::hasColumn('orders', 'discount_amount')) {
                 $table->decimal('discount_amount', 15, 2)->default(0)->after('total_price');
             }
-            if (!Schema::hasColumn('orders', 'shipping_method')) {
+            if (! Schema::hasColumn('orders', 'shipping_method')) {
                 $table->string('shipping_method')->nullable()->after('shipping_address');
             }
-            if (!Schema::hasColumn('orders', 'shipping_fee')) {
+            if (! Schema::hasColumn('orders', 'shipping_fee')) {
                 $table->decimal('shipping_fee', 15, 2)->default(0)->after('shipping_method');
             }
-            if (!Schema::hasColumn('orders', 'tracking_number')) {
+            if (! Schema::hasColumn('orders', 'tracking_number')) {
                 $table->string('tracking_number')->nullable()->after('shipping_fee');
             }
-            if (!Schema::hasColumn('orders', 'tracking_url')) {
+            if (! Schema::hasColumn('orders', 'tracking_url')) {
                 $table->string('tracking_url')->nullable()->after('tracking_number');
             }
-            if (!Schema::hasColumn('orders', 'estimated_delivery')) {
+            if (! Schema::hasColumn('orders', 'estimated_delivery')) {
                 $table->date('estimated_delivery')->nullable()->after('tracking_url');
             }
-            if (!Schema::hasColumn('orders', 'delivered_at')) {
+            if (! Schema::hasColumn('orders', 'delivered_at')) {
                 $table->timestamp('delivered_at')->nullable()->after('estimated_delivery');
             }
-            if (!Schema::hasColumn('orders', 'cancel_reason')) {
+            if (! Schema::hasColumn('orders', 'cancel_reason')) {
                 $table->text('cancel_reason')->nullable()->after('notes');
             }
-            if (!Schema::hasColumn('orders', 'cancelled_at')) {
+            if (! Schema::hasColumn('orders', 'cancelled_at')) {
                 $table->timestamp('cancelled_at')->nullable()->after('cancel_reason');
             }
         });
 
         // 3. BANK INFO ON STORES (for seller payout)
         Schema::table('stores', function (Blueprint $table) {
-            if (!Schema::hasColumn('stores', 'bank_name')) {
+            if (! Schema::hasColumn('stores', 'bank_name')) {
                 $table->string('bank_name')->nullable()->after('metadata');
             }
-            if (!Schema::hasColumn('stores', 'bank_account_name')) {
+            if (! Schema::hasColumn('stores', 'bank_account_name')) {
                 $table->string('bank_account_name')->nullable()->after('bank_name');
             }
-            if (!Schema::hasColumn('stores', 'bank_account_number')) {
+            if (! Schema::hasColumn('stores', 'bank_account_number')) {
                 $table->string('bank_account_number')->nullable()->after('bank_account_name');
             }
-            if (!Schema::hasColumn('stores', 'phone')) {
+            if (! Schema::hasColumn('stores', 'phone')) {
                 $table->string('phone')->nullable()->after('description');
             }
-            if (!Schema::hasColumn('stores', 'address')) {
+            if (! Schema::hasColumn('stores', 'address')) {
                 $table->text('address')->nullable()->after('phone');
             }
         });
 
         // 4. USER ADDRESSES
-        if (!Schema::hasTable('user_addresses')) {
+        if (! Schema::hasTable('user_addresses')) {
             Schema::create('user_addresses', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();

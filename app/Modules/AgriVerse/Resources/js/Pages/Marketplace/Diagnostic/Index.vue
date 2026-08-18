@@ -40,6 +40,15 @@
                 <span class="diagnostic__symptom-label">{{ symptom }}</span>
               </label>
             </div>
+            <div class="diagnostic__analyze">
+              <input type="text" class="diagnostic__plant-input" v-model="plantName" placeholder="Tên cây (không bắt buộc)..." />
+              <button class="diagnostic__analyze-btn" @click="analyze" :disabled="analyzing">
+                <span v-if="analyzing" class="diagnostic__spinner"></span>
+                <span class="material-symbols-outlined" v-else>psychology</span>
+                {{ analyzing ? 'Đang chẩn đoán...' : 'Chẩn Đoán' }}
+              </button>
+            </div>
+            <p v-if="error" class="diagnostic__error">{{ error }}</p>
           </div>
         </div>
 
@@ -88,6 +97,16 @@
           </div>
 
           <div class="diagnostic__report" ref="reportRef">
+            <template v-if="!result">
+              <div class="diagnostic__report-header">
+                <div class="diagnostic__report-icon">
+                  <span class="material-symbols-outlined">psychology</span>
+                </div>
+                <div>
+                  <h3 class="diagnostic__report-title">Báo Cáo Chẩn Đoán</h3>
+                  <p class="diagnostic__report-subtitle">Chọn triệu chứng và bấm "Chẩn Đoán" để có kết quả.</p>
+                </div>
+              </div>
             <div class="diagnostic__report-header">
               <div class="diagnostic__report-icon">
                 <span class="material-symbols-outlined">psychology</span>
@@ -160,6 +179,7 @@ const props = defineProps({
 })
 
 const selectedSymptoms = ref([])
+const plantName = ref('')
 const reportRef = ref(null)
 const statusText = ref('Sẵn Sàng Chẩn Đoán')
 const previewUrl = ref('')
@@ -255,6 +275,30 @@ async function handleUpload() {
   } finally {
     isAnalyzing.value = false
   }
+}
+
+const overallVigor = computed(() => {
+  const d = result.value?.diagnosis
+  if (!d) return 0
+  const map = { low: 82, medium: 64, high: 40, critical: 20 }
+  return map[d.severity] ?? 60
+})
+const vigorPercent = computed(() => overallVigor.value + '%')
+
+const chlorophyll = computed(() => {
+  const d = result.value?.diagnosis
+  if (!d) return 0
+  return Math.round((d.confidence || 0) * 60)
+})
+const chlorophyllPercent = computed(() => chlorophyll.value + '%')
+
+function severityLabel(sev) {
+  return ({
+    low: 'Nhẹ',
+    medium: 'Trung bình',
+    high: 'Nghiêm trọng',
+    critical: 'Nguy kịch',
+  }[sev]) || 'Không xác định'
 }
 </script>
 
@@ -599,7 +643,8 @@ async function handleUpload() {
 .diagnostic__bar-fill {
   height: 100%;
   border-radius: 9999px;
-  transition: width 1s;
+  transform-origin: left;
+  transition: transform 1s;
 }
 
 .diagnostic__bar-fill--primary {
@@ -885,6 +930,7 @@ async function handleUpload() {
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
+  line-height: 20px;
   letter-spacing: 0.05em;
 }
 

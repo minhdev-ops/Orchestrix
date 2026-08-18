@@ -2,10 +2,9 @@
 
 namespace App\Modules\AgriVerse\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
-use App\Models\User;
-use PragmaRX\Google2FALaravel\Support\Authenticatable as Google2FAAuthenticatable;
 use PragmaRX\Google2FALaravel\Google2FA;
 
 class TwoFactorService
@@ -40,7 +39,7 @@ class TwoFactorService
         return [
             'secret' => $secret,
             'qr_code_url' => $qrCodeUrl,
-            'otpauth_url' => "otpauth://totp/" . urlencode(config('app.name', 'AgriVerse')) . ":" . urlencode($user->email) . "?secret={$secret}&issuer=" . urlencode(config('app.name', 'AgriVerse')),
+            'otpauth_url' => 'otpauth://totp/'.urlencode(config('app.name', 'AgriVerse')).':'.urlencode($user->email)."?secret={$secret}&issuer=".urlencode(config('app.name', 'AgriVerse')),
         ];
     }
 
@@ -57,7 +56,7 @@ class TwoFactorService
      */
     public function enable(User $user, string $secret, string $code): array
     {
-        if (!$this->verifyCode($secret, $code)) {
+        if (! $this->verifyCode($secret, $code)) {
             return ['success' => false, 'message' => 'Mã xác thực không đúng. Vui lòng thử lại.'];
         }
 
@@ -81,13 +80,13 @@ class TwoFactorService
      */
     public function disable(User $user, string $code): array
     {
-        if (!$this->is2FAEnabled($user)) {
+        if (! $this->is2FAEnabled($user)) {
             return ['success' => false, 'message' => '2FA chưa được bật.'];
         }
 
         $secret = $this->getSecret($user);
 
-        if (!$this->verifyCode($secret, $code)) {
+        if (! $this->verifyCode($secret, $code)) {
             return ['success' => false, 'message' => 'Mã xác thực không đúng.'];
         }
 
@@ -105,7 +104,7 @@ class TwoFactorService
      */
     public function is2FAEnabled(User $user): bool
     {
-        return !is_null($user->two_factor_secret) && !is_null($user->two_factor_enabled_at);
+        return ! is_null($user->two_factor_secret) && ! is_null($user->two_factor_enabled_at);
     }
 
     /**
@@ -113,7 +112,7 @@ class TwoFactorService
      */
     public function getSecret(User $user): ?string
     {
-        if (!$user->two_factor_secret) {
+        if (! $user->two_factor_secret) {
             return null;
         }
 
@@ -129,7 +128,7 @@ class TwoFactorService
      */
     public function verifyLogin(User $user, string $code): array
     {
-        if (!$this->is2FAEnabled($user)) {
+        if (! $this->is2FAEnabled($user)) {
             return ['success' => true, 'requires_2fa' => false];
         }
 
@@ -159,8 +158,9 @@ class TwoFactorService
     {
         $codes = [];
         for ($i = 0; $i < $count; $i++) {
-            $codes[] = strtoupper(Str::random(4) . '-' . Str::random(4));
+            $codes[] = strtoupper(Str::random(4).'-'.Str::random(4));
         }
+
         return $codes;
     }
 
@@ -178,7 +178,7 @@ class TwoFactorService
     public function regenerateRecoveryCodes(User $user, string $code): array
     {
         $secret = $this->getSecret($user);
-        if (!$secret || !$this->verifyCode($secret, $code)) {
+        if (! $secret || ! $this->verifyCode($secret, $code)) {
             return ['success' => false, 'message' => 'Mã xác thực không đúng.'];
         }
 

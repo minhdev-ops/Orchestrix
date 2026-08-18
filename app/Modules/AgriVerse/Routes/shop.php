@@ -1,29 +1,63 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Modules\AgriVerse\Http\Controllers\Shop\HomeController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\ProductController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\StoreController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\CartController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\OrderController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\WishlistController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\CheckoutController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\AddressController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\GHNAddressController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\AffiliateController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\AIExpertController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\AirQualityController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\CartController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\ChatController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\CheckoutController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\ContractController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\DiagnosticController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\ForumController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\ForumUploadController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\GHTKAddressController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\HomeController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\MarketController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\OfferOrderController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\OrderController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\GardenController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\PageController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\SellerVerificationController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\PaymentController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\ProductController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\QuizController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\SellerDashboardController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\SellerOrderController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\SellerShippingController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\SellerProductController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\SellerStoreController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\SellerReviewController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\ChatController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\ForumController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\AirQualityController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\PaymentController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\SellerShippingController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\SellerStoreController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\SellerVerificationController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\StoreController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\SupportController;
 use App\Modules\AgriVerse\Http\Controllers\Shop\TwoFactorController;
-use App\Modules\AgriVerse\Http\Controllers\Shop\AffiliateController;
+use App\Modules\AgriVerse\Http\Controllers\Shop\WishlistController;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/agriverse/demo-seed', function () {
+    if (app()->environment('production')) {
+        abort(403, 'Cannot run in production');
+    }
+
+    try {
+        Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database has been migrated and seeded successfully!',
+            'output' => Artisan::output(),
+        ]);
+    } catch (Exception $e) {
+        Log::error('Demo seed error: '.$e->getMessage());
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Đã xảy ra lỗi khi seed dữ liệu.',
+        ], 500);
+    }
+});
 
 Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
     // Home
@@ -32,6 +66,7 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
     // Products
     Route::get('san-pham', [ProductController::class, 'index'])->name('products.index');
     Route::get('san-pham/{product}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('so-sanh', [ProductController::class, 'compare'])->name('compare.index');
 
     // Stores
     Route::get('cua-hang', [StoreController::class, 'index'])->name('stores.index');
@@ -41,29 +76,59 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
     Route::get('danh-muc', [ProductController::class, 'categories'])->name('categories.index');
 
     // New feature pages (static / design preview)
-    Route::get('tai-khoan/cai-dat', [PageController::class, 'accountSettings'])->name('account.settings');
+    Route::get('tai-khoan/cai-dat', [PageController::class, 'accountSettings'])->name('account.settings')->middleware('auth');
+    Route::get('flash-sale', [MarketController::class, 'flashDealIndex'])->name('market.flash-deal')->middleware('auth');
+    Route::get('de-xuat-gia', [MarketController::class, 'offerIndex'])->name('market.offer')->middleware('auth');
     Route::get('dien-dan/tao-bai-viet', [ForumController::class, 'create'])->name('forum.create')->middleware('auth');
     Route::get('dien-dan/{post}', [ForumController::class, 'show'])->name('forum.show');
     Route::get('dien-dan', [ForumController::class, 'index'])->name('forum.index');
-    Route::get('ho-so/{user?}', [PageController::class, 'profile'])->name('profile.index');
-    Route::get('khu-vuon', [PageController::class, 'garden'])->name('garden.index');
+    Route::get('ho-so/{user?}', [PageController::class, 'profile'])->name('profile.index')->middleware('auth');
+    // Garden
+    Route::prefix('khu-vuon')->name('garden.')->group(function () {
+        Route::get('/', [GardenController::class, 'index'])->name('index')->middleware('auth');
+        Route::post('plants/{plant}/water', [GardenController::class, 'water'])->name('plants.water')->middleware('auth');
+        Route::post('plants/{plant}/fertilize', [GardenController::class, 'fertilize'])->name('plants.fertilize')->middleware('auth');
+        Route::put('plants/{plant}/move', [GardenController::class, 'move'])->name('plants.move')->middleware('auth');
+        Route::put('plants/{plant}/stage', [GardenController::class, 'updateStage'])->name('plants.stage')->middleware('auth');
+        Route::delete('plants/{plant}', [GardenController::class, 'destroy'])->name('plants.destroy')->middleware('auth');
+    });
     Route::get('cay-tim-nguoi', [PageController::class, 'quiz'])->name('quiz.index');
     Route::get('chan-doan', [PageController::class, 'diagnostic'])->name('diagnostic.index');
-    Route::get('theo-doi-van-chuyen', [OrderController::class, 'tracking'])->name('tracking.index');
+    Route::get('theo-doi-van-chuyen', [OrderController::class, 'tracking'])->name('tracking.index')->middleware('auth');
     Route::get('ho-tro', [PageController::class, 'support'])->name('support.index');
     Route::get('phat-trien-ben-vung', [PageController::class, 'sustainability'])->name('sustainability.index');
+    Route::get('bai-viet', [PageController::class, 'journalIndex'])->name('journal.index');
     Route::get('bai-viet/{article?}', [PageController::class, 'journal'])->name('journal.show');
     Route::get('404', [PageController::class, 'notFound'])->name('not-found');
 
     // Air quality (public, with lat/lng)
     Route::get('khong-khi', [AirQualityController::class, 'index'])->name('air-quality');
 
+    // AI Expert chat (public)
+    Route::post('ai-chat', [AIExpertController::class, 'chat'])->name('ai.chat');
+
+    // Consultation booking (public)
+    Route::post('ho-tro/dat-lich', [SupportController::class, 'storeBooking'])->name('support.booking');
+
+    // Diagnostic analyze (public)
+    Route::post('api/diagnostic/analyze', [DiagnosticController::class, 'analyze'])->name('diagnostic.analyze');
+
+    // Quiz recommendation (public)
+    Route::post('api/quiz/recommend', [QuizController::class, 'recommend'])->name('quiz.recommend');
+
     // AR / 3D Viewer
     Route::get('xem-3d/{product}', [PageController::class, 'arViewer'])->name('ar-viewer');
+
+    // Payment IPN/callbacks (must be outside auth — payment gateways send server-to-server)
+    Route::get('thanh-toan/{order}/vnpay-callback', [PaymentController::class, 'vnpayCallback'])->name('payment.vnpay-callback');
+    Route::post('thanh-toan/{order}/vnpay-ipn', [PaymentController::class, 'vnpayIpn'])->name('payment.vnpay-ipn');
+    Route::get('thanh-toan/{order}/momo-callback', [PaymentController::class, 'momoCallback'])->name('payment.momo-callback');
+    Route::post('thanh-toan/{order}/momo-ipn', [PaymentController::class, 'momoIpn'])->name('payment.momo-ipn');
 
     // Cart & notifications (auth required)
     Route::middleware('auth')->group(function () {
         Route::get('thong-bao', [PageController::class, 'notifications'])->name('notifications.index');
+        Route::get('chat/ws-token', [ChatController::class, 'wsToken'])->name('chat.ws-token');
         Route::get('gio-hang', [CartController::class, 'index'])->name('cart.index');
         Route::get('thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
         Route::get('thanh-toan/thanh-cong/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
@@ -71,14 +136,17 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
         Route::get('don-hang/{order}', [OrderController::class, 'show'])->name('orders.show');
         Route::get('yeu-thich', [WishlistController::class, 'index'])->name('wishlist.index');
         // Forum
-    Route::post('dien-dan', [ForumController::class, 'store'])->name('forum.store');
-    Route::get('dien-dan/{post}/sua', [ForumController::class, 'edit'])->name('forum.edit');
-    Route::match(['put', 'patch'], 'dien-dan/{post}', [ForumController::class, 'update'])->name('forum.update');
-    Route::delete('dien-dan/{post}', [ForumController::class, 'destroy'])->name('forum.destroy');
-    Route::post('forum/{post}/comments', [ForumController::class, 'storeComment'])->name('forum.comment');
-    Route::post('forum/{post}/like', [ForumController::class, 'toggleLike'])->name('forum.like');
+        Route::post('dien-dan', [ForumController::class, 'store'])->name('forum.store');
+        Route::post('dien-dan/upload', [ForumUploadController::class, 'uploadImage'])->name('forum.upload');
+        Route::get('dien-dan/images', [ForumUploadController::class, 'listImages'])->name('forum.images');
+        Route::get('dien-dan/{post}/sua', [ForumController::class, 'edit'])->name('forum.edit');
+        Route::match(['put', 'patch'], 'dien-dan/{post}', [ForumController::class, 'update'])->name('forum.update');
+        Route::delete('dien-dan/{post}', [ForumController::class, 'destroy'])->name('forum.destroy');
+        Route::get('dien-dan/{post}/comments', [ForumController::class, 'getComments'])->name('forum.comments.get');
+        Route::post('forum/{post}/comments', [ForumController::class, 'storeComment'])->name('forum.comment');
+        Route::post('forum/{post}/like', [ForumController::class, 'toggleLike'])->name('forum.like');
 
-    // Addresses
+        // Addresses
         Route::get('dia-chi', [AddressController::class, 'index'])->name('addresses.index');
         Route::get('dia-chi/them-moi', [AddressController::class, 'create'])->name('addresses.create');
         Route::post('dia-chi', [AddressController::class, 'store'])->name('addresses.store');
@@ -115,12 +183,10 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
         // Payment
         Route::get('thanh-toan/{order}', [PaymentController::class, 'index'])->name('payment.index');
         Route::post('thanh-toan/{order}/process', [PaymentController::class, 'process'])->name('payment.process');
-        Route::get('thanh-toan/{order}/vnpay-callback', [PaymentController::class, 'vnpayCallback'])->name('payment.vnpay-callback');
-        Route::post('thanh-toan/{order}/vnpay-ipn', [PaymentController::class, 'vnpayIpn'])->name('payment.vnpay-ipn');
-        Route::get('thanh-toan/{order}/momo-callback', [PaymentController::class, 'momoCallback'])->name('payment.momo-callback');
-        Route::post('thanh-toan/{order}/momo-ipn', [PaymentController::class, 'momoIpn'])->name('payment.momo-ipn');
         Route::get('thanh-toan/{order}/chuyen-khoan', [PaymentController::class, 'banking'])->name('payment.banking');
         Route::post('thanh-toan/{order}/upload-proof', [PaymentController::class, 'uploadProof'])->name('payment.upload-proof');
+
+        // Affiliate
 
         // Affiliate
         Route::get('affiliate', [AffiliateController::class, 'index'])->name('affiliate.index');
@@ -148,8 +214,8 @@ Route::prefix('agriverse')->name('agriverse.shop.')->group(function () {
     });
 });
 
-    // API endpoints for cart/wishlist/checkout/order actions
-    // Cart add & wishlist toggle must be public for guest support; other ops require auth
+// API endpoints for cart/wishlist/checkout/order actions
+// Cart add & wishlist toggle must be public for guest support; other ops require auth
 Route::post('agriverse/api/cart/add', [CartController::class, 'add'])->name('agriverse.api.cart.add');
 Route::post('agriverse/api/wishlist/{product}/toggle', [WishlistController::class, 'toggle'])->name('agriverse.api.wishlist.toggle');
 
@@ -180,6 +246,7 @@ Route::middleware('auth')->prefix('agriverse/api')->name('agriverse.api.')->grou
     Route::get('chat/{conversation}/messages', [ChatController::class, 'messages'])->name('chat.messages');
     Route::post('chat/{conversation}/send', [ChatController::class, 'send'])->name('chat.send');
     Route::post('chat/start', [ChatController::class, 'start'])->name('chat.start');
+    Route::get('chat/pickable-products', [ChatController::class, 'pickableProducts'])->name('chat.pickable');
 
     // Group Chat
     Route::get('chat/groups', [ChatController::class, 'groups'])->name('chat.groups');
@@ -194,26 +261,34 @@ Route::middleware('auth')->prefix('agriverse/api')->name('agriverse.api.')->grou
     Route::post('chat/groups/{group}/reject-member/{user}', [ChatController::class, 'rejectMember'])->name('chat.groups.reject-member');
     Route::get('chat/search-users', [ChatController::class, 'searchUsers'])->name('chat.search-users');
 
-    // GHN address lookup & shipping fee
-    Route::get('ghn/provinces', [GHNAddressController::class, 'provinces'])->name('ghn.provinces');
-    Route::post('ghn/districts', [GHNAddressController::class, 'districts'])->name('ghn.districts');
-    Route::post('ghn/wards', [GHNAddressController::class, 'wards'])->name('ghn.wards');
-    Route::post('ghn/shipping-fee', [GHNAddressController::class, 'shippingFee'])->name('ghn.shipping-fee');
+    // Market: pickable products for offer (reuse authorizer for seller filtering)
+    Route::get('market/pickable-products', [MarketController::class, 'pickableProducts'])->name('market.pickable');
+
+    // Market: đơn hàng từ đề xuất giá (sau admin duyệt -> buyer xác nhận / 12h auto-hủy)
+    Route::post('offers/{offerId}/initialize-order', [OfferOrderController::class, 'initialize'])->name('offer.order.initialize');
+    Route::get('offers/{offerId}/order', [OfferOrderController::class, 'show'])->name('offer.order.show');
+    Route::post('orders/{order}/confirm-offer', [OfferOrderController::class, 'confirm'])->name('offer.order.confirm');
+    Route::post('orders/{order}/cancel-offer', [OfferOrderController::class, 'cancel'])->name('offer.order.cancel');
+
+    // GHTK address lookup & shipping fee (thay thế GHN)
+    Route::get('ghtk/provinces', [GHTKAddressController::class, 'provinces'])->name('ghtk.provinces');
+    Route::post('ghtk/districts', [GHTKAddressController::class, 'districts'])->name('ghtk.districts');
+    Route::post('ghtk/wards', [GHTKAddressController::class, 'wards'])->name('ghtk.wards');
+    Route::post('ghtk/shipping-fee', [GHTKAddressController::class, 'shippingFee'])->name('ghtk.shipping-fee');
 
     // Address API (JSON for async operations)
     Route::post('addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.api.set-default');
 
     // Settings
-    Route::post('settings/notifications', [\App\Modules\AgriVerse\Http\Controllers\Shop\PageController::class, 'saveNotificationPreferences'])->name('settings.notifications');
-    Route::post('settings/profile', [\App\Modules\AgriVerse\Http\Controllers\Shop\PageController::class, 'updateProfile'])->name('settings.profile');
-    Route::post('settings/password', [\App\Modules\AgriVerse\Http\Controllers\Shop\PageController::class, 'changePassword'])->name('settings.password');
-
-    // Plant Doctor (AI Diagnosis) - web session auth
-    Route::post('plant-doctor/diagnose', [\App\Modules\AgriVerse\Http\Controllers\Api\PlantDoctorController::class, 'diagnose'])->name('plant-doctor.diagnose');
-    Route::get('plant-doctor/history', [\App\Modules\AgriVerse\Http\Controllers\Api\PlantDoctorController::class, 'history'])->name('plant-doctor.history');
+    Route::post('settings/notifications', [PageController::class, 'saveNotificationPreferences'])->name('settings.notifications');
+    Route::post('settings/profile', [PageController::class, 'updateProfile'])->name('settings.profile');
+    Route::post('settings/password', [PageController::class, 'changePassword'])->name('settings.password');
 });
 
 // Contracts (shop view)
 Route::middleware('auth')->prefix('agriverse')->name('agriverse.shop.')->group(function () {
-    Route::get('hop-dong/{contract}', [\App\Modules\AgriVerse\Http\Controllers\Shop\ContractController::class, 'show'])->name('contracts.show');
+    Route::get('hop-dong/{contract}', [ContractController::class, 'show'])->name('contracts.show');
 });
+
+// Catch-all for unmatched agriverse routes (must be last)
+Route::match(['get', 'post'], 'agriverse/{any}', [PageController::class, 'notFound'])->where('any', '.*');

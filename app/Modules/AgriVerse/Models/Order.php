@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,12 +13,13 @@ class Order extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'uuid', 'product_id', 'buyer_id', 'seller_id', 'store_id',
+        'uuid', 'offer_id', 'product_id', 'buyer_id', 'seller_id', 'store_id',
         'coupon_id', 'quantity', 'unit_price', 'total_price',
         'discount_amount', 'total_amount',
         'commission_fee', 'status', 'shipping_address',
         'shipping_method', 'shipping_fee', 'tracking_number', 'tracking_url',
         'estimated_delivery', 'delivered_at',
+        'confirm_deadline', 'confirmed_at',
         'notes', 'cancel_reason', 'cancelled_at', 'metadata',
     ];
 
@@ -28,13 +30,15 @@ class Order extends Model
             'unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
             'discount_amount' => 'decimal:2',
-        'commission_fee' => 'decimal:2',
-        'total_amount' => 'decimal:2',
-        'shipping_fee' => 'decimal:2',
-        'estimated_delivery' => 'date',
-        'delivered_at' => 'datetime',
-        'cancelled_at' => 'datetime',
-        'metadata' => 'array',
+            'commission_fee' => 'decimal:2',
+            'total_amount' => 'decimal:2',
+            'shipping_fee' => 'decimal:2',
+            'estimated_delivery' => 'date',
+            'delivered_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+            'confirm_deadline' => 'datetime',
+            'confirmed_at' => 'datetime',
+            'metadata' => 'array',
         ];
     }
 
@@ -59,12 +63,12 @@ class Order extends Model
 
     public function buyer()
     {
-        return $this->belongsTo(\App\Models\User::class, 'buyer_id');
+        return $this->belongsTo(User::class, 'buyer_id');
     }
 
     public function seller()
     {
-        return $this->belongsTo(\App\Models\User::class, 'seller_id');
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
     public function store()

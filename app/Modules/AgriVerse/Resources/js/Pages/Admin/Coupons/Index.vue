@@ -14,7 +14,7 @@
             <td class="p-3 text-stone-500">{{ c.type === 'percent' ? '%' : 'VNĐ' }}</td>
             <td class="p-3 text-stone-700">{{ c.type === 'percent' ? c.value+'%' : formatPrice(c.value)+'₫' }}</td>
             <td class="p-3 text-stone-500">{{ c.expires_at || '—' }}</td>
-            <td class="p-3"><span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="c.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-stone-100 text-stone-500'">{{ c.is_active ? 'Hoạt động' : 'Tắt' }}</span></td>
+            <td class="p-3"><span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="c.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-stone-100 text-stone-600'">{{ c.is_active ? 'Hoạt động' : 'Tắt' }}</span></td>
             <td class="p-3 text-right"><Link :href="route('admin.agriverse.coupons.edit', c.id)" class="text-emerald-600 hover:text-emerald-800 mr-2">Sửa</Link><button @click="destroy(c.id)" class="text-red-500 hover:text-red-700">Xóa</button></td>
           </tr>
         </tbody>

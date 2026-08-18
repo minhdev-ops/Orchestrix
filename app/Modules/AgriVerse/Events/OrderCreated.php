@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Events;
 
+use App\Modules\AgriVerse\Models\Order;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
-use App\Modules\AgriVerse\Models\Order;
 
 class OrderCreated
 {

@@ -19,7 +19,7 @@
           <h2 class="support__bento-title">Tư Vấn Chuyên Gia</h2>
           <p class="support__bento-desc">Đặt lịch chẩn đoán ảo 1-1 với các nhà thực vật học kỳ cựu. Lý tưởng cho việc thích nghi mẫu vật quý hiếm hoặc tối ưu hóa môi trường phức tạp.</p>
           <div class="support__bento-actions">
-            <button class="support__btn support__btn--primary">Đặt Lịch Gọi</button>
+            <button class="support__btn support__btn--primary" @click="openBooking">Đặt Lịch Gọi</button>
             <span class="support__bento-availability">Có sẵn tiếp theo: Hôm nay, 2:00 CH</span>
           </div>
         </div>
@@ -116,8 +116,7 @@
         <div class="support__concierge-tooltip" :class="{ 'support__concierge-tooltip--visible': showTooltip }">Trợ Lý AI Thực Vật</div>
       </div>
 
-      <div class="support__chat" :class="{ 'support__chat--open': chatOpen }">
-        <div class="support__chat-header">
+      <div class="support__chat" :class="{ 'support__chat--open': chatOpen }">        <div class="support__chat-header">
           <div class="support__chat-header-info">
             <span class="material-symbols-outlined">auto_awesome</span>
             <span class="support__chat-header-title">Trợ Lý AI AgriVerse</span>
@@ -138,6 +137,87 @@
           </button>
         </div>
       </div>
+
+      <!-- Booking modal -->
+      <Transition name="support-modal">
+        <div v-if="bookingOpen" class="support-modal-overlay" @click.self="closeBooking">
+          <div class="support-modal">
+            <div class="support-modal-header">
+              <div>
+                <h3 class="support-modal-title">Đặt Lịch Tư Vấn Chuyên Gia</h3>
+                <p class="support-modal-sub">Chuyên gia AgriVerse sẽ liên hệ lại để xác nhận lịch.</p>
+              </div>
+              <button type="button" class="support-modal-close" @click="closeBooking">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div v-if="bookingDone" class="support-modal-done">
+              <span class="material-symbols-outlined support-modal-done-icon">check_circle</span>
+              <h4 class="support-modal-done-title">Đặt lịch thành công!</h4>
+              <p class="support-modal-done-desc">
+                Mã tham chiếu: <strong>{{ bookingReference }}</strong>.
+                Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.
+              </p>
+              <button type="button" class="support__btn support__btn--primary" @click="closeBooking">Đóng</button>
+            </div>
+
+            <form v-else class="support-modal-form" @submit.prevent="submitBooking">
+              <div class="support__form-group">
+                <label class="support__form-label">Họ tên *</label>
+                <input type="text" class="support__form-input" v-model="booking.name" placeholder="Nguyễn Văn A" required />
+              </div>
+              <div class="support-modal-row">
+                <div class="support__form-group">
+                  <label class="support__form-label">Email *</label>
+                  <input type="email" class="support__form-input" v-model="booking.email" placeholder="you@example.com" required />
+                </div>
+                <div class="support__form-group">
+                  <label class="support__form-label">Số điện thoại</label>
+                  <input type="tel" class="support__form-input" v-model="booking.phone" placeholder="0987654321" />
+                </div>
+              </div>
+              <div class="support__form-group">
+                <label class="support__form-label">Chủ đề tư vấn</label>
+                <select class="support__form-input support__form-select" v-model="booking.topic">
+                  <option value="">Chọn chủ đề</option>
+                  <option>Chăm sóc cây cảnh định kỳ</option>
+                  <option>Chẩn đoán bệnh & sâu hại</option>
+                  <option>Tư vấn phong thủy cây cảnh</option>
+                  <option>Tạo dáng & thế bonsai</option>
+                  <option>Thích nghi cây mới mua</option>
+                  <option>Khác</option>
+                </select>
+              </div>
+              <div class="support-modal-row">
+                <div class="support__form-group">
+                  <label class="support__form-label">Ngày mong muốn</label>
+                  <input type="date" class="support__form-input" v-model="booking.preferred_date" :min="minDate" />
+                </div>
+                <div class="support__form-group">
+                  <label class="support__form-label">Giờ mong muốn</label>
+                  <select class="support__form-input support__form-select" v-model="booking.preferred_time">
+                    <option value="">Chọn giờ</option>
+                    <option>08:00 – 10:00</option>
+                    <option>10:00 – 12:00</option>
+                    <option>13:30 – 15:30</option>
+                    <option>15:30 – 17:30</option>
+                  </select>
+                </div>
+              </div>
+              <div class="support__form-group">
+                <label class="support__form-label">Mô tả vấn đề</label>
+                <textarea class="support__form-textarea" rows="3" v-model="booking.message" placeholder="Mô tả tình trạng cây, môi trường sống, các triệu chứng..."></textarea>
+              </div>
+              <p v-if="bookingError" class="support-modal-error">{{ bookingError }}</p>
+              <button type="submit" class="support__btn support__btn--primary support__btn--block" :disabled="bookingSubmitting">
+                <span v-if="bookingSubmitting" class="support-modal-spinner"></span>
+                {{ bookingSubmitting ? 'Đang gửi...' : 'Xác nhận đặt lịch' }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </Transition>
     </main>
   </MarketplaceLayout>
 </template>
@@ -165,6 +245,54 @@ const form = ref({
   subject: 'Yêu Cầu Đặt Hàng',
   message: ''
 })
+
+const bookingOpen = ref(false)
+const bookingDone = ref(false)
+const bookingSubmitting = ref(false)
+const bookingError = ref('')
+const bookingReference = ref('')
+const booking = ref({
+  name: '',
+  email: '',
+  phone: '',
+  topic: '',
+  preferred_date: '',
+  preferred_time: '',
+  message: '',
+})
+
+const minDate = new Date().toISOString().split('T')[0]
+
+function openBooking() {
+  bookingDone.value = false
+  bookingError.value = ''
+  bookingOpen.value = true
+}
+
+function closeBooking() {
+  if (bookingSubmitting.value) return
+  bookingOpen.value = false
+}
+
+async function submitBooking() {
+  if (bookingSubmitting.value) return
+  bookingSubmitting.value = true
+  bookingError.value = ''
+  try {
+    const { data } = await window.axios.post(route('agriverse.shop.support.booking'), booking.value)
+    if (data?.success) {
+      bookingReference.value = data.reference || ''
+      bookingDone.value = true
+      booking.value = { name: '', email: '', phone: '', topic: '', preferred_date: '', preferred_time: '', message: '' }
+    } else {
+      bookingError.value = data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại.'
+    }
+  } catch (e) {
+    bookingError.value = e?.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại.'
+  } finally {
+    bookingSubmitting.value = false
+  }
+}
 
 const chatMessages = ref([
   { text: 'Xin chào. Tôi là Trợ lý AI AgriVerse, được đào tạo trên cơ sở dữ liệu làm vườn độc quyền của chúng tôi. Tôi có thể giúp gì cho bộ sưu tập của bạn hôm nay?', isBot: true },
@@ -901,4 +1029,104 @@ function onSearchBlur() {
   color: var(--ag-primary);
   cursor: pointer;
 }
+
+.support-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(28, 28, 28, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.support-modal {
+  background: #fff;
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px -12px rgba(0,0,0,0.3);
+  padding: 32px;
+}
+.support-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.support-modal-title {
+  font-family: var(--ag-font-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 32px;
+  margin: 0 0 4px;
+  color: var(--ag-on-surface);
+}
+.support-modal-sub {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ag-on-surface-variant);
+  margin: 0;
+}
+.support-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ag-outline);
+  padding: 4px;
+  transition: color 0.2s;
+}
+.support-modal-close:hover { color: var(--ag-on-surface); }
+.support-modal-form { display: flex; flex-direction: column; gap: 20px; }
+.support-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 520px) { .support-modal-row { grid-template-columns: 1fr; } }
+.support-modal-error {
+  font-size: 13px;
+  color: var(--ag-error, #b3261e);
+  margin: 0;
+}
+.support-modal-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: support-spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+@keyframes support-spin { to { transform: rotate(360deg); } }
+.support-modal-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 24px 0;
+}
+.support-modal-done-icon {
+  font-size: 56px;
+  color: var(--ag-primary);
+}
+.support-modal-done-title {
+  font-family: var(--ag-font-display);
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+}
+.support-modal-done-desc {
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--ag-on-surface-variant);
+  margin: 0 0 8px;
+}
+.support-modal-enter-active, .support-modal-leave-active { transition: opacity 0.25s ease; }
+.support-modal-enter-from, .support-modal-leave-to { opacity: 0; }
+.support-modal-enter-active .support-modal, .support-modal-leave-active .support-modal { transition: transform 0.25s ease; }
+.support-modal-enter-from .support-modal, .support-modal-leave-to .support-modal { transform: translateY(16px) scale(0.98); }
 </style>

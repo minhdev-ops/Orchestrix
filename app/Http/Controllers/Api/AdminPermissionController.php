@@ -4,27 +4,29 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AdminPermissionController extends Controller
 {
     public function roles(): AnonymousResourceCollection
     {
         $roles = Role::with('permissions')->get();
+
         return JsonResource::collection($roles);
     }
 
-    public function permissions(): AnonymousResourceCollection
+    public function permissions(): JsonResponse
     {
-        $permissions = Permission::all()->groupBy(function ($p) {
-            return explode('.', $p->name)[0] ?? 'other';
+        $permissions = Permission::all()->groupBy(function ($perm) {
+            return explode('.', $perm->name)[0] ?? 'general';
         });
 
-        return JsonResource::collection($permissions);
+        return response()->json($permissions->map->values());
     }
 
     public function assignRoleToUser(Request $request): JsonResource
@@ -39,7 +41,7 @@ class AdminPermissionController extends Controller
         $guard = $data['guard'] ?? 'web';
         $role = Role::where('name', $data['role'])->where('guard_name', $guard)->first();
 
-        if (!$role) {
+        if (! $role) {
             $role = Role::findOrCreate($data['role'], $guard);
         }
 
@@ -104,7 +106,7 @@ class AdminPermissionController extends Controller
         }
 
         return JsonResource::make([
-            'message' => 'Permissions updated for role: ' . $data['role'],
+            'message' => 'Permissions updated for role: '.$data['role'],
             'role' => $role->name,
             'permissions' => $role->permissions->pluck('name'),
         ]);

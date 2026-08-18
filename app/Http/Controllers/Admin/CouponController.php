@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @deprecated Use App\Modules\AgriVerse\Http\Controllers\Admin\CouponController instead.
+ * This controller uses Blade views; the module version uses Inertia SPA.
+ * Kept for backward compatibility. Will be removed in next major version.
+ */
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -11,6 +17,7 @@ class CouponController extends Controller
     public function index()
     {
         $coupons = Coupon::latest()->paginate(20);
+
         return view('admin.coupons.index', compact('coupons'));
     }
 
@@ -48,7 +55,7 @@ class CouponController extends Controller
     public function update(Request $request, Coupon $coupon)
     {
         $data = $request->validate([
-            'code' => 'required|string|max:50|unique:coupons,code,' . $coupon->id,
+            'code' => 'required|string|max:50|unique:coupons,code,'.$coupon->id,
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => 'required|in:fixed,percent',
@@ -69,6 +76,7 @@ class CouponController extends Controller
     public function destroy(Coupon $coupon)
     {
         $coupon->delete();
+
         return redirect()->route('admin.coupons.index')->with('success', 'Mã giảm giá đã được xóa.');
     }
 }

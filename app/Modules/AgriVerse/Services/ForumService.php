@@ -2,13 +2,13 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use Proto\ChatMessage;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
+use Predis\Client;
 
 class ForumService
 {
-    private function redis(): \Predis\Client
+    private function redis(): Client
     {
         return Redis::connection('jakartaee')->client();
     }
@@ -26,7 +26,7 @@ class ForumService
             ]);
             Redis::connection('jakartaee')->publish("forum:post:{$postId}", $payload);
         } catch (\Throwable $e) {
-            Log::warning('Forum publish comment failed: ' . $e->getMessage());
+            Log::warning('Forum publish comment failed: '.$e->getMessage());
         }
     }
 
@@ -43,7 +43,7 @@ class ForumService
             ]);
             Redis::connection('jakartaee')->publish("forum:post:{$postId}", $payload);
         } catch (\Throwable $e) {
-            Log::warning('Forum publish like failed: ' . $e->getMessage());
+            Log::warning('Forum publish like failed: '.$e->getMessage());
         }
     }
 }

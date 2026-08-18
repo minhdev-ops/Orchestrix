@@ -11,6 +11,8 @@ class ChatConversation extends Model
 
     protected $casts = [
         'last_message_at' => 'datetime',
+        'buyer_unread' => 'integer',
+        'seller_unread' => 'integer',
     ];
 
     public function buyer()

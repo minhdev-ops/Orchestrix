@@ -2,15 +2,16 @@
 
 namespace App\Modules\AgriVerse\Console;
 
-use Illuminate\Console\Command;
-use App\Modules\AgriVerse\Models\Province;
 use App\Modules\AgriVerse\Models\District;
+use App\Modules\AgriVerse\Models\Province;
 use App\Modules\AgriVerse\Models\Ward;
 use App\Modules\AgriVerse\Services\GHNService;
+use Illuminate\Console\Command;
 
 class FetchGHNAddresses extends Command
 {
     protected $signature = 'agriverse:sync-ghn-addresses';
+
     protected $description = 'Fetch provinces, districts, wards from GHN API and cache in local DB';
 
     public function handle(GHNService $ghn): int

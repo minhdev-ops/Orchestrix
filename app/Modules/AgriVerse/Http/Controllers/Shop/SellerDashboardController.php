@@ -2,11 +2,10 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\Store;
-use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Order;
-use Illuminate\Support\Facades\DB;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\Store;
+use Inertia\Inertia;
 
 class SellerDashboardController
 {
@@ -37,7 +36,7 @@ class SellerDashboardController
             ->get();
 
         $topProducts = Product::where('store_id', $store->id)
-            ->withCount(['orders as sold_count' => fn($q) => $q->whereIn('status', ['completed', 'delivered'])])
+            ->withCount(['orders as sold_count' => fn ($q) => $q->whereIn('status', ['completed', 'delivered'])])
             ->orderByDesc('sold_count')
             ->take(5)
             ->get();

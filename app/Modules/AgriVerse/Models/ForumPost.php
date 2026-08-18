@@ -10,7 +10,13 @@ class ForumPost extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['category_id', 'user_id', 'title', 'content', 'status', 'is_pinned', 'reject_reason'];
+    protected $fillable = ['category_id', 'user_id', 'title', 'content', 'images', 'status', 'is_pinned', 'reject_reason'];
+
+    protected $casts = [
+        'is_pinned' => 'boolean',
+        'status' => 'string',
+        'images' => 'array',
+    ];
 
     public function category()
     {

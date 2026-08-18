@@ -70,21 +70,6 @@
               </div>
               <div class="h-px" style="background-color: var(--ag-border);" />
               <div class="py-1">
-                <Link :href="route('agriverse.shop.profile.index')"
-                  class="flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200 admin-dropdown-item"
-                  @click="adminUserMenuOpen = false">
-                  <span class="material-symbols-outlined text-lg" style="color: var(--ag-text-muted);">person</span>
-                  Hồ sơ
-                </Link>
-                <Link :href="route('agriverse.shop.account.settings')"
-                  class="flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200 admin-dropdown-item"
-                  @click="adminUserMenuOpen = false">
-                  <span class="material-symbols-outlined text-lg" style="color: var(--ag-text-muted);">settings</span>
-                  Cài đặt
-                </Link>
-              </div>
-              <div class="h-px" style="background-color: var(--ag-border);" />
-              <div class="py-1">
                 <button @click="handleAdminLogout"
                   class="flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200 w-full text-left admin-dropdown-logout">
                   <span class="material-symbols-outlined text-lg">logout</span>

@@ -3,39 +3,42 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Modules\AgriVerse\Database\Seeders\ForumCategorySeeder;
+use App\Modules\AgriVerse\Models\Category;
 use App\Modules\AgriVerse\Models\Store;
 use App\Modules\AgriVerse\Models\SubscriptionPlan;
 use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Category;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
-
     public function run(): void
     {
         $this->call([
             RoleAndPermissionSeeder::class,
-            \App\Modules\AgriVerse\Database\Seeders\ForumCategorySeeder::class,
-            ExpenseSeeder::class,
+            ForumCategorySeeder::class,
         ]);
 
+        // --- Core Users ---
         $admin = User::firstOrCreate(
             ['email' => 'admin@orchestrix.com'],
             ['name' => 'Admin', 'password' => bcrypt('12345678'), 'role' => User::ROLE_ADMIN]
         );
-        if (!$admin->hasRole(User::ROLE_ADMIN)) {
+        if (! $admin->hasRole(User::ROLE_ADMIN)) {
             $admin->assignRole(User::ROLE_ADMIN);
-            $admin->assignRole(\Spatie\Permission\Models\Role::where('name', User::ROLE_ADMIN)->where('guard_name', 'api')->first());
+            $admin->assignRole(Role::where('name', User::ROLE_ADMIN)->where('guard_name', 'api')->first());
         }
 
+        // Seller user + store for product seeding
         $seller = User::firstOrCreate(
             ['email' => 'seller@orchestrix.com'],
-            ['name' => 'Seller', 'password' => bcrypt('12345678'), 'role' => User::ROLE_SELLER]
+            ['name' => 'Seller', 'password' => bcrypt('12345678'), 'role' => User::ROLE_SELLER, 'is_active' => 1]
         );
-        if (!$seller->hasRole(User::ROLE_SELLER)) {
+        if (! $seller->hasRole(User::ROLE_SELLER)) {
             $seller->assignRole(User::ROLE_SELLER);
-            $seller->assignRole(\Spatie\Permission\Models\Role::where('name', User::ROLE_SELLER)->where('guard_name', 'api')->first());
+            $seller->assignRole(Role::where('name', User::ROLE_SELLER)->where('guard_name', 'api')->first());
         }
 
         $employee = User::firstOrCreate(
@@ -58,15 +61,15 @@ class DatabaseSeeder extends Seeder
 
         $store = Store::firstOrCreate(
             ['owner_id' => $seller->id],
-            ['name' => 'Vườn bonsai Việt', 'description' => 'Cung cấp cây cảnh bonsai chất lượng cao, nhập khẩu và tạo tác bởi nghệ nhân Việt.', 'status' => 'active']
+            ['name' => 'Vườn Bonsai Empire', 'description' => 'Cửa hàng cây cảnh chất lượng cao - nguồn dữ liệu từ BonsaiEmpire.vn và các web cây cảnh Việt Nam.', 'status' => 'active']
         );
 
+        // --- Subscription Plans ---
         $plans = [
             ['name' => 'Cơ bản', 'limit_3d_models' => 10, 'price_per_month' => 29.99, 'features' => ['products_limit' => 10, 'assets_limit' => 50, 'storage_gb' => 5]],
             ['name' => 'Chuyên nghiệp', 'limit_3d_models' => 100, 'price_per_month' => 99.99, 'features' => ['products_limit' => 100, 'assets_limit' => 500, 'storage_gb' => 50]],
             ['name' => 'Cao cấp', 'limit_3d_models' => 500, 'price_per_month' => 299.99, 'features' => ['products_limit' => -1, 'assets_limit' => -1, 'storage_gb' => 500]],
         ];
-
         foreach ($plans as $plan) {
             SubscriptionPlan::firstOrCreate(['name' => $plan['name']], $plan);
         }
@@ -189,7 +192,6 @@ class DatabaseSeeder extends Seeder
             SustainabilityReportSeeder::class,
         ]);
 
-        // Seed journal articles & specimens (only if empty)
         if (\App\Modules\AgriVerse\Models\JournalArticle::count() === 0) {
             $this->call(JournalArticleSeeder::class);
         }
@@ -197,7 +199,7 @@ class DatabaseSeeder extends Seeder
             $this->call(SpecimenSeeder::class);
         }
 
-        // Seed categories (idempotent)
+        // --- Categories ---
         if (Category::count() === 0) {
             $categories = [
                 ['name' => 'Bonsai cổ thụ', 'slug' => 'bonsai-co-thu', 'icon' => 'forest', 'sort_order' => 1],
@@ -211,6 +213,52 @@ class DatabaseSeeder extends Seeder
             ];
             foreach ($categories as $cat) {
                 Category::create($cat);
+            }
+        }
+
+        Category::whereNull('is_active')->orWhere('is_active', false)->update(['is_active' => true]);
+
+        // --- Import dữ liệu thật từ BonsaiEmpire ---
+        $this->command->info('');
+        $this->command->info('🌿 Import dữ liệu từ BonsaiEmpire.vn...');
+
+        // Copy CSV files to seeder data directory
+        $this->prepareCsvFiles();
+
+        $this->call([
+            TreeSpeciesSeeder::class,
+            CareGuideSeeder::class,
+            BonsaiStyleSeeder::class,
+            VietnamesePlantSeeder::class,
+            ProductSeeder::class,
+        ]);
+
+        $this->command->info('✅ Hoàn tất import dữ liệu BonsaiEmpire!');
+    }
+
+    /**
+     * Copy CSV files from docs/ to database/seeders/data/
+     */
+    private function prepareCsvFiles(): void
+    {
+        $dataDir = database_path('seeders/data');
+        if (! is_dir($dataDir)) {
+            mkdir($dataDir, 0755, true);
+        }
+
+        $files = [
+            'docs/bonsaiempire_tree_species.csv' => 'tree_species.csv',
+            'docs/bonsaiempire_care_guides.csv' => 'care_guides.csv',
+            'docs/bonsaiempire_blog_styles.csv' => 'blog_styles.csv',
+            'docs/vietnamese_plants_comprehensive.csv' => 'vietnamese_plants.csv',
+        ];
+
+        foreach ($files as $source => $dest) {
+            $sourcePath = base_path($source);
+            $destPath = $dataDir.'/'.$dest;
+            if (file_exists($sourcePath) && ! file_exists($destPath)) {
+                copy($sourcePath, $destPath);
+                $this->command->info("  📄 Copied $source → database/seeders/data/$dest");
             }
         }
     }

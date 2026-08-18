@@ -43,7 +43,7 @@
             <select v-model="selectedProvince" @change="onProvinceChange"
               class="w-full h-11 px-4 rounded-xl border-2 border-[var(--ag-border)] text-sm outline-none focus:border-[var(--ag-primary-500)]/40 focus:ring-4 focus:ring-[var(--ag-primary-500)]/8 transition-all appearance-none bg-white">
               <option value="">Chọn tỉnh</option>
-              <option v-for="p in provinces" :key="p.province_id" :value="p.province_id">{{ p.province_name }}</option>
+              <option v-for="p in allProvinces" :key="p.province_id" :value="p.province_id">{{ p.province_name }}</option>
             </select>
           </div>
           <div>
@@ -97,13 +97,13 @@ import { Link, router } from '@inertiajs/vue3';
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue';
 import webApi from '@agriverse/services/webApi';
 
-const props = defineProps({ address: Object });
+const props = defineProps({ address: Object, provinces: { type: Array, default: () => [] } });
 const isEdit = computed(() => !!props.address);
 
 const labels = ['Nhà', 'Văn phòng', 'Người thân', 'Kho'];
 const loading = ref(false);
 
-const provinces = ref([]);
+const allProvinces = ref([]);
 const districts = ref([]);
 const wards = ref([]);
 const selectedProvince = ref('');
@@ -143,7 +143,7 @@ onMounted(async () => {
     form.ward_code = props.address.ward_code;
     form.ghn_ward_code = props.address.ghn_ward_code;
   }
-  await loadProvinces();
+  allProvinces.value = props.provinces;
   // Restore selections for edit
   if (isEdit.value && form.province_id) {
     selectedProvince.value = String(form.province_id);
@@ -158,19 +158,10 @@ onMounted(async () => {
   }
 });
 
-async function loadProvinces() {
-  try {
-    const { data } = await webApi.get('/agriverse/api/ghn/provinces');
-    provinces.value = data.data || [];
-  } catch {
-    provinces.value = [];
-  }
-}
-
 async function loadDistricts() {
   if (!selectedProvince.value) { districts.value = []; return; }
   try {
-    const { data } = await webApi.post('/agriverse/api/ghn/districts', { province_id: selectedProvince.value });
+    const { data } = await webApi.post('/agriverse/api/ghtk/districts', { province_id: selectedProvince.value });
     districts.value = data.data || [];
   } catch { districts.value = []; }
 }
@@ -178,7 +169,7 @@ async function loadDistricts() {
 async function loadWards() {
   if (!selectedDistrict.value) { wards.value = []; return; }
   try {
-    const { data } = await webApi.post('/agriverse/api/ghn/wards', { district_id: selectedDistrict.value });
+    const { data } = await webApi.post('/agriverse/api/ghtk/wards', { district_id: selectedDistrict.value });
     wards.value = data.data || [];
   } catch { wards.value = []; }
 }
@@ -188,7 +179,7 @@ async function onProvinceChange() {
   selectedWard.value = '';
   districts.value = [];
   wards.value = [];
-  const p = provinces.value.find(x => Number(x.province_id) === Number(selectedProvince.value));
+  const p = allProvinces.value.find(x => Number(x.province_id) === Number(selectedProvince.value));
   form.province = p?.province_name || '';
   form.province_id = p?.province_id || null;
   if (selectedProvince.value) await loadDistricts();

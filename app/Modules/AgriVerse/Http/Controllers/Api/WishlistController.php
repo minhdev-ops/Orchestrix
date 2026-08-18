@@ -2,8 +2,8 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\Wishlist;
 use App\Modules\AgriVerse\Http\Resources\WishlistResource;
+use App\Modules\AgriVerse\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,7 +15,7 @@ class WishlistController
         $items = Wishlist::with('product.store')
             ->where('user_id', $request->user()->id)
             ->latest()
-            ->get();
+            ->paginate(20);
 
         return WishlistResource::collection($items);
     }

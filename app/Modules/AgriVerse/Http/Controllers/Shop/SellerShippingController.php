@@ -2,11 +2,12 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\OrderStatus;
-use App\Modules\AgriVerse\Services\GHNService;
+use App\Modules\AgriVerse\Services\GHTKService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class SellerShippingController
 {
@@ -23,24 +24,12 @@ class SellerShippingController
         $services = [];
         $toDistrictId = null;
 
-        // Try to get district from address metadata or parse address
-        $metadata = $order->metadata ?? [];
-        if (isset($metadata['to_district_id'])) {
-            $toDistrictId = (int) $metadata['to_district_id'];
-        }
-
-        if ($toDistrictId) {
-            try {
-                $services = app(GHNService::class)->getServices($toDistrictId);
-            } catch (\Exception) {
-                $services = [];
-            }
-        }
+        $services = app(GHTKService::class)->getServices();
 
         return Inertia::render('Marketplace/Seller/Orders/Shipping', [
             'order' => $order,
             'services' => $services,
-            'toDistrictId' => $toDistrictId,
+            'toDistrictId' => null,
         ]);
     }
 
@@ -62,51 +51,67 @@ class SellerShippingController
             'height' => 'nullable|numeric|min:1',
         ]);
 
-        $metadata = $order->metadata ?? [];
-        $toDistrictId = $metadata['to_district_id'] ?? null;
-        $toWardCode = $metadata['to_ward_code'] ?? '';
+        $pickProvince = 'Hồ Chí Minh';
+        $pickDistrict = 'Quận 1';
 
-        if (!$toDistrictId || !$toWardCode) {
-            return back()->with('error', 'Thiếu thông tin địa chỉ giao hàng để tạo vận đơn GHN.');
-        }
+        // Parse địa chỉ giao hàng để lấy tên tỉnh/quận
+        $addressParts = explode(', ', $order->shipping_address ?? '');
+        $deliverProvince = end($addressParts);
+        $deliverDistrict = count($addressParts) > 1 ? $addressParts[count($addressParts) - 2] : 'Quận 1';
 
         $params = [
-            'service_id' => (int) $data['service_id'],
-            'to_district_id' => (int) $toDistrictId,
-            'to_ward_code' => (string) $toWardCode,
-            'weight' => (int) $data['weight'],
-            'length' => isset($data['length']) ? (int) $data['length'] : 10,
-            'width' => isset($data['width']) ? (int) $data['width'] : 10,
-            'height' => isset($data['height']) ? (int) $data['height'] : 10,
-            'insurance_value' => (int) $order->total_amount,
-            'cod_amount' => 0,
+            'order_id' => 'ORD_'.$order->id.'_'.time(),
+            'pick_name' => auth()->user()->name ?? 'Người bán',
+            'pick_address' => 'Địa chỉ lấy hàng',
+            'pick_province' => $pickProvince,
+            'pick_district' => $pickDistrict,
+            'pick_tel' => auth()->user()->phone ?? '',
+            'name' => $order->buyer->name ?? '',
+            'address' => $order->shipping_address ?? '',
+            'province' => $deliverProvince,
+            'district' => $deliverDistrict,
+            'tel' => $order->buyer->phone ?? '',
             'note' => $order->notes ?? '',
+            'value' => (int) $order->total_amount,
+            'cod_amount' => 0,
+            'transport' => 'road',
+            'products' => [
+                [
+                    'name' => $order->product->name ?? 'Sản phẩm',
+                    'weight' => (float) $data['weight'],
+                    'quantity' => (int) $order->quantity,
+                    'product_code' => (string) $order->product_id,
+                ],
+            ],
         ];
 
         try {
-            $result = app(GHNService::class)->createOrder($params);
+            $result = app(GHTKService::class)->createOrder($params);
 
-            if (isset($result['order_code'])) {
+            if (isset($result['order_code']) && ! empty($result['order_code'])) {
                 $order->update([
                     'tracking_number' => $result['order_code'],
-                    'tracking_url' => $result['tracking_url'] ?? null,
+                    'tracking_url' => null,
                     'status' => 'shipping',
                 ]);
 
                 OrderStatus::create([
                     'order_id' => $order->id,
                     'status' => 'shipping',
-                    'note' => 'Đã tạo vận đơn GHN: ' . $result['order_code'],
+                    'note' => 'Đã tạo vận đơn GHTK: '.$result['order_code'].' - Nhãn: '.($result['label'] ?? ''),
                     'user_id' => auth()->id(),
                 ]);
 
                 return redirect()->route('agriverse.shop.seller.orders.show', $order->id)
-                    ->with('success', 'Đã tạo vận đơn thành công.');
+                    ->with('success', 'Đã tạo vận đơn GHTK thành công.');
             }
 
-            return back()->with('error', 'Không thể tạo vận đơn GHN. Vui lòng thử lại.');
+            $errorMsg = $result['error'] ?? 'Không thể tạo vận đơn GHTK. Vui lòng thử lại.';
+
+            return back()->with('error', $errorMsg);
         } catch (\Exception $e) {
-            return back()->with('error', 'Lỗi GHN: ' . $e->getMessage());
+            Log::error('GHTK error: '.$e->getMessage());
+            return back()->withErrors(['error' => 'Đã xảy ra lỗi khi tính phí vận chuyển.']);
         }
     }
 }

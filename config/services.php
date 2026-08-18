@@ -46,9 +46,16 @@ return [
         'base_url' => env('GHN_BASE_URL', 'https://dev-online-gateway.ghn.vn/api/v2'),
     ],
 
+    'ghtk' => [
+        'token' => env('GHTK_TOKEN'),
+        'client_source' => env('GHTK_CLIENT_SOURCE'),
+        'base_url' => env('GHTK_BASE_URL', 'https://services.giaohangtietkiem.vn'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL', '/auth/google/callback'),
     ],
 
     'facebook' => [
@@ -90,5 +97,15 @@ return [
     'firebase' => [
         'project_id' => env('FIREBASE_PROJECT_ID'),
         'credentials' => env('FIREBASE_CREDENTIALS', ''),
+    ],
+
+    'mailchimp_api_key' => env('MAILCHIMP_API_KEY', ''),
+    'mailchimp_list_id' => env('MAILCHIMP_LIST_ID', ''),
+
+    'pusher' => [
+        'app_id' => env('PUSHER_APP_ID', ''),
+        'app_key' => env('PUSHER_APP_KEY', ''),
+        'app_secret' => env('PUSHER_APP_SECRET', ''),
+        'app_cluster' => env('PUSHER_APP_CLUSTER', ''),
     ],
 ];

@@ -12,12 +12,12 @@ class OrderResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'product' => new ProductResource($this->whenLoaded('product')),
-            'buyer' => $this->whenLoaded('buyer', fn() => [
+            'buyer' => $this->whenLoaded('buyer', fn () => [
                 'id' => $this->buyer->id,
                 'name' => $this->buyer->name,
                 'email' => $this->buyer->email,
             ]),
-            'seller' => $this->whenLoaded('seller', fn() => [
+            'seller' => $this->whenLoaded('seller', fn () => [
                 'id' => $this->seller->id,
                 'name' => $this->seller->name,
                 'email' => $this->seller->email,
@@ -34,7 +34,7 @@ class OrderResource extends JsonResource
             'notes' => $this->notes,
             'contract' => new ContractResource($this->whenLoaded('contract')),
             'transaction' => new TransactionResource($this->whenLoaded('transaction')),
-            'statuses' => $this->whenLoaded('statuses', fn() => $this->statuses->map(fn($s) => [
+            'statuses' => $this->whenLoaded('statuses', fn () => $this->statuses->map(fn ($s) => [
                 'status' => $s->status,
                 'note' => $s->note,
                 'created_at' => $s->created_at,

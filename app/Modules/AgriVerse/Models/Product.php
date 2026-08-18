@@ -2,6 +2,7 @@
 
 namespace App\Modules\AgriVerse\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,7 +42,7 @@ class Product extends Model
                 $product->uuid = (string) Str::uuid();
             }
             if (empty($product->slug)) {
-                $product->slug = Str::slug($product->name) . '-' . Str::random(6);
+                $product->slug = Str::slug($product->name).'-'.Str::random(6);
             }
         });
     }
@@ -53,7 +54,7 @@ class Product extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function store()
@@ -69,6 +70,11 @@ class Product extends Model
     public function passportLogs()
     {
         return $this->hasMany(DigitalPassportLog::class);
+    }
+
+    public function ownershipHistory()
+    {
+        return $this->hasMany(OwnershipHistory::class);
     }
 
     public function manufacturer()
@@ -149,20 +155,23 @@ class Product extends Model
     public function getMinPriceAttribute(): float
     {
         $minVariant = $this->variants()->active()->min('price');
+
         return $minVariant ?? $this->price;
     }
 
     public function getMaxPriceAttribute(): float
     {
         $maxVariant = $this->variants()->active()->max('price');
+
         return $maxVariant ?? $this->price;
     }
 
     public function getModel3dUrlAttribute()
     {
-        if (!$this->model_3d_path) {
+        if (! $this->model_3d_path) {
             return null;
         }
-        return '/storage/' . ltrim($this->model_3d_path, '/');
+
+        return '/storage/'.ltrim($this->model_3d_path, '/');
     }
 }

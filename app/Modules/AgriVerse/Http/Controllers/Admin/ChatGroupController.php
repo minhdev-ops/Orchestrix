@@ -2,11 +2,11 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Modules\AgriVerse\Models\ChatGroup;
 use App\Modules\AgriVerse\Models\ChatGroupMember;
 use App\Modules\AgriVerse\Models\ChatMessage;
-use App\Models\User;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ChatGroupController
@@ -120,6 +120,7 @@ class ChatGroupController
     public function destroy(ChatGroup $group)
     {
         $group->delete();
+
         return redirect()->route('admin.agriverse.chat-groups.index')
             ->with('success', 'Đã xóa nhóm chat');
     }

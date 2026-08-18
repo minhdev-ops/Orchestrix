@@ -2,13 +2,13 @@
 
 namespace App\Modules\AgriVerse\Jobs;
 
+use App\Modules\AgriVerse\Models\ThreeDAsset;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use App\Modules\AgriVerse\Models\ThreeDAsset;
 
 class ProcessThreeDAsset implements ShouldQueue
 {
@@ -25,14 +25,15 @@ class ProcessThreeDAsset implements ShouldQueue
         $this->asset->update(['compression_status' => 'processing']);
 
         $disk = Storage::disk('public');
-        $inputPath = storage_path('app/public/' . $this->asset->original_path);
+        $inputPath = storage_path('app/public/'.$this->asset->original_path);
 
-        if (!$disk->exists($this->asset->original_path)) {
+        if (! $disk->exists($this->asset->original_path)) {
             $this->asset->update(['compression_status' => 'failed']);
+
             return;
         }
 
-        $outputDir = storage_path('app/public/3d-assets/compressed/' . $this->asset->uuid);
+        $outputDir = storage_path('app/public/3d-assets/compressed/'.$this->asset->uuid);
         $scriptDir = base_path('Modules/AgriVerse/Scripts');
 
         $cmd = sprintf(
@@ -49,12 +50,13 @@ class ProcessThreeDAsset implements ShouldQueue
                 'compression_status' => 'failed',
                 'compression_settings' => ['error' => implode("\n", $output)],
             ]);
+
             return;
         }
 
         $storedBasename = pathinfo($this->asset->original_path, PATHINFO_FILENAME);
-        $glbFilename = $storedBasename . '.glb';
-        $glbPath = '3d-assets/compressed/' . $this->asset->uuid . '/' . $glbFilename;
+        $glbFilename = $storedBasename.'.glb';
+        $glbPath = '3d-assets/compressed/'.$this->asset->uuid.'/'.$glbFilename;
 
         if ($disk->exists($glbPath)) {
             $compressedSize = $disk->size($glbPath);

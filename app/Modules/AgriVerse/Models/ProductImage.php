@@ -4,6 +4,7 @@ namespace App\Modules\AgriVerse\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ProductImage extends Model
 {
@@ -29,6 +30,8 @@ class ProductImage extends Model
 
     public function getUrlAttribute()
     {
-        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->path);
+        // All files served via storage symlink (public/storage -> storage/app/public)
+        // CKFinder files are accessible via storage/app/public/userfiles/ -> public/userfiles/ symlink
+        return Storage::disk('public')->url($this->path);
     }
 }

@@ -11,7 +11,11 @@ class SellerStoreController
     public function edit()
     {
         $user = auth()->user();
-        $store = Store::where('owner_id', $user->id)->firstOrFail();
+        $store = Store::where('owner_id', $user->id)->first();
+        if (! $store) {
+            return redirect()->route('agriverse.shop.seller.store.create')
+                ->with('info', 'Bạn chưa có cửa hàng. Vui lòng tạo cửa hàng trước.');
+        }
 
         return Inertia::render('Marketplace/Seller/Store/Edit', [
             'store' => $store,
@@ -21,7 +25,11 @@ class SellerStoreController
     public function update(Request $request)
     {
         $user = auth()->user();
-        $store = Store::where('owner_id', $user->id)->firstOrFail();
+        $store = Store::where('owner_id', $user->id)->first();
+        if (! $store) {
+            return redirect()->route('agriverse.shop.seller.store.create')
+                ->with('info', 'Bạn chưa có cửa hàng. Vui lòng tạo cửa hàng trước.');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',

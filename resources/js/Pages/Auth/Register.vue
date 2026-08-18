@@ -44,10 +44,8 @@
               placeholder="••••••••" />
           </div>
 
-          <!-- CAPTCHA -->
-          <div v-if="captchaSiteKey" class="login-captcha">
-            <div ref="captchaRef" class="g-recaptcha" :data-sitekey="captchaSiteKey" data-theme="light"></div>
-          </div>
+          <!-- CAPTCHA (v2 invisible — rendered programmatically) -->
+          <div v-if="captchaSiteKey" ref="captchaContainer" class="login-captcha"></div>
 
           <button type="submit" :disabled="loading" class="login-submit">
             <span v-if="loading" class="login-spinner" />
@@ -87,20 +85,20 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 
 const loading = ref(false);
 const socialLoading = ref(false);
 const success = ref('');
-const error = ref('');
+const formError = ref('');
 const page = usePage();
-const captchaRef = ref(null);
+const captchaContainer = ref(null);
 
 const captchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
 
 const errorMsg = computed(() => {
-  if (error.value) return error.value;
+  if (formError.value) return formError.value;
   const errors = page.props.errors || {};
   return Object.values(errors).flat().join(', ');
 });
@@ -112,47 +110,63 @@ const form = reactive({
   password_confirmation: '',
 });
 
+let recaptchaWidgetId = null;
+
 onMounted(() => {
-  if (captchaSiteKey && !window.grecaptcha) {
-    const script = document.createElement('script');
-    script.src = 'https://www.google.com/recaptcha/api.js?render=' + captchaSiteKey;
-    script.async = true;
-    document.head.appendChild(script);
+  if (!captchaSiteKey) return;
+  if (window.grecaptcha) {
+    renderCaptcha();
+    return;
+  }
+  window._recaptchaOnload = renderCaptcha;
+  const script = document.createElement('script');
+  script.src = 'https://www.google.com/recaptcha/api.js?onload=_recaptchaOnload&render=explicit';
+  script.async = true;
+  document.head.appendChild(script);
+});
+
+function renderCaptcha() {
+  if (!window.grecaptcha || !captchaContainer.value) return;
+  recaptchaWidgetId = window.grecaptcha.render(captchaContainer.value, {
+    sitekey: captchaSiteKey,
+  });
+}
+
+onBeforeUnmount(() => {
+  if (window.grecaptcha && recaptchaWidgetId !== null) {
+    window.grecaptcha.reset(recaptchaWidgetId);
   }
 });
 
 function getCaptchaToken() {
-  return new Promise((resolve) => {
-    if (!captchaSiteKey || !window.grecaptcha) {
-      resolve('bypass');
-      return;
-    }
-    window.grecaptcha.ready(() => {
-      window.grecaptcha.execute(captchaSiteKey, { action: 'register' }).then(resolve);
-    });
-  });
+  if (!captchaSiteKey || !window.grecaptcha || recaptchaWidgetId === null) return Promise.resolve(null);
+  const response = window.grecaptcha.getResponse(recaptchaWidgetId);
+  return Promise.resolve(response);
 }
 
 function handleRegister() {
   if (form.password !== form.password_confirmation) {
-    error.value = 'Mật khẩu xác nhận không khớp';
+    formError.value = 'Mật khẩu xác nhận không khớp';
     return;
   }
   loading.value = true;
   success.value = '';
-  error.value = '';
+  formError.value = '';
   getCaptchaToken().then(captchaToken => {
-    router.post('/register', {
+    const payload = {
       name: form.name,
       email: form.email,
       password: form.password,
       password_confirmation: form.password_confirmation,
-      captcha_token: captchaToken,
-    }, {
+    };
+    if (captchaToken) payload.captcha_token = captchaToken;
+    router.post('/register', payload, {
       preserveState: true,
       onFinish: () => { loading.value = false; },
     });
-  }).catch(() => { loading.value = false; });
+  }).catch(() => {
+    loading.value = false;
+  });
 }
 
 function registerWithGoogle() {
@@ -169,7 +183,6 @@ function registerWithGoogle() {
       + '&redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/google/callback')
       + '&response_type=code&scope=email profile';
   }
-  socialLoading.value = false;
 }
 
 function handleGoogleCredential(response) {
@@ -178,9 +191,26 @@ function handleGoogleCredential(response) {
   });
 }
 
+function initFacebookSDK() {
+  return new Promise((resolve) => {
+    if (window.FB) { resolve(); return; }
+    const fbAppId = import.meta.env.VITE_FACEBOOK_APP_ID || '';
+    if (!fbAppId) { resolve(); return; }
+    window.fbAsyncInit = function() {
+      window.FB.init({ appId: fbAppId, cookie: true, xfbml: true, version: 'v18.0' });
+      resolve();
+    };
+    const s = document.createElement('script');
+    s.src = 'https://connect.facebook.net/en_US/sdk.js';
+    s.async = true; s.defer = true; s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+  });
+}
+
 function registerWithFacebook() {
   socialLoading.value = true;
-  if (window.FB) {
+  initFacebookSDK().then(() => {
+    if (!window.FB) { socialLoading.value = false; return; }
     window.FB.login(function(response) {
       if (response.authResponse) {
         const accessToken = response.authResponse.accessToken;
@@ -200,33 +230,7 @@ function registerWithFacebook() {
         socialLoading.value = false;
       }
     }, { scope: 'public_profile,email' });
-  } else {
-    window.FB.init({
-      appId: import.meta.env.VITE_FACEBOOK_APP_ID || '',
-      cookie: true,
-      xfbml: true,
-      version: 'v18.0',
-    });
-    window.FB.login(function(response) {
-      if (response.authResponse) {
-        const accessToken = response.authResponse.accessToken;
-        const userID = response.authResponse.userID;
-        window.FB.api('/me', { fields: 'name,email,picture' }, function(profile) {
-          router.post('/auth/facebook', {
-            access_token: accessToken,
-            user_id: userID,
-            name: profile.name,
-            email: profile.email || '',
-            picture: profile.picture?.data?.url || '',
-          }, {
-            onFinish: () => { socialLoading.value = false; },
-          });
-        });
-      } else {
-        socialLoading.value = false;
-      }
-    }, { scope: 'public_profile,email' });
-  }
+  });
 }
 </script>
 

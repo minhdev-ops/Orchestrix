@@ -978,7 +978,7 @@ class AIPlantDoctorService
         $apiKey = config('services.ai_plant_doctor.openai_api_key');
         $model = config('services.ai_plant_doctor.openai_model', 'gpt-4o');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             throw new \RuntimeException('OpenAI API key not configured (AI_PLANT_DOCTOR_OPENAI_API_KEY)');
         }
 
@@ -1055,6 +1055,7 @@ PROMPT;
 
         if (!$parsed || !isset($parsed['disease_name'])) {
             Log::warning("AI Plant Doctor: Failed to parse {$provider} response", ['text' => $text]);
+
             return [
                 'plant_name' => null,
                 'disease_name' => 'Không thể phân tích',

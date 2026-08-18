@@ -2,10 +2,10 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\Product;
-use App\Modules\AgriVerse\Http\Resources\ProductResource;
 use App\Modules\AgriVerse\Http\Requests\StoreProductRequest;
 use App\Modules\AgriVerse\Http\Requests\UpdateProductRequest;
+use App\Modules\AgriVerse\Http\Resources\ProductResource;
+use App\Modules\AgriVerse\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -13,22 +13,27 @@ class ProductController
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Product::query()->with(['user', 'store', 'assets']);
-
-        if ($request->user()->hasRole('seller')) {
-            $query->where('user_id', $request->user()->id);
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['data' => []]);
         }
 
-        if ($request->user()->hasRole('employee')) {
-            $storeIds = $request->user()->stores->pluck('id');
+        $query = Product::query()->with(['user', 'store', 'assets']);
+
+        if ($user->hasRole('seller')) {
+            $query->where('user_id', $user->id);
+        }
+
+        if ($user->hasRole('employee')) {
+            $storeIds = $user->stores->pluck('id');
             $query->whereIn('store_id', $storeIds);
         }
 
-        if (!$request->user()->hasRole('admin')) {
+        if (! $user->hasRole('admin')) {
             $query->where('status', 'published');
         }
 
-        if ($request->filled('status') && $request->user()->hasRole('admin')) {
+        if ($request->filled('status') && $user->hasRole('admin')) {
             $query->where('status', $request->status);
         }
 
@@ -41,9 +46,10 @@ class ProductController
         }
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('description', 'like', '%'.$search.'%');
             });
         }
 
@@ -57,7 +63,7 @@ class ProductController
 
     public function show(Request $request, Product $product): ProductResource
     {
-        if ($product->status !== 'published' && !$request->user()->hasRole('admin')) {
+        if ($product->status !== 'published' && ! $request->user()->hasRole('admin')) {
             if ($request->user()->hasRole('seller') && $product->user_id !== $request->user()->id) {
                 abort(404);
             }
@@ -67,6 +73,7 @@ class ProductController
         }
 
         $product->load(['user', 'store', 'assets']);
+
         return ProductResource::make($product);
     }
 

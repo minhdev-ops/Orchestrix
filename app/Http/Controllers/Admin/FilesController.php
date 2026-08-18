@@ -1,9 +1,14 @@
 <?php
 
+/**
+ * @deprecated Use App\Modules\AgriVerse\Http\Controllers\Admin\FileController instead.
+ * This controller uses Blade views; the module version uses Inertia SPA.
+ * Kept for backward compatibility. Will be removed in next major version.
+ */
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
 class FilesController extends Controller
@@ -18,7 +23,7 @@ class FilesController extends Controller
                 'images' => 0,
                 'documents' => 0,
                 'others' => 0,
-            ]
+            ],
         ];
 
         $recent_images = [];
@@ -42,7 +47,7 @@ class FilesController extends Controller
                     if (count($recent_images) < 8) {
                         $recent_images[] = [
                             'name' => $file->getFilename(),
-                            'url' => asset('userfiles/' . str_replace(public_path('userfiles/'), '', $file->getRealPath())),
+                            'url' => asset('userfiles/'.str_replace(public_path('userfiles/'), '', $file->getRealPath())),
                             'size' => $this->formatBytes($file->getSize()),
                             'mtime' => date('Y-m-d H:i:s', $file->getMTime()),
                         ];
@@ -69,6 +74,6 @@ class FilesController extends Controller
         $pow = min($pow, count($units) - 1);
         $bytes /= pow(1024, $pow);
 
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }

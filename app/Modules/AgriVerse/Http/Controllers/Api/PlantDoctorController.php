@@ -6,8 +6,9 @@ use App\Modules\AgriVerse\Models\PlantDiagnosis;
 use App\Modules\AgriVerse\Services\AIPlantDoctorService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class PlantDoctorController
 {
@@ -45,7 +46,7 @@ class PlantDoctorController
                 'diagnosis' => [
                     'id' => $diagnosis->id,
                     'uuid' => $diagnosis->uuid,
-                    'image_url' => asset('storage/' . $path),
+                    'image_url' => asset('storage/'.$path),
                     'plant_name' => $diagnosis->plant_name,
                     'disease_name' => $diagnosis->disease_name,
                     'confidence' => $diagnosis->confidence,
@@ -59,9 +60,10 @@ class PlantDoctorController
             ]);
 
         } catch (\Throwable $e) {
-            return response()->json([
-                'error' => 'Chẩn đoán thất bại: ' . $e->getMessage(),
-            ], 500);
+            Log::error('Plant diagnosis failed: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Diagnosis failed. Please try again.'], 500);
         }
     }
 
@@ -76,7 +78,7 @@ class PlantDoctorController
 
     public function show(PlantDiagnosis $diagnosis): JsonResource
     {
-        if ($diagnosis->user_id !== auth()->id() && !auth()->user()->hasRole('admin')) {
+        if ($diagnosis->user_id !== auth()->id() && ! auth()->user()->hasRole('admin')) {
             abort(403);
         }
 
@@ -85,7 +87,7 @@ class PlantDoctorController
 
     public function destroy(PlantDiagnosis $diagnosis): JsonResponse
     {
-        if ($diagnosis->user_id !== auth()->id() && !auth()->user()->hasRole('admin')) {
+        if ($diagnosis->user_id !== auth()->id() && ! auth()->user()->hasRole('admin')) {
             abort(403);
         }
 

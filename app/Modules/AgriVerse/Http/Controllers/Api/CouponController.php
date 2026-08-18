@@ -4,8 +4,8 @@ namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
 use App\Modules\AgriVerse\Models\Coupon;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class CouponController
 {
@@ -16,7 +16,7 @@ class CouponController
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
             })
             ->latest()
-            ->get();
+            ->paginate(20);
 
         return JsonResource::collection($coupons);
     }
@@ -35,16 +35,16 @@ class CouponController
 
         $coupon = Coupon::where('code', $data['code'])->first();
 
-        if (!$coupon) {
+        if (! $coupon) {
             abort(404, 'Coupon not found.');
         }
 
-        if (!$coupon->isValid()) {
+        if (! $coupon->isValid()) {
             abort(422, 'Coupon is expired or inactive.');
         }
 
         if ($data['order_amount'] < $coupon->min_order_amount) {
-            abort(422, "Minimum order amount is " . number_format($coupon->min_order_amount, 0) . "đ");
+            abort(422, 'Minimum order amount is '.number_format($coupon->min_order_amount, 0).'đ');
         }
 
         $discount = $coupon->calculateDiscount($data['order_amount']);

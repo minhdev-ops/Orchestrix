@@ -22,6 +22,65 @@
           <textarea v-model="form.description" rows="4" class="form-textarea" placeholder="Mô tả chi tiết về sản phẩm..."></textarea>
         </div>
 
+        <!-- Thông tin cây trồng -->
+        <div class="border-t pt-6" style="border-color: var(--ag-border);">
+          <h2 class="text-sm font-semibold uppercase tracking-wider mb-4" style="color: var(--ag-text-secondary);">Thông tin cây trồng</h2>
+
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="form-label">Tên khoa học</label>
+              <input v-model="form.species_latin" class="form-input" placeholder="VD: Ixora coccinea">
+            </div>
+            <div>
+              <label class="form-label">Họ thực vật</label>
+              <input v-model="form.family" class="form-input" placeholder="VD: Rubiaceae">
+            </div>
+            <div>
+              <label class="form-label">Nguồn gốc</label>
+              <input v-model="form.origin" class="form-input" placeholder="VD: Việt Nam">
+            </div>
+          </div>
+
+          <h3 class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: var(--ag-text-muted);">Hướng dẫn chăm sóc</h3>
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="form-label">Ánh sáng</label>
+              <input v-model="form.light_requirements" class="form-input" placeholder="VD: Ưa sáng">
+            </div>
+            <div>
+              <label class="form-label">Tưới nước</label>
+              <input v-model="form.watering_needs" class="form-input" placeholder="VD: Nhỏ: hàng ngày, lớn: 2-3 ngày/lần">
+            </div>
+            <div>
+              <label class="form-label">Phân bón</label>
+              <input v-model="form.fertilizing_guide" class="form-input" placeholder="VD: Bón thêm NPK khi có nụ">
+            </div>
+            <div>
+              <label class="form-label">Nhiệt độ tối thiểu (°C)</label>
+              <input v-model="form.min_temp" class="form-input" placeholder="VD: 15">
+            </div>
+            <div>
+              <label class="form-label">Độ pH đất</label>
+              <input v-model="form.soil_ph" class="form-input" placeholder="VD: 6.0-7.0">
+            </div>
+            <div>
+              <label class="form-label">Vị trí</label>
+              <input v-model="form.indoor_outdoor" class="form-input" placeholder="VD: Ngoài trời, sân vườn">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Mô tả / Đặc điểm nổi bật</label>
+              <textarea v-model="form.key_features" rows="3" class="form-textarea" placeholder="VD: Hoa đỏ đẹp. Sinh trưởng mạnh. Làm hàng rào."></textarea>
+            </div>
+            <div>
+              <label class="form-label">Ý nghĩa phong thủy</label>
+              <textarea v-model="form.meaning_fengshui" rows="3" class="form-textarea" placeholder="VD: Vương giả, phú quý, giàu sang"></textarea>
+            </div>
+          </div>
+        </div>
+
         <!-- Giá -->
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -153,6 +212,17 @@ const errors = ref({})
 const form = reactive({
   name: props.product?.name || '',
   description: props.product?.description || '',
+  species_latin: props.product?.technical_specs?.['Tên khoa học'] || props.product?.metadata?.species_latin || '',
+  family: props.product?.technical_specs?.['Họ thực vật'] || props.product?.metadata?.family || '',
+  origin: props.product?.metadata?.origin || '',
+  light_requirements: props.product?.technical_specs?.['Ánh sáng'] || props.product?.metadata?.light_requirements || '',
+  watering_needs: props.product?.technical_specs?.['Tưới nước'] || props.product?.metadata?.watering_needs || '',
+  fertilizing_guide: props.product?.metadata?.fertilizing_guide || '',
+  min_temp: props.product?.technical_specs?.['Nhiệt độ tối thiểu']?.replace('°C', '') || '',
+  soil_ph: props.product?.technical_specs?.['Độ pH đất'] || '',
+  indoor_outdoor: props.product?.technical_specs?.['Vị trí'] || '',
+  key_features: '',
+  meaning_fengshui: props.product?.metadata?.meaning_fengshui || '',
   price: props.product?.price || 0,
   compare_price: props.product?.compare_price || 0,
   category: props.product?.categories?.[0]?.name || props.product?.category || '',
@@ -166,6 +236,34 @@ const form = reactive({
   status: props.product?.status || 'pending_review',
 })
 
+function buildDescription() {
+  const parts = []
+  const f = form
+  if (f.species_latin) parts.push(`🌿 *Tên khoa học:* ${f.species_latin}`)
+  if (f.family) parts.push(`🏷️ *Họ:* ${f.family}`)
+  if (f.origin) parts.push(`🌍 *Nguồn gốc:* ${f.origin}`)
+  parts.push('')
+  parts.push('---')
+  parts.push('**📋 Hướng dẫn chăm sóc:**')
+  parts.push('')
+  if (f.light_requirements) parts.push(`☀️ *Ánh sáng:* ${f.light_requirements}`)
+  if (f.watering_needs) parts.push(`💧 *Tưới nước:* ${f.watering_needs}`)
+  if (f.fertilizing_guide) parts.push(`🧪 *Phân bón:* ${f.fertilizing_guide}`)
+  if (f.min_temp) parts.push(`🌡️ *Nhiệt độ tối thiểu:* ${f.min_temp}°C`)
+  if (f.soil_ph) parts.push(`🧫 *Độ pH đất:* ${f.soil_ph}`)
+  if (f.indoor_outdoor) parts.push(`🏠 *Vị trí:* ${f.indoor_outdoor}`)
+  if (f.key_features) {
+    parts.push('')
+    parts.push('---')
+    parts.push(`**📝 Mô tả:** ${f.key_features}`)
+  }
+  if (f.meaning_fengshui) {
+    parts.push('')
+    parts.push(`💰 *Ý nghĩa phong thủy:* ${f.meaning_fengshui}`)
+  }
+  return parts.join('\n')
+}
+
 function onFile3D(e) {
   const file = e.target.files[0]
   if (!file) return
@@ -177,6 +275,43 @@ function submit() {
   saving.value = true
   errors.value = {}
 
+  // Compile description from structured fields
+  form.description = buildDescription()
+
+  // Build technical_specs and metadata
+  const specs = {}
+  const meta = {}
+  if (form.species_latin) specs['Tên khoa học'] = form.species_latin
+  if (form.family) specs['Họ thực vật'] = form.family
+  if (form.light_requirements) specs['Ánh sáng'] = form.light_requirements
+  if (form.watering_needs) specs['Tưới nước'] = form.watering_needs
+  if (form.min_temp) specs['Nhiệt độ tối thiểu'] = form.min_temp + '°C'
+  if (form.soil_ph) specs['Độ pH đất'] = form.soil_ph
+  if (form.indoor_outdoor) specs['Vị trí'] = form.indoor_outdoor
+  if (form.origin) meta['origin'] = form.origin
+  if (form.fertilizing_guide) meta['fertilizing_guide'] = form.fertilizing_guide
+  if (form.meaning_fengshui) meta['meaning_fengshui'] = form.meaning_fengshui
+  if (form.key_features) meta['key_features'] = form.key_features
+
+  const payload = {
+    ...form,
+    technical_specs: Object.keys(specs).length ? specs : null,
+    metadata: Object.keys(meta).length ? meta : null,
+  }
+
+  // Remove helper fields from payload
+  delete payload.species_latin
+  delete payload.family
+  delete payload.origin
+  delete payload.light_requirements
+  delete payload.watering_needs
+  delete payload.fertilizing_guide
+  delete payload.min_temp
+  delete payload.soil_ph
+  delete payload.indoor_outdoor
+  delete payload.key_features
+  delete payload.meaning_fengshui
+
   const routeName = props.product
     ? 'agriverse.shop.seller.products.update'
     : 'agriverse.shop.seller.products.store'
@@ -184,9 +319,9 @@ function submit() {
 
   if (form._model_3d_file) {
     const fd = new FormData()
-    Object.keys(form).forEach(k => {
+    Object.keys(payload).forEach(k => {
       if (k === '_model_3d_file') fd.append('model_3d_file', form[k])
-      else fd.append(k, form[k] ?? '')
+      else fd.append(k, typeof payload[k] === 'object' ? JSON.stringify(payload[k]) : (payload[k] ?? ''))
     })
     fd.append('_method', method)
 
@@ -197,9 +332,8 @@ function submit() {
       onSuccess: () => { saving.value = false },
     })
   } else {
-    const data = { ...form }
-    delete data._model_3d_file
-    router[method](route(routeName, props.product?.id), data, {
+    delete payload._model_3d_file
+    router[method](route(routeName, props.product?.id), payload, {
       preserveScroll: true,
       onError: (err) => { errors.value = err; saving.value = false },
       onSuccess: () => { saving.value = false },

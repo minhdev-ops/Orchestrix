@@ -2,8 +2,8 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Category;
+use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\Store;
 
 class SeoService
@@ -13,9 +13,9 @@ class SeoService
      */
     public function productMeta(Product $product): array
     {
-        $title = $product->seo_title ?: $product->name . ' - AgriVerse';
+        $title = $product->seo_title ?: $product->name.' - AgriVerse';
         $description = $product->seo_description ?: $this->cleanHtml($product->description, 160);
-        $image = $product->image_url ?? config('app.url') . '/images/og-default.jpg';
+        $image = $product->image_url ?? config('app.url').'/images/og-default.jpg';
         $url = route('agriverse.shop.products.show', $product->id);
 
         return [
@@ -34,9 +34,9 @@ class SeoService
      */
     public function categoryMeta(Category $category): array
     {
-        $title = $category->seo_title ?: $category->name . ' - AgriVerse';
+        $title = $category->seo_title ?: $category->name.' - AgriVerse';
         $description = $category->seo_description ?: $this->cleanHtml($category->description, 160);
-        $image = $category->image ?? config('app.url') . '/images/og-default.jpg';
+        $image = $category->image ?? config('app.url').'/images/og-default.jpg';
         $url = route('agriverse.shop.products.index', ['category' => $category->slug]);
 
         return [
@@ -55,9 +55,9 @@ class SeoService
      */
     public function storeMeta(Store $store): array
     {
-        $title = $store->seo_title ?: $store->name . ' - AgriVerse';
+        $title = $store->seo_title ?: $store->name.' - AgriVerse';
         $description = $store->seo_description ?: $this->cleanHtml($store->description, 160);
-        $image = $store->logo ?? config('app.url') . '/images/og-default.jpg';
+        $image = $store->logo ?? config('app.url').'/images/og-default.jpg';
         $url = route('agriverse.shop.stores.show', $store->id);
 
         return [
@@ -80,7 +80,7 @@ class SeoService
             'title' => 'AgriVerse - Sàn thương mại điện tử nông nghiệp',
             'description' => 'AgriVerse - Nền tảng thương mại điện tử nông nghiệp hàng đầu Việt Nam. Mua bán cây cảnh, vật tư nông nghiệp, chia sẻ kiến thức trồng trọt.',
             'keywords' => 'nông nghiệp, cây cảnh, bonsai, vật tư nông nghiệp, thị trường nông sản',
-            'image' => config('app.url') . '/images/og-home.jpg',
+            'image' => config('app.url').'/images/og-home.jpg',
             'url' => config('app.url'),
             'type' => 'website',
             'schema' => $this->organizationSchema(),
@@ -166,7 +166,7 @@ class SeoService
             '@type' => 'Organization',
             'name' => 'AgriVerse',
             'url' => config('app.url'),
-            'logo' => config('app.url') . '/images/logo.png',
+            'logo' => config('app.url').'/images/logo.png',
             'description' => 'Sàn thương mại điện tử nông nghiệp hàng đầu Việt Nam',
             'sameAs' => [
                 'https://facebook.com/agriverse',
@@ -191,7 +191,7 @@ class SeoService
         ];
 
         // Products
-        Product::where('is_active', true)
+        Product::published()
             ->latest('updated_at')
             ->chunk(100, function ($products) use (&$sitemap) {
                 foreach ($products as $product) {
@@ -251,14 +251,17 @@ TXT;
     /**
      * Clean HTML tags and truncate
      */
-    protected function cleanHtml(string $html, int $length = 160): string
+    protected function cleanHtml(?string $html, int $length = 160): string
     {
+        if ($html === null || $html === '') {
+            return '';
+        }
         $text = strip_tags($html);
         $text = preg_replace('/\s+/', ' ', $text);
         $text = trim($text);
 
         if (mb_strlen($text) > $length) {
-            $text = mb_substr($text, 0, $length) . '...';
+            $text = mb_substr($text, 0, $length).'...';
         }
 
         return $text;

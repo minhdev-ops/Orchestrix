@@ -2,18 +2,23 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\Store;
 use App\Modules\AgriVerse\Http\Resources\StoreResource;
+use App\Modules\AgriVerse\Models\Store;
 use Illuminate\Http\Request;
 
 class StoreController
 {
     public function index(Request $request)
     {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['data' => []]);
+        }
+
         $query = Store::query()->with('owner')->withCount('products');
 
-        if ($request->user()->hasRole('seller')) {
-            $query->where('owner_id', $request->user()->id);
+        if ($user->hasRole('seller')) {
+            $query->where('owner_id', $user->id);
         }
 
         if ($request->filled('status')) {
@@ -28,6 +33,7 @@ class StoreController
     public function show(Store $store): StoreResource
     {
         $store->load('owner')->loadCount('products');
+
         return StoreResource::make($store);
     }
 }

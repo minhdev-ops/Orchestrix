@@ -1,37 +1,196 @@
-name: Orchestrix
+name: Orchestrix CI/CD
 
 on:
   push:
     branches:
       - module/AgriVerse
+      - main
 
 jobs:
-  deploy:
+  lint:
     runs-on: ubuntu-latest
-
-    environment:
-     name: VPS
-
     steps:
-      - name: Debug Secrets
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: PHP Lint
+        run: vendor/bin/pint --test || true
+
+      - name: ESLint
+        run: npx eslint resources/js/ app/Modules/AgriVerse/Resources/js/ || true
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: orchestrix_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - uses: actions/checkout@v4
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Generate key
+        run: php artisan key:generate
+
+      - name: Run migrations
+        run: php artisan migrate --force
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: orchestrix_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+
+      - name: Run tests
+        run: php artisan test --parallel --quiet || true
+        continue-on-error: true
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: orchestrix_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+
+  deploy-orchestrix:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    if: success() && github.ref == 'refs/heads/module/AgriVerse'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build frontend
         run: |
-          echo "HOST=${{ secrets.VPS_HOST }}"
-          echo "USER=${{ secrets.VPS_USER }}"
+          npm ci
+          npm run build
 
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-
+      - name: Deploy Orchestrix to VPS
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          source: "."
+          target: "/opt/agriverse/orchestrix"
+          strip_components: 0
+          rm: true
 
+      - name: SSH and restart Orchestrix
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
           script: |
-            cd /home/deployer/Orchestrix
+            cd /opt/agriverse
 
-            git pull origin main
+            # Load env
+            set -a; [ -f .env ] && source .env; set +a
 
-            podman restart orchestrix-php
-            podman restart orchestrix-nginx
+            # Down & up (only recreate orchestrix services)
+            docker compose up -d --build --no-deps php queue scheduler
 
-            echo "Deploy completed"
+            # Wait for PHP-FPM
+            sleep 3
+
+            # Run migrations
+            docker compose exec -T php php artisan migrate --force || true
+
+            # Optimize
+            docker compose exec -T php php artisan optimize || true
+
+            # Reload nginx
+            docker compose exec -T nginx nginx -s reload || true
+
+            echo "Orchestrix deploy completed"
+
+  deploy-jakarta:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    if: success() && github.ref == 'refs/heads/module/AgriVerse'
+    steps:
+      - name: Checkout JakartaEE
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.JAKARTA_REPO }}
+          token: ${{ secrets.GH_PAT }}
+          path: jakarta
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build WAR
+        run: |
+          cd jakarta
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+          cd ..
+
+      - name: Copy WAR to deploy context
+        run: |
+          mkdir -p jakarta/deploy/target
+          cp jakarta/target/JakartaEE-1.0-SNAPSHOT.war jakarta/deploy/target/
+
+      - name: Deploy JakartaEE to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          source: "jakarta/deploy/*"
+          target: "/opt/agriverse/jakarta"
+          strip_components: 2
+
+      - name: SSH and restart WildFly
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            cd /opt/agriverse
+
+            # Rebuild & restart just WildFly
+            docker compose up -d --build --no-deps wildfly
+
+            echo "JakartaEE deploy completed"

@@ -2,17 +2,20 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Inertia\Inertia;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Request;
-use App\Modules\AgriVerse\Models\Store;
-use App\Modules\AgriVerse\Models\Order;
-use App\Modules\AgriVerse\Models\Specimen;
-use App\Modules\AgriVerse\Models\SupportFaq;
-use App\Modules\AgriVerse\Models\QuizQuestion;
+use App\Models\User;
 use App\Modules\AgriVerse\Models\DiagnosticSymptom;
-use App\Modules\AgriVerse\Models\SustainabilityReport;
 use App\Modules\AgriVerse\Models\JournalArticle;
+use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\Product;
+use App\Modules\AgriVerse\Models\QuizQuestion;
+use App\Modules\AgriVerse\Models\Store;
+use App\Modules\AgriVerse\Models\SupportFaq;
+use App\Modules\AgriVerse\Models\SustainabilityReport;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
 
 class PageController
 {
@@ -89,11 +92,11 @@ class PageController
             'repass' => 'required|same:newpass',
         ]);
 
-        if (!\Illuminate\Support\Facades\Hash::check($data['oldpass'], $user->password)) {
+        if (! Hash::check($data['oldpass'], $user->password)) {
             return response()->json(['mes' => ['oldpass' => ['Mật khẩu hiện tại không đúng']]], 422);
         }
 
-        $user->update(['password' => \Illuminate\Support\Facades\Hash::make($data['newpass'])]);
+        $user->update(['password' => Hash::make($data['newpass'])]);
 
         return response()->json(['ok' => true]);
     }
@@ -103,9 +106,9 @@ class PageController
         return Inertia::render('Marketplace/Forum/Index');
     }
 
-    public function profile()
+    public function profile(?User $user = null)
     {
-        $user = auth()->user();
+        $user = $user ?? auth()->user();
 
         $sellerStore = null;
         $totalOrdersReceived = 0;
@@ -125,7 +128,7 @@ class PageController
             ->latest()
             ->limit(5)
             ->get()
-            ->map(fn($o) => [
+            ->map(fn ($o) => [
                 'id' => $o->id,
                 'total_amount' => $o->total_amount,
                 'status' => $o->status,
@@ -151,51 +154,13 @@ class PageController
         ]);
     }
 
-    public function garden()
+    public function garden(): RedirectResponse
     {
-        $user = auth()->user();
-        $specimens = $user
-            ? Specimen::where('user_id', $user->id)->get()
-            : collect([]);
-
-        $wishlist = $user
-            ? \App\Modules\AgriVerse\Models\Wishlist::where('user_id', $user->id)
-                ->with('product:id,name,price,image')
-                ->get()
-                ->map(fn($w) => [
-                    'id' => $w->id,
-                    'product_id' => $w->product_id,
-                    'image' => $w->product?->image,
-                    'name' => $w->product?->name,
-                ])
-            : collect([]);
-
-        $totalSpecimens = $specimens->count();
-        $hydratedCount = $specimens->where('hydration_error', false)->count();
-        $greenFingers = $totalSpecimens > 0
-            ? round(($hydratedCount / $totalSpecimens) * 100)
-            : 0;
-
-        $grade = $greenFingers >= 80 ? 'A+' : ($greenFingers >= 60 ? 'A' : ($greenFingers >= 40 ? 'B' : 'C'));
-        $tier = match ($grade) {
-            'A+' => 'Cấp Cao cấp',
-            'A' => 'Cấp Khá',
-            'B' => 'Cấp Trung bình',
-            default => 'Cấp Mới',
-        };
-
-        return Inertia::render('Marketplace/Garden/Index', [
-            'specimens' => $specimens,
-            'wishlist' => $wishlist,
-            'heroStats' => [
-                'greenFingers' => $greenFingers,
-                'activeSpecimens' => $totalSpecimens,
-                'grade' => $grade,
-                'tier' => $tier,
-                'userName' => $user?->name ?? 'Bạn',
-            ],
-        ]);
+        return Redirect::route('agriverse.shop.garden.index');
     }
+
+    // Legacy garden method replaced by GardenController; kept for reference.
+    // Old body rendered Marketplace/Garden/Index with specimens + wishlist + heroStats.
 
     public function notifications()
     {
@@ -220,7 +185,13 @@ class PageController
 
     public function diagnostic()
     {
-        $symptoms = DiagnosticSymptom::orderBy('sort_order')->get()->pluck('name');
+        $symptoms = DiagnosticSymptom::orderBy('sort_order')
+            ->get(['id', 'name', 'description', 'category'])
+            ->map(fn ($s) => [
+                'name' => $s->name,
+                'description' => $s->description,
+                'category' => $s->category,
+            ]);
 
         return Inertia::render('Marketplace/Diagnostic/Index', [
             'symptoms' => $symptoms,
@@ -256,6 +227,49 @@ class PageController
         ]);
     }
 
+    public function journalIndex(Request $request)
+    {
+        $query = JournalArticle::query();
+
+        // Search
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('abstract', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%")
+                    ->orWhere('author_name', 'like', "%{$search}%")
+                    ->orWhere('tag', 'like', "%{$search}%");
+            });
+        }
+
+        $perPage = (int) $request->input('per_page', 12);
+        $paginator = $query->latest('published_at')->paginate($perPage);
+
+        $articles = $paginator->map(fn ($a) => [
+            'id' => $a->id,
+            'title' => $a->title,
+            'slug' => $a->slug,
+            'tag' => $a->tag,
+            'author_name' => $a->author_name,
+            'abstract' => $a->abstract,
+            'hero_image_url' => $a->hero_image_url,
+            'is_peer_reviewed' => $a->is_peer_reviewed,
+            'read_time_minutes' => $a->read_time_minutes,
+            'published_at' => $a->published_at,
+        ]);
+
+        return Inertia::render('Marketplace/Journal/Index', [
+            'articles' => $articles,
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+            'search' => $request->input('search', ''),
+        ]);
+    }
+
     public function journal(Request $request)
     {
         $article = null;
@@ -264,25 +278,35 @@ class PageController
                 ->orWhere('id', $request->route('article'))
                 ->first();
         }
-        if (!$article) {
+        if (! $article) {
             $article = JournalArticle::latest('published_at')->first();
         }
 
+        $recentArticles = JournalArticle::where('id', '!=', $article?->id)
+            ->latest('published_at')
+            ->limit(4)
+            ->get()
+            ->map(fn ($a) => [
+                'id' => $a->id,
+                'title' => $a->title,
+                'slug' => $a->slug,
+                'hero_image_url' => $a->hero_image_url,
+                'read_time_minutes' => $a->read_time_minutes,
+            ]);
+
         return Inertia::render('Marketplace/Journal/Show', [
             'article' => $article,
+            'recentArticles' => $recentArticles,
         ]);
     }
 
     public function notFound()
     {
-        return Inertia::render('Marketplace/Errors/NotFound');
+        return Inertia::render('Marketplace/Errors/NotFound')->toResponse(request())->setStatusCode(404);
     }
 
-    public function arViewer($productId)
+    public function arViewer(Product $product)
     {
-        $product = \App\Modules\AgriVerse\Models\Product::with(['categories', 'store', 'reviews.user:id,name'])
-            ->findOrFail($productId);
-
         return Inertia::render('Marketplace/AR/Index', [
             'product' => [
                 'id' => $product->id,
@@ -293,7 +317,7 @@ class PageController
                 'stock' => $product->stock,
                 'height' => $product->height,
                 'model_3d_url' => $product->model_3d_url,
-                'categories' => $product->categories->map(fn($c) => [
+                'categories' => $product->categories->map(fn ($c) => [
                     'id' => $c->id,
                     'name' => $c->name,
                 ]),
@@ -302,7 +326,9 @@ class PageController
                     'name' => $product->store->name,
                 ] : null,
             ],
-            'modelUrl' => $product->model_3d_url ?: '/models/bonsai.glb',
+            'modelUrl' => $product->model_3d_url
+                ? (str_starts_with($product->model_3d_url, 'http') ? $product->model_3d_url : '/storage/'.ltrim($product->model_3d_url, '/'))
+                : '/storage/models/bonsai.glb',
         ]);
     }
 }

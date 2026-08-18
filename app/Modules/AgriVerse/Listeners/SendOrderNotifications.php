@@ -2,12 +2,11 @@
 
 namespace App\Modules\AgriVerse\Listeners;
 
-use App\Modules\AgriVerse\Events\OrderCreated;
 use App\Modules\AgriVerse\Notifications\OrderNotification;
 
 class SendOrderNotifications
 {
-    public function handle(OrderCreated $event): void
+    public function handle(object $event): void
     {
         $order = $event->order;
         $order->loadMissing(['buyer', 'seller']);

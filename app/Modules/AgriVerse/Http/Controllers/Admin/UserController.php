@@ -2,12 +2,12 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\User;
 use App\Modules\AgriVerse\Models\Order;
 use App\Modules\AgriVerse\Models\Review;
 use App\Modules\AgriVerse\Models\UserAddress;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UserController
 {
@@ -64,17 +64,25 @@ class UserController
         ]);
     }
 
-    public function toggleActive(User $user)
+    public function toggleActive(Request $request, User $user)
     {
-        $user->update(['is_active' => !$user->is_active]);
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Không thể tự thay đổi trạng thái của chính mình.');
+        }
+
+        if ($user->isAdmin()) {
+            return back()->with('error', 'Không thể thay đổi trạng thái tài khoản admin.');
+        }
+
+        $user->update(['is_active' => ! $user->is_active]);
 
         return back()->with('success', $user->is_active ? 'Người dùng đã được kích hoạt.' : 'Người dùng đã bị vô hiệu hóa.');
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
-        if ($user->isAdmin()) {
-            return back()->with('error', 'Không thể xóa tài khoản admin.');
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Không thể tự xóa tài khoản của chính mình.');
         }
 
         $user->delete();

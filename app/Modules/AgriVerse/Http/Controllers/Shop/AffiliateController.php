@@ -2,11 +2,12 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Http\Controllers\Controller;
-use App\Modules\AgriVerse\Services\AffiliateService;
 use App\Modules\AgriVerse\Models\Affiliate;
+use App\Modules\AgriVerse\Services\AffiliateService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class AffiliateController extends Controller
 {
@@ -25,7 +26,7 @@ class AffiliateController extends Controller
         $user = $request->user();
         $affiliate = Affiliate::where('user_id', $user->id)->first();
 
-        if (!$affiliate) {
+        if (! $affiliate) {
             return Inertia::render('Marketplace/Affiliate/Register');
         }
 
@@ -61,7 +62,8 @@ class AffiliateController extends Controller
             return redirect()->route('agriverse.shop.affiliate.index')
                 ->with('success', 'Đăng ký affiliate thành công!');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            Log::error('Affiliate error: '.$e->getMessage());
+            return back()->withErrors(['error' => 'Đã xảy ra lỗi. Vui lòng thử lại sau.']);
         }
     }
 
@@ -72,7 +74,7 @@ class AffiliateController extends Controller
     {
         $affiliate = Affiliate::where('user_id', $request->user()->id)->first();
 
-        if (!$affiliate) {
+        if (! $affiliate) {
             return response()->json(['message' => 'Chưa đăng ký affiliate'], 404);
         }
 
@@ -89,7 +91,7 @@ class AffiliateController extends Controller
     {
         $affiliate = Affiliate::where('user_id', $request->user()->id)->first();
 
-        if (!$affiliate) {
+        if (! $affiliate) {
             return response()->json(['message' => 'Chưa đăng ký affiliate'], 404);
         }
 

@@ -3,8 +3,8 @@
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class NotificationController
 {

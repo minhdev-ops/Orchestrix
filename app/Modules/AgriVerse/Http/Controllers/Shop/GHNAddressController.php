@@ -2,12 +2,15 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use App\Modules\AgriVerse\Models\Province;
 use App\Modules\AgriVerse\Models\District;
+use App\Modules\AgriVerse\Models\Province;
 use App\Modules\AgriVerse\Models\Ward;
 use App\Modules\AgriVerse\Services\GHNService;
+use Illuminate\Http\Request;
 
+/**
+ * @deprecated Replaced by GHTKAddressController. Will be removed in a future version.
+ */
 class GHNAddressController
 {
     public function provinces(GHNService $ghn)

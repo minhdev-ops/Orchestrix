@@ -2,12 +2,12 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
+use App\Jobs\ProcessAiScanning;
 use App\Modules\AgriVerse\Models\AiScanningJob;
 use App\Modules\AgriVerse\Models\Store;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Jobs\ProcessAiScanning;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AiScanningController
 {
@@ -21,7 +21,7 @@ class AiScanningController
 
         // Verify ownership
         $store = Store::findOrFail($data['store_id']);
-        if ($store->owner_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
+        if ($store->owner_id !== $request->user()->id && ! $request->user()->hasRole('admin')) {
             abort(403, 'You do not own this store.');
         }
 
@@ -37,8 +37,13 @@ class AiScanningController
         return JsonResource::make($job);
     }
 
-    public function scanStatus(AiScanningJob $job): JsonResource
+    public function scanStatus(Request $request, AiScanningJob $job): JsonResource
     {
+        $user = $request->user();
+        if (! $user || $job->store->owner_id !== $user->id) {
+            abort(403);
+        }
+
         return JsonResource::make($job);
     }
 

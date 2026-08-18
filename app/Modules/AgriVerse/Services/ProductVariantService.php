@@ -4,14 +4,14 @@ namespace App\Modules\AgriVerse\Services;
 
 use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Models\ProductVariant;
-use App\Modules\AgriVerse\Models\ProductAttribute;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductVariantService
 {
     /**
      * Get variants for a product
      */
-    public function getVariants(int $productId): \Illuminate\Database\Eloquent\Collection
+    public function getVariants(int $productId): Collection
     {
         return ProductVariant::where('product_id', $productId)
             ->active()
@@ -48,6 +48,7 @@ class ProductVariantService
     public function update(ProductVariant $variant, array $data): ProductVariant
     {
         $variant->update($data);
+
         return $variant->fresh();
     }
 
@@ -65,6 +66,7 @@ class ProductVariantService
     public function getAvailableStock(int $variantId, int $quantity = 1): bool
     {
         $variant = ProductVariant::find($variantId);
+
         return $variant && $variant->stock >= $quantity;
     }
 
@@ -77,6 +79,7 @@ class ProductVariantService
             return false;
         }
         $variant->decrement('stock', $quantity);
+
         return true;
     }
 
@@ -99,6 +102,7 @@ class ProductVariantService
 
         if ($variants->isEmpty()) {
             $product = Product::find($productId);
+
             return [
                 'min' => $product?->price ?? 0,
                 'max' => $product?->price ?? 0,
@@ -124,10 +128,10 @@ class ProductVariantService
         $attributes = [];
         foreach ($variants as $variant) {
             foreach ($variant->attributes as $key => $value) {
-                if (!isset($attributes[$key])) {
+                if (! isset($attributes[$key])) {
                     $attributes[$key] = [];
                 }
-                if (!in_array($value, $attributes[$key])) {
+                if (! in_array($value, $attributes[$key])) {
                     $attributes[$key][] = $value;
                 }
             }
@@ -143,7 +147,8 @@ class ProductVariantService
     {
         $prefix = strtoupper(substr($product->name, 0, 3));
         $attrHash = md5(json_encode($data['attributes'] ?? []));
-        return "{$prefix}-{$product->id}-" . substr($attrHash, 0, 6);
+
+        return "{$prefix}-{$product->id}-".substr($attrHash, 0, 6);
     }
 
     /**

@@ -2,12 +2,13 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use App\Modules\AgriVerse\Models\Contract;
-use App\Modules\AgriVerse\Http\Resources\ContractResource;
 use App\Modules\AgriVerse\Http\Requests\StoreContractRequest;
+use App\Modules\AgriVerse\Http\Resources\ContractResource;
+use App\Modules\AgriVerse\Models\Contract;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 class ContractController
 {
@@ -17,9 +18,9 @@ class ContractController
         $query = Contract::query()->with('order');
 
         if ($user->hasRole('buyer')) {
-            $query->whereHas('order', fn($q) => $q->where('buyer_id', $user->id));
+            $query->whereHas('order', fn ($q) => $q->where('buyer_id', $user->id));
         } elseif ($user->hasRole('seller')) {
-            $query->whereHas('order', fn($q) => $q->where('seller_id', $user->id));
+            $query->whereHas('order', fn ($q) => $q->where('seller_id', $user->id));
         }
 
         return ContractResource::collection($query->latest()->paginate($request->per_page ?? 15));
@@ -34,7 +35,7 @@ class ContractController
     {
         $contract = Contract::create([
             'order_id' => $request->order_id,
-            'contract_number' => 'CTR-' . strtoupper(\Illuminate\Support\Str::random(10)),
+            'contract_number' => 'CTR-'.strtoupper(Str::random(10)),
             'content' => $request->content,
             'status' => 'draft',
         ]);

@@ -2,15 +2,15 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Modules\AgriVerse\Models\ForumCategory;
-use App\Modules\AgriVerse\Models\ForumPost;
 use App\Modules\AgriVerse\Models\ForumComment;
 use App\Modules\AgriVerse\Models\ForumLike;
+use App\Modules\AgriVerse\Models\ForumPost;
 use App\Modules\AgriVerse\Services\ForumService;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ForumController
 {
@@ -24,6 +24,9 @@ class ForumController
             ->orderBy('name')
             ->get()
             ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name, 'slug' => $c->slug]);
+
+        $user = $request->user();
+        $isAuthenticated = $user && $user->id;
 
         $query = ForumPost::with(['user:id,name', 'category:id,name'])
             ->withCount(['comments', 'likes'])
@@ -53,6 +56,8 @@ class ForumController
             'id' => $p->id,
             'title' => $p->title,
             'content' => Str::limit(strip_tags($p->content), 200),
+            'images' => $p->images ?? [],
+            'status' => $p->status,
             'category' => $p->category ? ['id' => $p->category->id, 'name' => $p->category->name] : null,
             'user' => ['id' => $p->user->id, 'name' => $p->user->name],
             'comments_count' => $p->comments_count,
@@ -61,9 +66,32 @@ class ForumController
             'created_at' => $p->created_at->diffForHumans(),
         ]);
 
+        $pendingPosts = null;
+        if ($isAuthenticated) {
+            $pendingPosts = ForumPost::with(['user:id,name', 'category:id,name'])
+                ->where('user_id', $user->id)
+                ->where('status', 'pending')
+                ->latest()
+                ->limit(10)
+                ->get()
+                ->map(fn ($p) => [
+                    'id' => $p->id,
+                    'title' => $p->title,
+                    'content' => Str::limit(strip_tags($p->content), 200),
+                    'images' => $p->images ?? [],
+                    'status' => $p->status,
+                    'category' => $p->category ? ['id' => $p->category->id, 'name' => $p->category->name] : null,
+                    'user' => ['id' => $p->user->id, 'name' => $p->user->name],
+                    'comments_count' => $p->comments_count,
+                    'likes_count' => $p->likes_count,
+                    'created_at' => $p->created_at->diffForHumans(),
+                ]);
+        }
+
         return Inertia::render('Marketplace/Forum/Index', [
             'categories' => $categories,
             'posts' => $posts,
+            'pendingPosts' => $pendingPosts,
             'filters' => [
                 'category' => $request->category,
                 'search' => $request->search,
@@ -72,12 +100,10 @@ class ForumController
         ]);
     }
 
-    public function show($id)
+    public function show(ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
-
         if ($post->status !== 'approved') {
-            if (!auth()->check() || auth()->id() !== $post->user_id) {
+            if (! auth()->check() || auth()->id() !== $post->user_id) {
                 abort(404);
             }
         }
@@ -85,8 +111,9 @@ class ForumController
         $post->load(['user:id,name', 'category:id,name']);
         $post->loadCount(['comments', 'likes']);
 
-        $comments = ForumComment::with('user:id,name')
+        $comments = ForumComment::with(['user:id,name', 'replies'])
             ->where('post_id', $post->id)
+            ->whereNull('parent_id')
             ->orderBy('created_at', 'asc')
             ->get()
             ->map(fn ($c) => [
@@ -94,6 +121,12 @@ class ForumController
                 'content' => $c->content,
                 'user' => ['id' => $c->user->id, 'name' => $c->user->name],
                 'created_at' => $c->created_at->diffForHumans(),
+                'replies' => $c->replies->map(fn ($r) => [
+                    'id' => $r->id,
+                    'content' => $r->content,
+                    'user' => ['id' => $r->user->id, 'name' => $r->user->name],
+                    'created_at' => $r->created_at->diffForHumans(),
+                ]),
             ]);
 
         $isLiked = auth()->check() && $post->isLikedBy(auth()->id());
@@ -103,6 +136,8 @@ class ForumController
                 'id' => $post->id,
                 'title' => $post->title,
                 'content' => $post->content,
+                'images' => $post->images ?? [],
+                'status' => $post->status,
                 'category' => $post->category ? ['id' => $post->category->id, 'name' => $post->category->name] : null,
                 'user' => ['id' => $post->user->id, 'name' => $post->user->name],
                 'comments_count' => $post->comments_count,
@@ -115,7 +150,7 @@ class ForumController
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $categories = ForumCategory::where('is_active', true)
             ->orderBy('name')
@@ -123,6 +158,10 @@ class ForumController
 
         return Inertia::render('Marketplace/Forum/Create', [
             'categories' => $categories,
+            'prefill' => [
+                'title' => $request->query('title'),
+                'content' => $request->query('content'),
+            ],
         ]);
     }
 
@@ -132,6 +171,8 @@ class ForumController
             'category_id' => 'required|exists:forum_categories,id',
             'title' => 'required|string|max:200',
             'content' => 'required|string',
+            'images' => 'nullable|array',
+            'images.*' => 'string',
         ]);
 
         $post = ForumPost::create([
@@ -139,6 +180,7 @@ class ForumController
             'user_id' => auth()->id(),
             'title' => $data['title'],
             'content' => $data['content'],
+            'images' => $data['images'] ?? [],
             'status' => 'pending',
         ]);
 
@@ -146,10 +188,8 @@ class ForumController
             ->with('success', 'Bài viết đã được gửi và chờ admin duyệt.');
     }
 
-    public function edit($id)
+    public function edit(ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
-
         if ($post->user_id !== auth()->id()) {
             abort(403);
         }
@@ -173,10 +213,8 @@ class ForumController
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
-
         if ($post->user_id !== auth()->id()) {
             abort(403);
         }
@@ -189,12 +227,15 @@ class ForumController
             'category_id' => 'required|exists:forum_categories,id',
             'title' => 'required|string|max:200',
             'content' => 'required|string',
+            'images' => 'nullable|array',
+            'images.*' => 'string',
         ]);
 
         $post->update([
             'category_id' => $data['category_id'],
             'title' => $data['title'],
             'content' => $data['content'],
+            'images' => $data['images'] ?? [],
             'status' => 'pending',
         ]);
 
@@ -202,10 +243,8 @@ class ForumController
             ->with('success', 'Bài viết đã được cập nhật và gửi lại để duyệt.');
     }
 
-    public function destroy($id)
+    public function destroy(ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
-
         if ($post->user_id !== auth()->id()) {
             abort(403);
         }
@@ -216,21 +255,75 @@ class ForumController
             ->with('success', 'Bài viết đã được xóa.');
     }
 
-    public function storeComment(Request $request, $id)
+    public function getComments(ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
+        if ($post->status !== 'approved') {
+            abort(404);
+        }
 
+        $comments = ForumComment::with(['user:id,name', 'replies:user:id,name'])
+            ->where('post_id', $post->id)
+            ->whereNull('parent_id')
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'content' => $c->content,
+                'user' => ['id' => $c->user->id, 'name' => $c->user->name],
+                'created_at' => $c->created_at->diffForHumans(),
+                'replies' => $c->replies->map(fn ($r) => [
+                    'id' => $r->id,
+                    'content' => $r->content,
+                    'user' => ['id' => $r->user->id, 'name' => $r->user->name],
+                    'created_at' => $r->created_at->diffForHumans(),
+                ]),
+            ]);
+
+        return response()->json(['comments' => $comments]);
+    }
+
+    public function comments(ForumPost $post)
+    {
+        if ($post->status !== 'approved') {
+            abort(404);
+        }
+
+        $comments = ForumComment::with(['user:id,name', 'replies:user:id,name'])
+            ->where('post_id', $post->id)
+            ->whereNull('parent_id')
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'content' => $c->content,
+                'user' => ['id' => $c->user->id, 'name' => $c->user->name],
+                'created_at' => $c->created_at->diffForHumans(),
+                'replies' => $c->replies->map(fn ($r) => [
+                    'id' => $r->id,
+                    'content' => $r->content,
+                    'user' => ['id' => $r->user->id, 'name' => $r->user->name],
+                    'created_at' => $r->created_at->diffForHumans(),
+                ]),
+            ]);
+
+        return response()->json(['comments' => $comments]);
+    }
+
+        public function storeComment(Request $request, ForumPost $post)
+    {
         if ($post->status !== 'approved') {
             abort(404);
         }
 
         $data = $request->validate([
             'content' => 'required|string|max:2000',
+            'parent_id' => 'nullable|exists:forum_comments,id',
         ]);
 
         $comment = ForumComment::create([
             'post_id' => $post->id,
             'user_id' => auth()->id(),
+            'parent_id' => $data['parent_id'] ?? null,
             'content' => $data['content'],
         ]);
 
@@ -238,7 +331,7 @@ class ForumController
 
         $this->forumService->publishComment(
             $post->id,
-            auth()->id(),
+            (int) auth()->id(),
             auth()->user()->name,
             $data['content']
         );
@@ -249,19 +342,17 @@ class ForumController
                 'content' => $comment->content,
                 'user' => ['id' => $comment->user->id, 'name' => $comment->user->name],
                 'created_at' => $comment->created_at->diffForHumans(),
-            ]
+            ],
         ], 201);
     }
 
-    public function toggleLike(Request $request, $id)
+    public function toggleLike(Request $request, ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
-
         if ($post->status !== 'approved') {
             abort(404);
         }
 
-        $userId = auth()->id();
+        $userId = (int) auth()->id();
         $like = ForumLike::where('post_id', $post->id)->where('user_id', $userId)->first();
 
         if ($like) {

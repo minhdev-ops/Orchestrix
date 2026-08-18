@@ -2,8 +2,8 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
-use App\Modules\AgriVerse\Models\Refund;
 use App\Modules\AgriVerse\Models\OrderStatus;
+use App\Modules\AgriVerse\Models\Refund;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,6 +26,7 @@ class RefundController
     public function show(Refund $refund)
     {
         $refund->load(['order.product', 'order.store', 'user', 'processor']);
+
         return Inertia::render('Admin/Refunds/Show', ['refund' => $refund]);
     }
 
@@ -35,9 +36,10 @@ class RefundController
             return back()->with('error', 'Yêu cầu đã được xử lý.');
         }
 
+        $validated = $request->validate(['note' => 'nullable|string|max:500']);
         $refund->update([
             'status' => 'approved',
-            'admin_note' => $request->note,
+            'admin_note' => $validated['note'] ?? $refund->admin_note,
             'processed_by' => auth()->id(),
             'processed_at' => now(),
         ]);
@@ -50,7 +52,7 @@ class RefundController
         OrderStatus::create([
             'order_id' => $refund->order_id,
             'status' => 'refunded',
-            'note' => 'Hoàn tiền được duyệt: ' . ($request->note ?? ''),
+            'note' => 'Hoàn tiền được duyệt: '.($validated['note'] ?? ''),
             'user_id' => auth()->id(),
         ]);
 

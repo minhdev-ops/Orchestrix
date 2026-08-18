@@ -48,26 +48,26 @@ defineExpose({ scrollRef })
   display: flex;
   flex-direction: column;
   gap: 2px;
-  background: #f0f2f5;
+  background: var(--ag-bg-sand);
 }
 
 .chat-loading--msg {
   padding: 16px;
   text-align: center;
-  color: #999;
+  color: var(--ag-text-muted);
   font-size: 13px;
 }
 
 .chat-msg-loading {
   text-align: center;
-  color: #999;
+  color: var(--ag-text-muted);
   font-size: 12px;
   padding: 12px;
 }
 
 .chat-msg-end {
   text-align: center;
-  color: #bbb;
+  color: var(--ag-text-muted);
   font-size: 11px;
   padding: 8px;
 }

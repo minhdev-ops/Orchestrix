@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Admin;
 
+use App\Modules\AgriVerse\Models\ForumPost;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Modules\AgriVerse\Models\ForumPost;
 
 class ForumController
 {
@@ -43,9 +43,8 @@ class ForumController
         ]);
     }
 
-    public function show($id)
+    public function show(ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
         $post->load(['user:id,name', 'category:id,name']);
         $post->loadCount(['comments', 'likes']);
 
@@ -66,24 +65,22 @@ class ForumController
         ]);
     }
 
-    public function approve($id)
+    public function approve(ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
         $post->update([
-            'status' => $post->status === 'approved' ? 'pending' : 'approved',
+            'status' => 'approved',
             'reject_reason' => null,
         ]);
 
         return back()->with('success', 'Trạng thái bài viết đã được cập nhật.');
     }
 
-    public function reject(Request $request, $id)
+    public function reject(Request $request, ForumPost $post)
     {
         $data = $request->validate([
             'reason' => 'required|string|max:500',
         ]);
 
-        $post = ForumPost::findOrFail($id);
         $post->update([
             'status' => 'rejected',
             'reject_reason' => $data['reason'],
@@ -92,17 +89,15 @@ class ForumController
         return back()->with('success', 'Bài viết đã bị từ chối.');
     }
 
-    public function pin($id)
+    public function pin(ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
-        $post->update(['is_pinned' => !$post->is_pinned]);
+        $post->update(['is_pinned' => ! $post->is_pinned]);
 
         return back()->with('success', $post->is_pinned ? 'Bài viết đã được ghim.' : 'Bài viết đã bỏ ghim.');
     }
 
-    public function destroy($id)
+    public function destroy(ForumPost $post)
     {
-        $post = ForumPost::findOrFail($id);
         $post->delete();
 
         return redirect()->route('admin.agriverse.forum.index')

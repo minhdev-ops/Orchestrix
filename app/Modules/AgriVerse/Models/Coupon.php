@@ -42,17 +42,30 @@ class Coupon extends Model
 
     public function isValid(): bool
     {
-        if (!$this->is_active) return false;
-        if ($this->usage_limit > 0 && $this->used_count >= $this->usage_limit) return false;
-        if ($this->starts_at && now()->lt($this->starts_at)) return false;
-        if ($this->expires_at && now()->gt($this->expires_at)) return false;
+        if (! $this->is_active) {
+            return false;
+        }
+        if ($this->usage_limit > 0 && $this->used_count >= $this->usage_limit) {
+            return false;
+        }
+        if ($this->starts_at && now()->lt($this->starts_at)) {
+            return false;
+        }
+        if ($this->expires_at && now()->gt($this->expires_at)) {
+            return false;
+        }
+
         return true;
     }
 
     public function calculateDiscount(float $orderAmount): float
     {
-        if (!$this->isValid()) return 0;
-        if ($orderAmount < $this->min_order_amount) return 0;
+        if (! $this->isValid()) {
+            return 0;
+        }
+        if ($orderAmount < $this->min_order_amount) {
+            return 0;
+        }
 
         $discount = $this->type === 'percent'
             ? $orderAmount * ($this->value / 100)

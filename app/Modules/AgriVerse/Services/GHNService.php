@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Http;
 class GHNService
 {
     protected string $baseUrl;
+
     protected ?string $token;
+
     protected int $shopId;
 
     public function __construct()
@@ -29,6 +31,7 @@ class GHNService
         }
 
         $res = Http::withToken($this->token)->get("{$this->baseUrl}/address/getProvince");
+
         return $res->successful() ? ($res->json()['data'] ?? []) : [];
     }
 
@@ -43,6 +46,7 @@ class GHNService
         $res = Http::withToken($this->token)->post("{$this->baseUrl}/address/getDistrict", [
             'province_id' => $provinceId,
         ]);
+
         return $res->successful() ? ($res->json()['data'] ?? []) : [];
     }
 
@@ -57,6 +61,7 @@ class GHNService
         $res = Http::withToken($this->token)->post("{$this->baseUrl}/address/getWard", [
             'district_id' => $districtId,
         ]);
+
         return $res->successful() ? ($res->json()['data'] ?? []) : [];
     }
 
@@ -73,13 +78,14 @@ class GHNService
             'insurance_value' => $amount,
             'service_type_id' => $serviceTypeId ?? 2,
         ]);
+
         return $res->successful() ? ($res->json()['data'] ?? []) : [];
     }
 
     public function createOrder(array $params): array
     {
         if (empty($this->token)) {
-            return ['order_code' => 'MOCK_ORDER_' . time()];
+            return ['order_code' => 'MOCK_ORDER_'.time()];
         }
         $res = Http::withToken($this->token)->post("{$this->baseUrl}/shipping-order/create", array_merge([
             'shop_id' => $this->shopId,
@@ -87,6 +93,7 @@ class GHNService
             'payment_type_id' => 1,
             'required_note' => 'CHOXEMHANGKHONGTHU',
         ], $params));
+
         return $res->successful() ? ($res->json()['data'] ?? []) : [];
     }
 
@@ -95,6 +102,7 @@ class GHNService
         $res = Http::withToken($this->token)->post("{$this->baseUrl}/shipping-order/detail", [
             'order_code' => $orderCode,
         ]);
+
         return $res->successful() ? ($res->json()['data'] ?? []) : [];
     }
 
@@ -110,6 +118,7 @@ class GHNService
             'shop_id' => $this->shopId,
             'to_district_id' => $toDistrictId,
         ]);
+
         return $res->successful() ? ($res->json()['data'] ?? []) : [];
     }
 }

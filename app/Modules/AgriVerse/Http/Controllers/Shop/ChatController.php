@@ -2,22 +2,43 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-use App\Modules\AgriVerse\Models\Order;
-use App\Modules\AgriVerse\Models\Message;
-use App\Modules\AgriVerse\Models\Product;
+use App\Models\User;
 use App\Modules\AgriVerse\Models\ChatConversation;
-use App\Modules\AgriVerse\Models\ChatMessage;
 use App\Modules\AgriVerse\Models\ChatGroup;
 use App\Modules\AgriVerse\Models\ChatGroupMember;
-use App\Models\User;
+use App\Modules\AgriVerse\Models\ChatMessage;
+use App\Modules\AgriVerse\Models\Message;
+use App\Modules\AgriVerse\Models\Order;
+use App\Modules\AgriVerse\Models\Product;
 use App\Modules\AgriVerse\Services\ChatService;
+use Illuminate\Http\Request;
 
 class ChatController
 {
     public function __construct(
         protected ChatService $chatService,
     ) {}
+
+    /**
+     * Cấp lại Passport token mới (chạy bằng web session auth — không cần token cũ).
+     * Dùng khi WS bị chối vì token hết hạn; giúp realtime kéo dài như Messenger.
+     */
+    public function wsToken(Request $request)
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $user->tokens()->where('name', 'ws')->delete();
+
+        try {
+            $token = $user->createToken('ws')->accessToken;
+            return response()->json(['token' => $token]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Không thể cấp token'], 500);
+        }
+    }
 
     public function index(Request $request, Order $order)
     {
@@ -172,7 +193,7 @@ class ChatController
                 'sender_name' => $message->sender->name ?? 'Người dùng',
                 'is_mine' => true,
                 'created_at' => $message->created_at->toIso8601String(),
-            ]
+            ],
         ], 201);
     }
 
@@ -191,16 +212,46 @@ class ChatController
         }
 
         $conversation = ChatConversation::firstOrCreate(
-            ['buyer_id' => $buyerId, 'seller_id' => $sellerId, 'product_id' => $product->id],
+            ['buyer_id' => $buyerId, 'seller_id' => $sellerId],
             ['buyer_id' => $buyerId, 'seller_id' => $sellerId, 'product_id' => $product->id]
         );
+
+        if ((int) $conversation->product_id !== (int) $product->id) {
+            $conversation->updateQuietly(['product_id' => $product->id]);
+        }
 
         return response()->json([
             'conversation' => [
                 'id' => $conversation->id,
                 'product' => ['id' => $product->id, 'name' => $product->name, 'image' => $product->image],
-            ]
+            ],
         ]);
+    }
+
+    public function pickableProducts()
+    {
+        $userId = auth()->id();
+
+        $contactedSellerIds = ChatConversation::where('buyer_id', $userId)
+            ->pluck('seller_id')
+            ->merge(ChatConversation::where('seller_id', $userId)->pluck('buyer_id'))
+            ->unique()
+            ->values();
+
+        $products = Product::published()
+            ->where('user_id', '!=', $userId)
+            ->whereNotIn('user_id', $contactedSellerIds)
+            ->limit(20)
+            ->get(['id', 'name', 'image', 'price', 'user_id'])
+            ->map(fn ($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'image' => $p->image,
+                'price' => $p->price,
+                'seller_name' => $p->user->name ?? 'Người bán',
+            ]);
+
+        return response()->json(['products' => $products]);
     }
 
     // ===== Group Chat =====
@@ -215,6 +266,7 @@ class ChatController
             ->where('status', 'pending')
             ->pluck('group_id');
         $groups = ChatGroup::with(['creator:id,name'])
+            ->withCount(['approvedMembers'])
             ->whereIn('id', $memberGroups)
             ->orWhere('created_by', $userId)
             ->orderBy('created_at', 'desc')
@@ -223,7 +275,7 @@ class ChatController
                 'id' => $g->id,
                 'name' => $g->name,
                 'avatar' => $g->avatar,
-                'member_count' => $g->approvedMembers()->count(),
+                'member_count' => $g->approved_members_count,
                 'created_by' => $g->creator->name ?? 'Người dùng',
                 'is_creator' => $g->created_by === $userId,
                 'is_pending' => $pendingGroupIds->contains($g->id),
@@ -305,7 +357,7 @@ class ChatController
 
     public function groupMembers(ChatGroup $group)
     {
-        if (!ChatGroupMember::where('group_id', $group->id)->where('user_id', auth()->id())->where('status', 'approved')->exists()) {
+        if (! ChatGroupMember::where('group_id', $group->id)->where('user_id', auth()->id())->where('status', 'approved')->exists()) {
             abort(403);
         }
 
@@ -380,7 +432,7 @@ class ChatController
 
     public function groupMessages(Request $request, ChatGroup $group)
     {
-        if (!ChatGroupMember::where('group_id', $group->id)->where('user_id', auth()->id())->where('status', 'approved')->exists()) {
+        if (! ChatGroupMember::where('group_id', $group->id)->where('user_id', auth()->id())->where('status', 'approved')->exists()) {
             abort(403);
         }
 
@@ -412,7 +464,7 @@ class ChatController
 
     public function sendGroup(Request $request, ChatGroup $group)
     {
-        if (!ChatGroupMember::where('group_id', $group->id)->where('user_id', auth()->id())->where('status', 'approved')->exists()) {
+        if (! ChatGroupMember::where('group_id', $group->id)->where('user_id', auth()->id())->where('status', 'approved')->exists()) {
             abort(403);
         }
 
@@ -442,7 +494,7 @@ class ChatController
                 'sender_name' => $message->sender->name ?? 'Người dùng',
                 'is_mine' => true,
                 'created_at' => $message->created_at->toIso8601String(),
-            ]
+            ],
         ], 201);
     }
 }

@@ -43,7 +43,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
-            if (!Schema::hasColumn('notifications', 'is_delete')) {
+            if (! Schema::hasColumn('notifications', 'is_delete')) {
                 $table->boolean('is_delete')->default(false);
             }
         });

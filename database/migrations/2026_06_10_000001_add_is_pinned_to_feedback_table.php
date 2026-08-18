@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('feedback', function (Blueprint $table) {
-            if (!Schema::hasColumn('feedback', 'is_pinned')) {
+            if (! Schema::hasColumn('feedback', 'is_pinned')) {
                 $table->boolean('is_pinned')->default(false)->after('status');
             }
         });

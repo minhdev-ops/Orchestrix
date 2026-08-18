@@ -2,15 +2,17 @@
 
 namespace App\Modules\AgriVerse\Services;
 
+use App\Mail\EmailVerificationMail;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
-use App\Models\User;
-use App\Mail\EmailVerificationMail;
 
 class EmailVerificationService
 {
     protected int $codeLength = 6;
+
     protected int $codeExpiry = 60; // minutes
+
     protected int $maxAttempts = 5;
 
     /**
@@ -29,6 +31,7 @@ class EmailVerificationService
 
         try {
             Mail::to($user->email)->send(new EmailVerificationMail($user, $code));
+
             return true;
         } catch (\Exception $e) {
             return false;
@@ -43,12 +46,13 @@ class EmailVerificationService
         $cacheKey = "email_verification:{$user->id}";
         $data = Cache::get($cacheKey);
 
-        if (!$data) {
+        if (! $data) {
             return ['success' => false, 'message' => 'Mã xác thực đã hết hạn. Vui lòng yêu cầu mã mới.'];
         }
 
         if ($data['attempts'] >= $this->maxAttempts) {
             Cache::forget($cacheKey);
+
             return ['success' => false, 'message' => 'Đã hết số lần thử. Vui lòng yêu cầu mã mới.'];
         }
 
@@ -59,6 +63,7 @@ class EmailVerificationService
             ], now()->addMinutes($this->codeExpiry));
 
             $remaining = $this->maxAttempts - ($data['attempts'] + 1);
+
             return [
                 'success' => false,
                 'message' => "Mã xác thực không đúng. Còn {$remaining} lần thử.",
@@ -77,7 +82,7 @@ class EmailVerificationService
      */
     public function isVerified(User $user): bool
     {
-        return !is_null($user->email_verified_at);
+        return ! is_null($user->email_verified_at);
     }
 
     /**
@@ -87,6 +92,7 @@ class EmailVerificationService
     {
         $min = pow(10, $this->codeLength - 1);
         $max = pow(10, $this->codeLength) - 1;
+
         return (string) random_int($min, $max);
     }
 }

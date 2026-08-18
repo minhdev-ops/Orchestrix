@@ -14,7 +14,7 @@ class DigitalPassportLogResource extends JsonResource
             'product_id' => $this->product_id,
             'action' => $this->action,
             'data' => $this->data,
-            'performed_by' => $this->whenLoaded('performer', fn() => [
+            'performed_by' => $this->whenLoaded('performer', fn () => [
                 'id' => $this->performer->id,
                 'name' => $this->performer->name,
             ]),

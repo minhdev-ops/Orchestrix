@@ -8,8 +8,20 @@
 
       <div class="bg-white rounded-2xl border border-[var(--ag-border)] p-6 mb-8">
         <form @submit.prevent="lookup" class="flex gap-3">
-          <input v-model="code" placeholder="Nhập mã đơn hàng hoặc mã vận đơn..."
-            class="flex-1 h-12 px-4 rounded-xl border-2 border-[var(--ag-border)] text-sm outline-none focus:border-[var(--ag-primary-500)]/40 focus:ring-4 focus:ring-[var(--ag-primary-500)]/8 transition-all" />
+          <div class="flex-1 relative">
+            <input v-model="code" placeholder="Nhập mã đơn hàng hoặc mã vận đơn..."
+              class="w-full h-12 px-4 rounded-xl border-2 border-[var(--ag-border)] text-sm outline-none focus:border-[var(--ag-primary-500)]/40 focus:ring-4 focus:ring-[var(--ag-primary-500)]/8 transition-all" />
+            <div v-if="recentOrders.length && !code" class="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl border border-[var(--ag-border)] shadow-lg z-10 overflow-hidden">
+              <div class="px-3 py-2 text-xs font-semibold text-[var(--ag-text-muted)] uppercase tracking-wider">Đơn hàng gần đây</div>
+              <button v-for="o in recentOrders" :key="o.id" type="button" @click="selectRecentOrder(o)"
+                class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-left hover:bg-[var(--ag-bg)] transition-all">
+                <span class="material-symbols-outlined text-base text-[var(--ag-text-muted)]">receipt</span>
+                <span class="font-semibold text-[var(--ag-text-primary)]">#{{ o.id }}</span>
+                <span class="text-[var(--ag-text-muted)] truncate flex-1">{{ o.product?.name }}</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="statusClass(o.status)">{{ statusLabel(o.status) }}</span>
+              </button>
+            </div>
+          </div>
           <button type="submit" :disabled="loading || !code"
             class="h-12 px-6 rounded-2xl bg-[var(--ag-primary-500)] text-white text-sm font-semibold hover:bg-[var(--ag-primary-600)] transition-all disabled:opacity-50 flex items-center gap-2">
             <span v-if="loading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -210,6 +222,15 @@ const error = ref('');
 const order = ref(null);
 const ghnTracking = ref({});
 const statuses = ref([]);
+
+const props = defineProps({
+  recentOrders: { type: Array, default: () => [] },
+});
+
+function selectRecentOrder(o) {
+  code.value = String(o.id);
+  lookup();
+}
 
 async function lookup() {
   if (!code.value) return;

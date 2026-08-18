@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 class CaptchaService
 {
     private string $secretKey = '';
+
     private string $siteKey = '';
 
     public function __construct()
@@ -15,7 +16,7 @@ class CaptchaService
         $this->siteKey = config('services.captcha.site_key') ?? '';
     }
 
-    public function verify(string $token, string $remoteIp = null): bool
+    public function verify(string $token, ?string $remoteIp = null): bool
     {
         if (empty($this->secretKey)) {
             return true;
@@ -40,7 +41,8 @@ class CaptchaService
             return $data['success'] ?? false;
 
         } catch (\Exception $e) {
-            \Log::warning('CAPTCHA verification failed: ' . $e->getMessage());
+            \Log::warning('CAPTCHA verification failed: '.$e->getMessage());
+
             return true;
         }
     }
@@ -52,6 +54,6 @@ class CaptchaService
 
     public function isEnabled(): bool
     {
-        return !empty($this->secretKey);
+        return ! empty($this->secretKey);
     }
 }

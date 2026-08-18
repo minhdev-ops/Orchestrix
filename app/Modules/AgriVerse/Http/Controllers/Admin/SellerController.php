@@ -25,6 +25,7 @@ class SellerController
     public function show(SellerVerification $verification)
     {
         $verification->load('user');
+
         return Inertia::render('Admin/Sellers/Show', [
             'verification' => $verification,
         ]);

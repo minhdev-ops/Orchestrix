@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'key')) {
+            if (! Schema::hasColumn('users', 'key')) {
                 $table->text('key')->nullable()->after('email');
             }
-            if (!Schema::hasColumn('users', 'keyTime')) {
+            if (! Schema::hasColumn('users', 'keyTime')) {
                 $table->timestamp('keyTime')->nullable()->after('key');
             }
         });

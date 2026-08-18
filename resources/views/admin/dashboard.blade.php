@@ -76,7 +76,7 @@
                 <h3 class="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-6">Đơn hàng gần đây</h3>
                 <div class="space-y-4">
                     @php
-                        $recentOrders = \Modules\AgriVerse\Models\Order::with(['buyer', 'product'])->latest()->take(5)->get();
+                        $recentOrders = \App\Modules\AgriVerse\Models\Order::with(['buyer', 'product'])->latest()->take(5)->get();
                     @endphp
                     @forelse($recentOrders as $order)
                         <div class="flex gap-4 items-start justify-between">

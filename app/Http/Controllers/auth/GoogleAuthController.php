@@ -1,47 +1,46 @@
 <?php
 
-    namespace App\Http\Controllers\auth;
+namespace App\Http\Controllers\auth;
 
-    use App\Http\Controllers\Controller;
-    use App\Models\Logging;
-    use App\Models\User;
-    use App\Services\UserService;
-    use Laravel\Socialite\Facades\Socialite;
-    use Laravel\Socialite\Two\InvalidStateException;
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Laravel\Socialite\Facades\Socialite;
 
-    class GoogleAuthController extends Controller {
-        public function login() {
-            return Socialite::driver( 'google' )->redirect();
-        }
+class GoogleAuthController extends Controller
+{
+    public function login()
+    {
+        return Socialite::driver('google')->redirect();
+    }
 
-        public function callBack() {
-            session_set_cookie_params(0, '/', '.' . env( 'APP_DOMAIN' ));
-            session_start();
-            try {
-                $u    = Socialite::driver( 'google' )->user();
-                $user = User::select( 'id', 'email', 'name', 'avatar', 'gender', 'phone', 'group' )->where( 'email', $u->getEmail() )->get();
-                if ( count( $user ) == 1 ) {
-                    UserService::getInstant()->saveSession( $user[0] );
-                    Logging::LOGIN_OK( 'Login with Google', 'Đăng nhập thành công -> ' . $user[0]->email );
+    public function callBack()
+    {
+        try {
+            $socialUser = Socialite::driver('google')->user();
+            $user = User::where('email', $socialUser->getEmail())->first();
 
-                    return redirect( '/' )->withCookie( cookie( 'auth', $user[0], 24 * 60 ) );
-                } else if ( count( $user ) == 0 ) {
-                    $user         = new User();
-                    $user->name   = $u->getName();
-                    $user->email  = $u->getEmail();
-                    $user->avatar = $u->getAvatar();
-                    $user->active = 1;
-                    $user->group  = 0;
-                    $user->save();
-                    UserService::getInstant()->saveSession( $user );
-                    Logging::LOGIN_OK( 'Register and Login with Google', 'Đăng nhập thành công -> ' . $user->email );
-
-                    return redirect( '/' )->withCookie( cookie( 'auth', $user, 24 * 60 ) );
-                } else {
-                    return redirect()->route( 'login.google' );
-                }
-            } catch ( InvalidStateException $e ) {
-                return redirect()->route( 'login.google' );
+            if ($user) {
+                Auth::login($user);
+                Log::info('Login with Google success: '.$user->email);
+            } else {
+                $user = new User;
+                $user->name = $socialUser->getName();
+                $user->email = $socialUser->getEmail();
+                $user->avatar = $socialUser->getAvatar();
+                $user->is_active = true;
+                $user->role = 'user';
+                $user->save();
+                Auth::login($user);
+                Log::info('Register and Login with Google: '.$user->email);
             }
+
+            return redirect('/');
+        } catch (\Exception $e) {
+            Log::error('Google login error: '.$e->getMessage());
+
+            return redirect()->route('login');
         }
     }
+}

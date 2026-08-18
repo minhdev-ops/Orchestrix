@@ -2,14 +2,17 @@
 
 namespace App\Modules\AgriVerse\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Modules\AgriVerse\Models\DeviceToken;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PushNotificationService
 {
     protected string $projectId = '';
+
     protected string $serviceAccountKey = '';
 
     public function __construct()
@@ -62,7 +65,7 @@ class PushNotificationService
         }
 
         // Cleanup invalid tokens
-        if (!empty($invalidTokens)) {
+        if (! empty($invalidTokens)) {
             DeviceToken::whereIn('token', $invalidTokens)->delete();
         }
 
@@ -78,17 +81,17 @@ class PushNotificationService
      */
     public function sendToTopic(string $topic, string $title, string $body, array $data = []): array
     {
-        return $this->sendFcmMessage("/topics/{$topic}", $title, $body, $data);
+        return $this->sendFcmMessage(ltrim($topic, '/'), $title, $body, $data, true);
     }
 
     /**
      * Send FCM message via HTTP v1 API
      */
-    protected function sendFcmMessage(string $token, string $title, string $body, array $data = []): array
+    protected function sendFcmMessage(string $token, string $title, string $body, array $data = [], bool $isTopic = false): array
     {
         $accessToken = $this->getAccessToken();
 
-        if (!$accessToken) {
+        if (! $accessToken) {
             return ['success' => false, 'message' => 'Failed to get access token'];
         }
 
@@ -96,7 +99,7 @@ class PushNotificationService
 
         $payload = [
             'message' => [
-                'token' => $token,
+                $isTopic ? 'topic' : 'token' => $token,
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
@@ -151,8 +154,9 @@ class PushNotificationService
         try {
             $serviceAccount = json_decode($this->serviceAccountKey, true);
 
-            if (!$serviceAccount) {
+            if (! $serviceAccount) {
                 Log::error('Invalid Firebase service account key');
+
                 return null;
             }
 
@@ -185,9 +189,11 @@ class PushNotificationService
             }
 
             Log::error('Failed to get Firebase access token', $response->json());
+
             return null;
         } catch (\Exception $e) {
             Log::error('Firebase auth error', ['error' => $e->getMessage()]);
+
             return null;
         }
     }
@@ -202,6 +208,7 @@ class PushNotificationService
 
         if ($existing) {
             $existing->touchLastUsed();
+
             return $existing;
         }
 
@@ -233,7 +240,7 @@ class PushNotificationService
     /**
      * Get user tokens
      */
-    public function getUserTokens(User $user): \Illuminate\Database\Eloquent\Collection
+    public function getUserTokens(User $user): Collection
     {
         return DeviceToken::where('user_id', $user->id)->get();
     }
@@ -244,6 +251,7 @@ class PushNotificationService
     public function cleanupInactiveTokens(int $days = 90): int
     {
         $cutoff = now()->subDays($days);
+
         return DeviceToken::where('last_used_at', '<', $cutoff)->delete();
     }
 
@@ -285,11 +293,14 @@ class PushNotificationService
 
         $message = $messages[$type] ?? $messages['created'];
 
+        $allowedKeys = ['order_id', 'status', 'total_amount', 'order_code'];
+        $filteredData = array_intersect_key($orderData, array_flip($allowedKeys));
+
         return $this->sendToUser($user, $message['title'], $message['body'], array_merge([
             'type' => 'order',
             'order_id' => (string) $orderData['id'],
             'action' => $type,
-        ], $orderData));
+        ], $filteredData));
     }
 
     /**
@@ -305,7 +316,7 @@ class PushNotificationService
     /**
      * Send promotion notification
      */
-    public function sendPromotionNotification(User $user, string $title, string $body, string $promoCode = null): array
+    public function sendPromotionNotification(User $user, string $title, string $body, ?string $promoCode = null): array
     {
         $data = ['type' => 'promotion'];
         if ($promoCode) {
@@ -318,7 +329,7 @@ class PushNotificationService
     /**
      * Broadcast promotion to all users
      */
-    public function broadcastPromotion(string $title, string $body, string $promoCode = null): array
+    public function broadcastPromotion(string $title, string $body, ?string $promoCode = null): array
     {
         $tokens = DeviceToken::active()->pluck('token')->toArray();
 
@@ -338,7 +349,7 @@ class PushNotificationService
         return [
             'total_tokens' => DeviceToken::count(),
             'active_tokens' => DeviceToken::active()->count(),
-            'by_platform' => DeviceToken::select('platform', \Illuminate\Support\Facades\DB::raw('COUNT(*) as count'))
+            'by_platform' => DeviceToken::select('platform', DB::raw('COUNT(*) as count'))
                 ->groupBy('platform')
                 ->pluck('count', 'platform')
                 ->toArray(),

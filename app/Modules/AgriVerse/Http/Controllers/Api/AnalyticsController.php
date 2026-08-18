@@ -2,9 +2,9 @@
 
 namespace App\Modules\AgriVerse\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Modules\AgriVerse\Services\AnalyticsService;
+use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {
