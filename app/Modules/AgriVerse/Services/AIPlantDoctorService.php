@@ -72,26 +72,56 @@ class AIPlantDoctorService
 
         $bboxes = $leavesResponse['bboxes'];
         $leafPredictions = [];
+        $unknownLeafCount = 0;
 
         // Bước 2 & 3: Crop each leaf và predict riêng lẻ
         foreach ($bboxes as $index => $bbox) {
             $cropResult = $this->callCropAndPredict($serviceUrl, $token, $timeout, $image, $bbox, $topK);
 
-            if ($cropResult && isset($cropResult['predicted_label'])) {
-                $cropResult['leaf_id'] = $index;
-                $cropResult['bbox'] = $bbox;
-                $leafPredictions[] = $cropResult;
-                Log::info("Leaf {$index}: {$cropResult['predicted_label']} @ {$cropResult['confidence']}");
-            } else {
-                Log::warning("Crop/Predict leaf {$index} thất bại");
+            $leafLabel = is_array($cropResult) ? ($cropResult['predicted_label'] ?? '') : '';
+            $isLeafUnknown = $leafLabel === ''
+                || stripos($leafLabel, 'unknown') !== false
+                || stripos($leafLabel, 'không xác định') !== false;
+
+            if ($isLeafUnknown) {
+                $unknownLeafCount++;
+                Log::warning("Leaf {$index}: không xác định được bệnh (unknown), khuyến nghị đưa cho người có thẩm quyền kiểm tra");
+                continue;
             }
+
+            $cropResult['leaf_id'] = $index;
+            $cropResult['bbox'] = $bbox;
+            $leafPredictions[] = $cropResult;
+            Log::info("Leaf {$index}: {$cropResult['predicted_label']} @ {$cropResult['confidence']}");
         }
 
         // Bước 4: Aggregate predictions from all leaves
         $aggregated = $this->aggregateLeafPredictions($leafPredictions, $topK);
 
         if (!$aggregated['predicted_label']) {
-            throw new \RuntimeException('Không có kết quả dự đoán từ các lá');
+            $description = $this->unknownLeafNotice($unknownLeafCount)
+                . ' Hệ thống không đủ thông tin để đưa ra chẩn đoán tự động.';
+
+            return [
+                'plant_name' => 'Không xác định',
+                'disease_name' => 'Không xác định',
+                'confidence' => 0,
+                'severity' => 'unknown',
+                'description' => $description,
+                'treatments' => [],
+                'prevention' => [],
+                'raw_response' => [
+                    'vit' => [
+                        'aggregated' => $aggregated,
+                        'leaf_predictions' => $leafPredictions,
+                        'bboxes_count' => count($bboxes),
+                        'unknown_leaves' => $unknownLeafCount,
+                    ],
+                    'symptoms' => $symptoms,
+                ],
+                'provider' => 'vit_local_enhanced',
+                'cross_validation' => null,
+            ];
         }
 
         $predictedLabel = $aggregated['predicted_label'];
@@ -105,13 +135,13 @@ class AIPlantDoctorService
         // Xác định severity dựa trên độ tin cậy trung bình
         $severity = $this->deriveSeverity($confidence);
 
-        // Trường hợp label là "healthy (...)" -> không bệnh
-        $isHealthy = stripos($predictedLabel, 'healthy') !== false
+        // Trường hợp label là "healthy (...)" -> không bệnh (theo ViT)
+        $isHealthyViT = stripos($predictedLabel, 'healthy') !== false
             || strcasecmp($diseaseName, 'healthy') === 0
             || strcasecmp($diseaseName, 'Khỏe mạnh') === 0;
 
         // Cây khỏe mạnh không thể có severity 'high' chỉ vì confidence cao
-        if ($isHealthy) {
+        if ($isHealthyViT) {
             $severity = 'none';
         }
 
@@ -122,7 +152,62 @@ class AIPlantDoctorService
         $providerTag = 'vit_local_enhanced';
         $crossValidation = null;
 
-        if ($isHealthy) {
+        // Luôn chạy xác nhận chéo với AI cloud (kể cả khi ViT cho là khỏe mạnh)
+        // để Gemini đóng vai trò bác sĩ thứ 2 quyết định khỏe/bệnh.
+        $infoProvider = (string) config('services.ai_plant_doctor.info_provider', '');
+        $kbInfo = $this->callDiseaseInfo($serviceUrl, $token, $timeout, $predictedLabel);
+
+        $enriched = null;
+        if (in_array($infoProvider, ['gemini', 'openai'], true)) {
+            // Hybrid: ViT chẩn đoán chính + cloud (Gemini/OpenAI) đóng vai trò bác sĩ thứ 2
+            $enriched = $this->enrichWithCloud($infoProvider, $image, [
+                'predicted_label' => $predictedLabel,
+                'confidence' => $confidence,
+                'symptoms' => $symptoms,
+                'leaf_predictions' => $leafPredictions,
+                'top_k' => $aggregated['top_k_aggregated'] ?? [],
+                'knowledge_base' => $kbInfo,
+                'is_healthy' => $isHealthyViT,
+            ]);
+        }
+
+        $isHealthy = $isHealthyViT;
+
+        if ($enriched !== null) {
+            $description = $enriched['description'] ?? '';
+            $treatments = $enriched['treatments'] ?? [];
+            $prevention = $enriched['prevention'] ?? [];
+            if (!empty($enriched['plant_name'])) {
+                $plantName = $enriched['plant_name'];
+            }
+            // Xác nhận chéo: ưu tiên kết quả AI cloud (Gemini) thay cho nhãn ViT tiếng Anh
+            if (!empty($enriched['disease_name'])) {
+                $diseaseName = $enriched['disease_name'];
+            }
+            if (!empty($enriched['severity']) && in_array($enriched['severity'], ['none', 'low', 'medium', 'high', 'critical'], true)) {
+                $severity = $enriched['severity'];
+            }
+            // Cloud quyết định khỏe/bệnh, không theo ViT
+            $isHealthy = $this->isHealthyVerdict($diseaseName, $severity);
+            $providerTag = 'vit_local_enhanced+' . $infoProvider;
+            $rawResponse['info'] = $enriched['raw'] ?? null;
+            $crossValidation = [
+                'provider' => $infoProvider,
+                'agrees' => $enriched['agrees'] ?? null,
+                'cloud_confidence' => $enriched['gemini_confidence'] ?? null,
+                'vi_predict' => $predictedLabel,
+                'cloud_disease' => $enriched['disease_name'] ?? null,
+            ];
+
+            // Cloud không đồng ý với ViT -> thông báo đã ưu tiên kết quả cloud
+            if ($enriched['agrees'] === false) {
+                $description = '[Lưu ý] AI cloud (' . $infoProvider . ') không đồng ý với mô hình local (dự đoán "'
+                    . $predictedLabel . '") nên kết quả hiển thị theo AI cloud: "'
+                    . ($enriched['disease_name'] ?? 'khác') . '". '
+                    . $description;
+            }
+        } elseif ($isHealthyViT) {
+            // Không có cloud (chưa cấu hình key): giữ kết quả khỏe mạnh từ ViT
             $description = 'Cây có vẻ khỏe mạnh, không phát hiện dấu hiệu bệnh trên các lá đã phân tích.';
             $treatments = [];
             $prevention = [
@@ -130,57 +215,9 @@ class AIPlantDoctorService
                 'Kiểm tra định kỳ để phát hiện sớm dấu hiệu bất thường.',
             ];
         } else {
-            $infoProvider = (string) config('services.ai_plant_doctor.info_provider', '');
-            $kbInfo = $this->callDiseaseInfo($serviceUrl, $token, $timeout, $predictedLabel);
-
-            $enriched = null;
-            if (in_array($infoProvider, ['gemini', 'openai'], true)) {
-                // Hybrid: ViT chẩn đoán chính + cloud (Gemini/OpenAI) đóng vai trò bác sĩ thứ 2
-                $enriched = $this->enrichWithCloud($infoProvider, $image, [
-                    'predicted_label' => $predictedLabel,
-                    'confidence' => $confidence,
-                    'symptoms' => $symptoms,
-                    'leaf_predictions' => $leafPredictions,
-                    'top_k' => $aggregated['top_k_aggregated'] ?? [],
-                    'knowledge_base' => $kbInfo,
-                ]);
-            }
-
-            if ($enriched !== null) {
-                $description = $enriched['description'] ?? '';
-                $treatments = $enriched['treatments'] ?? [];
-                $prevention = $enriched['prevention'] ?? [];
-                if (!empty($enriched['plant_name'])) {
-                    $plantName = $enriched['plant_name'];
-                }
-                // Gemini đồng ý -> dùng tên bệnh tiếng Việt thân thiện hơn nhãn ViT tiếng Anh
-                if (!empty($enriched['disease_name']) && $enriched['agrees'] !== false) {
-                    $diseaseName = $enriched['disease_name'];
-                }
-                if (!empty($enriched['severity']) && in_array($enriched['severity'], ['none', 'low', 'medium', 'high', 'critical'], true)) {
-                    $severity = $enriched['severity'];
-                }
-                $providerTag = 'vit_local_enhanced+' . $infoProvider;
-                $rawResponse['info'] = $enriched['raw'] ?? null;
-                $crossValidation = [
-                    'provider' => $infoProvider,
-                    'agrees' => $enriched['agrees'] ?? null,
-                    'cloud_confidence' => $enriched['gemini_confidence'] ?? null,
-                    'vi_predict' => $predictedLabel,
-                    'cloud_disease' => $enriched['disease_name'] ?? null,
-                ];
-
-                // Cloud không đồng ý với ViT -> cảnh báo rõ ràng cho user
-                if ($enriched['agrees'] === false) {
-                    $description = '[Lưu ý] Mô hình local dự đoán "' . $predictedLabel . '" nhưng AI cloud đề xuất "'
-                        . ($enriched['disease_name'] ?? 'khác') . '". Khuyến nghị tham khảo chuyên gia để xác nhận. '
-                        . $description;
-                }
-            } else {
-                // Fallback tầng 2: knowledge base; tầng 3: template
-                [$description, $treatments, $prevention] = $this->fallbackDescriptionFor($kbInfo, $predictedLabel);
-                $providerTag = 'vit_local_enhanced+kb';
-            }
+            // Fallback tầng 2: knowledge base; tầng 3: template
+            [$description, $treatments, $prevention] = $this->fallbackDescriptionFor($kbInfo, $predictedLabel);
+            $providerTag = 'vit_local_enhanced+kb';
         }
 
         if ($confidence < $minConfidence) {
@@ -189,10 +226,15 @@ class AIPlantDoctorService
                 . $description;
         }
 
+        if ($unknownLeafCount > 0) {
+            $description = $this->unknownLeafNotice($unknownLeafCount) . "\n\n" . $description;
+        }
+
         $rawResponse['vit'] = [
             'aggregated' => $aggregated,
             'leaf_predictions' => $leafPredictions,
             'bboxes_count' => count($bboxes),
+            'unknown_leaves' => $unknownLeafCount,
         ];
         $rawResponse['symptoms'] = $symptoms;
         if ($crossValidation !== null) {
@@ -256,12 +298,13 @@ class AIPlantDoctorService
 
         $severity = $this->deriveSeverity($confidence);
 
-        $isHealthy = stripos($predictedLabel, 'healthy') !== false
+        // Trường hợp label là "healthy (...)" -> không bệnh (theo ViT)
+        $isHealthyViT = stripos($predictedLabel, 'healthy') !== false
             || strcasecmp($diseaseName, 'healthy') === 0
             || strcasecmp($diseaseName, 'Khỏe mạnh') === 0;
 
         // Cây khỏe mạnh không thể có severity 'high' chỉ vì confidence cao
-        if ($isHealthy) {
+        if ($isHealthyViT) {
             $severity = 'none';
         }
 
@@ -271,7 +314,61 @@ class AIPlantDoctorService
         $providerTag = 'vit_local';
         $crossValidation = null;
 
-        if ($isHealthy) {
+        // Luôn chạy xác nhận chéo với AI cloud (kể cả khi ViT cho là khỏe mạnh)
+        // để Gemini đóng vai trò bác sĩ thứ 2 quyết định khỏe/bệnh.
+        $infoProvider = (string) config('services.ai_plant_doctor.info_provider', '');
+        $kbInfo = $this->callDiseaseInfo($serviceUrl, $token, $timeout, $predictedLabel);
+
+        $enriched = null;
+        if (in_array($infoProvider, ['gemini', 'openai'], true)) {
+            $enriched = $this->enrichWithCloud($infoProvider, $image, [
+                'predicted_label' => $predictedLabel,
+                'confidence' => $confidence,
+                'symptoms' => $symptoms,
+                'leaf_predictions' => [],
+                'top_k' => $vit['top'] ?? [],
+                'knowledge_base' => $kbInfo,
+                'is_healthy' => $isHealthyViT,
+            ]);
+        }
+
+        $isHealthy = $isHealthyViT;
+
+        if ($enriched !== null) {
+            $description = $enriched['description'] ?? '';
+            $treatments = $enriched['treatments'] ?? [];
+            $prevention = $enriched['prevention'] ?? [];
+            if (!empty($enriched['plant_name'])) {
+                $plantName = $enriched['plant_name'];
+            }
+            // Xác nhận chéo: ưu tiên kết quả AI cloud (Gemini) thay cho nhãn ViT tiếng Anh
+            if (!empty($enriched['disease_name'])) {
+                $diseaseName = $enriched['disease_name'];
+            }
+            if (!empty($enriched['severity']) && in_array($enriched['severity'], ['none', 'low', 'medium', 'high', 'critical'], true)) {
+                $severity = $enriched['severity'];
+            }
+            // Cloud quyết định khỏe/bệnh, không theo ViT
+            $isHealthy = $this->isHealthyVerdict($diseaseName, $severity);
+            $providerTag = 'vit_local+' . $infoProvider;
+            $rawResponse['info'] = $enriched['raw'] ?? null;
+            $crossValidation = [
+                'provider' => $infoProvider,
+                'agrees' => $enriched['agrees'] ?? null,
+                'cloud_confidence' => $enriched['gemini_confidence'] ?? null,
+                'vi_predict' => $predictedLabel,
+                'cloud_disease' => $enriched['disease_name'] ?? null,
+            ];
+
+            // Cloud không đồng ý với ViT -> thông báo đã ưu tiên kết quả cloud
+            if ($enriched['agrees'] === false) {
+                $description = '[Lưu ý] AI cloud (' . $infoProvider . ') không đồng ý với mô hình local (dự đoán "'
+                    . $predictedLabel . '") nên kết quả hiển thị theo AI cloud: "'
+                    . ($enriched['disease_name'] ?? 'khác') . '". '
+                    . $description;
+            }
+        } elseif ($isHealthyViT) {
+            // Không có cloud (chưa cấu hình key): giữ kết quả khỏe mạnh từ ViT
             $description = 'Cây có vẻ khỏe mạnh, không phát hiện dấu hiệu bệnh trên ảnh.';
             $treatments = [];
             $prevention = [
@@ -279,61 +376,23 @@ class AIPlantDoctorService
                 'Kiểm tra định kỳ để phát hiện sớm dấu hiệu bất thường.',
             ];
         } else {
-            $infoProvider = (string) config('services.ai_plant_doctor.info_provider', '');
-            $kbInfo = $this->callDiseaseInfo($serviceUrl, $token, $timeout, $predictedLabel);
-
-            $enriched = null;
-            if (in_array($infoProvider, ['gemini', 'openai'], true)) {
-                $enriched = $this->enrichWithCloud($infoProvider, $image, [
-                    'predicted_label' => $predictedLabel,
-                    'confidence' => $confidence,
-                    'symptoms' => $symptoms,
-                    'leaf_predictions' => [],
-                    'top_k' => $vit['top'] ?? [],
-                    'knowledge_base' => $kbInfo,
-                ]);
-            }
-
-            if ($enriched !== null) {
-                $description = $enriched['description'] ?? '';
-                $treatments = $enriched['treatments'] ?? [];
-                $prevention = $enriched['prevention'] ?? [];
-                if (!empty($enriched['plant_name'])) {
-                    $plantName = $enriched['plant_name'];
-                }
-                // Gemini đồng ý -> dùng tên bệnh tiếng Việt thân thiện hơn nhãn ViT tiếng Anh
-                if (!empty($enriched['disease_name']) && $enriched['agrees'] !== false) {
-                    $diseaseName = $enriched['disease_name'];
-                }
-                if (!empty($enriched['severity']) && in_array($enriched['severity'], ['none', 'low', 'medium', 'high', 'critical'], true)) {
-                    $severity = $enriched['severity'];
-                }
-                $providerTag = 'vit_local+' . $infoProvider;
-                $rawResponse['info'] = $enriched['raw'] ?? null;
-                $crossValidation = [
-                    'provider' => $infoProvider,
-                    'agrees' => $enriched['agrees'] ?? null,
-                    'cloud_confidence' => $enriched['gemini_confidence'] ?? null,
-                    'vi_predict' => $predictedLabel,
-                    'cloud_disease' => $enriched['disease_name'] ?? null,
-                ];
-
-                if ($enriched['agrees'] === false) {
-                    $description = '[Lưu ý] Mô hình local dự đoán "' . $predictedLabel . '" nhưng AI cloud đề xuất "'
-                        . ($enriched['disease_name'] ?? 'khác') . '". Khuyến nghị tham khảo chuyên gia để xác nhận. '
-                        . $description;
-                }
-            } else {
-                // Fallback tầng 2: knowledge base; tầng 3: template
-                [$description, $treatments, $prevention] = $this->fallbackDescriptionFor($kbInfo, $predictedLabel);
-                $providerTag = 'vit_local+kb';
-            }
+            // Fallback tầng 2: knowledge base; tầng 3: template
+            [$description, $treatments, $prevention] = $this->fallbackDescriptionFor($kbInfo, $predictedLabel);
+            $providerTag = 'vit_local+kb';
         }
 
         if ($confidence < $minConfidence) {
             $description = 'Mô hình không tự tin cao về kết quả này (' . round($confidence * 100, 1) . '%). '
                 . 'Hãy chụp ảnh rõ nét hơn, lấy gần lá/cành bị bệnh và thử lại. '
                 . $description;
+        }
+
+        $isUnknown = stripos($predictedLabel, 'unknown') !== false
+            || stripos($predictedLabel, 'không xác định') !== false;
+
+        if ($isUnknown) {
+            $severity = 'unknown';
+            $description = $this->unknownLeafNotice(0) . "\n\n" . $description;
         }
 
         if ($crossValidation !== null) {
@@ -538,6 +597,10 @@ class AIPlantDoctorService
         $lines[] = '';
         $lines[] = '=== Kết quả mô hình ViT local (best_vit.keras, 71 classes) ===';
         $lines[] = "- Dự đoán chính: {$predictedLabel} (độ tin cậy: {$confidence}%)";
+
+        if (!empty($context['is_healthy'])) {
+            $lines[] = '- Mô hình local cho rằng cây KHỎE MẠNH (không phát hiện bệnh). Hãy quan sát kỹ ảnh để xác nhận hoặc bác bỏ.';
+        }
 
         if (!empty($topK)) {
             $lines[] = '- Top candidates:';
@@ -770,6 +833,29 @@ class AIPlantDoctorService
         ];
 
         return [$description, $treatments, $prevention];
+    }
+
+    /**
+     * Thông báo khi có lá không xác định được bệnh (unknown):
+     * khuyến nghị đưa mẫu vật cho người có thẩm quyền kiểm tra.
+     */
+    private function unknownLeafNotice(int $count): string
+    {
+        $leafPart = $count > 0 ? "{$count} lá không xác định được bệnh (unknown). " : '';
+
+        return $leafPart . 'Khuyến nghị đưa mẫu vật cho người có thẩm quyền '
+            . '(chuyên gia nông nghiệp, cán bộ bảo vệ thực vật) để kiểm tra và xác nhận chẩn đoán.';
+    }
+
+    /**
+     * Quyết định khỏe/bệnh theo phán quyết của AI cloud (Gemini/OpenAI).
+     */
+    private function isHealthyVerdict(string $diseaseName, string $severity): bool
+    {
+        return strcasecmp($diseaseName, 'Khỏe mạnh') === 0
+            || strcasecmp($diseaseName, 'healthy') === 0
+            || stripos($diseaseName, 'khỏe') !== false
+            || ($severity === 'none' && strcasecmp($diseaseName, 'Không xác định') !== 0);
     }
 
     private function callGeminiWithPrompt(string $base64, string $mimeType, string $prompt): array

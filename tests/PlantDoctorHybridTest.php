@@ -183,7 +183,7 @@ class PlantDoctorHybridTest extends TestCase
         $this->assertEquals(2, $geminiRequests, 'Gemini phải được gọi 2 lần (1 fail + 1 retry)');
     }
 
-    public function test_gemini_disagrees_adds_warning_and_keeps_vi_label(): void
+    public function test_gemini_disagrees_takes_cloud_result(): void
     {
         $this->fakeVitService();
 
@@ -208,7 +208,8 @@ class PlantDoctorHybridTest extends TestCase
 
         $result = $this->service->diagnose($this->makeImage(), 'Đốm đen trên quả');
 
-        $this->assertEquals('Bacterial spot', $result['disease_name'], 'Giữ nhãn ViT làm chính');
+        $this->assertEquals('Bệnh thán thư', $result['disease_name'], 'Ưu tiên kết quả AI cloud khi không đồng ý với ViT');
+        $this->assertEquals('medium', $result['severity']);
         $this->assertStringContainsString('[Lưu ý]', $result['description']);
         $this->assertFalse($result['cross_validation']['agrees']);
         $this->assertEquals('Bệnh thán thư', $result['cross_validation']['cloud_disease']);
@@ -247,7 +248,7 @@ class PlantDoctorHybridTest extends TestCase
         $this->assertEquals(1, $geminiRequests, 'Gọi thứ 2 cùng label + symptoms phải dùng cache');
     }
 
-    public function test_healthy_plant_skips_gemini(): void
+    public function test_healthy_plant_still_calls_gemini_and_cloud_verdict_wins(): void
     {
         $this->fakeVitService([
             'predict-leaf' => [
@@ -259,13 +260,76 @@ class PlantDoctorHybridTest extends TestCase
             ],
         ]);
 
+        // Gemini đồng ý cây khỏe mạnh
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [[
+                    'content' => ['parts' => [[
+                        'text' => json_encode([
+                            'plant_name' => 'Cà chua',
+                            'disease_name' => 'Khỏe mạnh',
+                            'agrees' => true,
+                            'gemini_confidence' => 0.9,
+                            'severity' => 'none',
+                            'description' => 'Lá xanh tốt, không dấu hiệu bệnh.',
+                            'treatments' => [],
+                            'prevention' => ['Kiểm tra định kỳ'],
+                        ]),
+                    ]]],
+                ]],
+            ], 200),
+        ]);
+
         $result = $this->service->diagnose($this->makeImage(), null);
 
         $this->assertEquals('Khỏe mạnh', $result['disease_name']);
         $this->assertEquals('none', $result['severity'], 'Cây khỏe phải có severity none');
-        $this->assertNull($result['cross_validation']);
+        $this->assertEquals('vit_local_enhanced+gemini', $result['provider']);
+        $this->assertNotNull($result['cross_validation']);
+        $this->assertTrue($result['cross_validation']['agrees']);
 
-        Http::assertNotSent(fn ($request) => str_contains($request->url(), 'generativelanguage.googleapis.com'));
+        // Gemini vẫn phải được gọi kể cả khi ViT kết luận khỏe mạnh
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'generativelanguage.googleapis.com'));
+    }
+
+    public function test_vit_says_healthy_but_gemini_finds_disease(): void
+    {
+        $this->fakeVitService([
+            'predict-leaf' => [
+                'predicted_label' => 'healthy (Tomato)',
+                'confidence' => 0.95,
+                'top' => [
+                    ['label' => 'healthy (Tomato)', 'confidence' => 0.95],
+                ],
+            ],
+        ]);
+
+        // Gemini phát hiện bệnh dù ViT nói khỏe -> kết quả theo cloud
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [[
+                    'content' => ['parts' => [[
+                        'text' => json_encode([
+                            'plant_name' => 'Cà chua',
+                            'disease_name' => 'Bệnh đốm lá',
+                            'agrees' => false,
+                            'gemini_confidence' => 0.8,
+                            'severity' => 'medium',
+                            'description' => 'Lá có đốm nâu lan rộng.',
+                            'treatments' => ['Phun đồng'],
+                            'prevention' => ['Vệ sinh vườn'],
+                        ]),
+                    ]]],
+                ]],
+            ], 200),
+        ]);
+
+        $result = $this->service->diagnose($this->makeImage(), null);
+
+        $this->assertEquals('Bệnh đốm lá', $result['disease_name'], 'Cloud phát hiện bệnh phải được ưu tiên');
+        $this->assertEquals('medium', $result['severity']);
+        $this->assertStringContainsString('[Lưu ý]', $result['description']);
+        $this->assertFalse($result['cross_validation']['agrees']);
     }
 
     private function fakeVitService(array $overrides = []): void

@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\AdminPermissionController;
 use App\Http\Controllers\api\auth\SocialAuthController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\ExpenseController;
-use App\Http\Controllers\Api\AdminPermissionController;
 
 use App\Modules\AgriVerse\Http\Controllers\Api\AuthBridgeController;
 

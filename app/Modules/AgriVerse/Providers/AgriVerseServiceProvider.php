@@ -15,8 +15,6 @@ use App\Modules\AgriVerse\Policies\ProductPolicy;
 use App\Modules\AgriVerse\Policies\StorePolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
 
 class AgriVerseServiceProvider extends ServiceProvider
 {
