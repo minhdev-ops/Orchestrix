@@ -35,6 +35,7 @@ class AgriVerseServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \App\Modules\AgriVerse\Console\FetchGHNAddresses::class,
+                \App\Modules\AgriVerse\Console\TestPlantDoctorPipeline::class,
             ]);
         }
     }

@@ -207,6 +207,10 @@ Route::middleware('auth')->prefix('agriverse/api')->name('agriverse.api.')->grou
     Route::post('settings/notifications', [\App\Modules\AgriVerse\Http\Controllers\Shop\PageController::class, 'saveNotificationPreferences'])->name('settings.notifications');
     Route::post('settings/profile', [\App\Modules\AgriVerse\Http\Controllers\Shop\PageController::class, 'updateProfile'])->name('settings.profile');
     Route::post('settings/password', [\App\Modules\AgriVerse\Http\Controllers\Shop\PageController::class, 'changePassword'])->name('settings.password');
+
+    // Plant Doctor (AI Diagnosis) - web session auth
+    Route::post('plant-doctor/diagnose', [\App\Modules\AgriVerse\Http\Controllers\Api\PlantDoctorController::class, 'diagnose'])->name('plant-doctor.diagnose');
+    Route::get('plant-doctor/history', [\App\Modules\AgriVerse\Http\Controllers\Api\PlantDoctorController::class, 'history'])->name('plant-doctor.history');
 });
 
 // Contracts (shop view)

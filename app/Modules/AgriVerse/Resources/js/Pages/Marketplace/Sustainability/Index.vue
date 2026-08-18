@@ -282,6 +282,7 @@ function showMethodology() {
   }
 }
 
+</script>
 
 <style scoped>
 .sustainability {

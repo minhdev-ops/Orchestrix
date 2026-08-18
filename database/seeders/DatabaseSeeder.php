@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleAndPermissionSeeder::class,
             \App\Modules\AgriVerse\Database\Seeders\ForumCategorySeeder::class,
+            ExpenseSeeder::class,
         ]);
 
         $admin = User::firstOrCreate(

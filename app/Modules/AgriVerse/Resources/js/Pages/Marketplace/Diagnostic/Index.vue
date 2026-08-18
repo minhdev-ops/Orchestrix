@@ -9,13 +9,19 @@
       <div class="diagnostic__grid">
         <div class="diagnostic__left">
           <div class="diagnostic__upload" @click="handleUpload">
-            <input id="specimen-upload" type="file" class="diagnostic__upload-input" @change="onFileChange" />
+            <input id="specimen-upload" type="file" class="diagnostic__upload-input" accept="image/jpeg,image/png,image/webp" @change="onFileChange" />
             <label for="specimen-upload" class="diagnostic__upload-label">
-              <div class="diagnostic__upload-icon">
-                <span class="material-symbols-outlined">photo_camera</span>
-              </div>
-              <h3 class="diagnostic__upload-title">Tải Ảnh Mẫu Vật</h3>
-              <p class="diagnostic__upload-desc">Đảm bảo chụp độ phân giải cao, từ trên xuống phần tán lá bị ảnh hưởng để xử lý thần kinh chính xác.</p>
+              <template v-if="!previewUrl">
+                <div class="diagnostic__upload-icon">
+                  <span class="material-symbols-outlined">photo_camera</span>
+                </div>
+                <h3 class="diagnostic__upload-title">Tải Ảnh Mẫu Vật</h3>
+                <p class="diagnostic__upload-desc">Đảm bảo chụp độ phân giải cao, từ trên xuống phần tán lá bị ảnh hưởng để xử lý thần kinh chính xác.</p>
+              </template>
+              <template v-else>
+                <img :src="previewUrl" alt="Ảnh mẫu vật đã chọn" class="diagnostic__upload-preview" />
+                <p class="diagnostic__upload-desc">Nhấn để chọn ảnh khác</p>
+              </template>
             </label>
             <div class="diagnostic__corner diagnostic__corner--tl"></div>
             <div class="diagnostic__corner diagnostic__corner--tr"></div>
@@ -87,21 +93,38 @@
                 <span class="material-symbols-outlined">psychology</span>
               </div>
               <div>
-                <h3 class="diagnostic__report-title">Báo Cáo Chẩn Đoán: A04</h3>
-                <p class="diagnostic__report-subtitle">Phát Hiện: Thiếu Magie</p>
+                <h3 class="diagnostic__report-title">Báo Cáo Chẩn Đoán{{ result ? `: #${result.id}` : '' }}</h3>
+                <p class="diagnostic__report-subtitle">{{ reportSubtitle }}</p>
               </div>
             </div>
             <div class="diagnostic__report-body">
-              <p class="diagnostic__report-desc">Mẫu vật có dấu hiệu vàng úa gân lá cổ điển. Các mô hình thần kinh cho thấy độ pH của giá thể hơi kiềm (7.4), ức chế sự hấp thu magie trong hệ thống mạch.</p>
-              <ul class="diagnostic__treatment-list">
-                <li v-for="treatment in treatments" :key="treatment" class="diagnostic__treatment-item">
-                  <span class="material-symbols-outlined diagnostic__treatment-icon">check_circle</span>
-                  <span>{{ treatment }}</span>
-                </li>
-              </ul>
+              <div v-if="isAnalyzing" class="diagnostic__analyzing">
+                <span class="material-symbols-outlined diagnostic__analyzing-icon">auto_awesome</span>
+                <p>AI đang phân tích mẫu vật...</p>
+              </div>
+              <template v-else-if="result">
+                <p class="diagnostic__report-desc">{{ result.description }}</p>
+                <ul class="diagnostic__treatment-list">
+                  <li v-for="treatment in result.treatments" :key="treatment" class="diagnostic__treatment-item">
+                    <span class="material-symbols-outlined diagnostic__treatment-icon">check_circle</span>
+                    <span>{{ treatment }}</span>
+                  </li>
+                </ul>
+                <div class="diagnostic__prevention">
+                  <h4 class="diagnostic__prevention-title">Phòng Ngừa</h4>
+                  <ul class="diagnostic__treatment-list">
+                    <li v-for="item in result.prevention" :key="item" class="diagnostic__treatment-item">
+                      <span class="material-symbols-outlined diagnostic__treatment-icon">shield</span>
+                      <span>{{ item }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </template>
+              <p v-else-if="errorMessage" class="diagnostic__report-error">{{ errorMessage }}</p>
+              <p v-else class="diagnostic__report-desc">Tải lên ảnh lá cây để bắt đầu chẩn đoán. Hệ thống AI sẽ phát hiện bệnh và đề xuất biện pháp xử lý.</p>
             </div>
-            <button class="diagnostic__cta">
-              Nhận Bộ Xử Lý
+            <button class="diagnostic__cta" @click="handleUpload" :disabled="isAnalyzing">
+              {{ isAnalyzing ? 'Đang Phân Tích...' : 'Chẩn Đoán Ngay' }}
               <span class="material-symbols-outlined">arrow_forward</span>
             </button>
           </div>
@@ -129,6 +152,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import axios from 'axios'
 import MarketplaceLayout from '@agriverse/Layouts/MarketplaceLayout.vue'
 
 const props = defineProps({
@@ -137,18 +161,23 @@ const props = defineProps({
 
 const selectedSymptoms = ref([])
 const reportRef = ref(null)
-const statusText = ref('Đang Phân Tích Luồng Thời Gian Thực...')
+const statusText = ref('Sẵn Sàng Chẩn Đoán')
+const previewUrl = ref('')
+const selectedFile = ref(null)
+const isAnalyzing = ref(false)
+const result = ref(null)
+const errorMessage = ref('')
 
 const symptomNames = computed(() => {
   if (props.symptoms.length > 0) return props.symptoms
   return ['Vàng Lá', 'Rụng Lá', 'Đầu Lá Nâu', 'Chậm Phát Triển', 'Lá Đốm', 'Mốc Trắng']
 })
 
-const treatments = [
-  'Bón dung dịch muối Epson (1 muỗng cà phê/gallon)',
-  'Điều chỉnh pH về khoảng 6.2 - 6.5',
-  'Tăng PAR lên 15%'
-]
+const reportSubtitle = computed(() => {
+  if (!result.value) return 'Chưa có kết quả phân tích'
+  const confidence = Math.round((result.value.confidence ?? 0) * 100)
+  return `${result.value.disease_name} • ${result.value.plant_name} • Độ tin cậy ${confidence}% • Mức độ: ${result.value.severity}`
+})
 
 const gallery = [
   {
@@ -174,9 +203,42 @@ const gallery = [
   }
 ]
 
-function handleUpload() {
+function onFileChange(e) {
+  const file = e.target.files && e.target.files[0]
+  if (!file) return
+
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    errorMessage.value = 'Định dạng ảnh không hợp lệ. Vui lòng chọn JPG, PNG hoặc WEBP.'
+    return
+  }
+
+  selectedFile.value = file
+  previewUrl.value = URL.createObjectURL(file)
+  errorMessage.value = ''
+  result.value = null
+}
+
+async function handleUpload() {
+  if (!selectedFile.value) {
+    errorMessage.value = 'Vui lòng chọn ảnh mẫu vật trước khi chẩn đoán.'
+    return
+  }
+
+  isAnalyzing.value = true
+  errorMessage.value = ''
+  result.value = null
   statusText.value = 'AI: Đang Phát Hiện Dị Thường Tán Lá...'
-  setTimeout(() => {
+
+  const formData = new FormData()
+  formData.append('image', selectedFile.value)
+  formData.append('symptoms', selectedSymptoms.value.join(', '))
+
+  try {
+    const { data } = await axios.post('/agriverse/api/plant-doctor/diagnose', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    result.value = data.diagnosis
+    statusText.value = 'Hoàn Tất Phân Tích'
     if (reportRef.value) {
       reportRef.value.scrollIntoView({ behavior: 'smooth', block: 'center' })
       reportRef.value.classList.add('diagnostic__report--highlight')
@@ -184,12 +246,14 @@ function handleUpload() {
         reportRef.value.classList.remove('diagnostic__report--highlight')
       }, 1000)
     }
-  }, 1500)
-}
-
-function onFileChange(e) {
-  if (e.target.files.length > 0) {
-    handleUpload()
+  } catch (err) {
+    statusText.value = 'Chẩn Đoán Thất Bại'
+    const detail = err.response?.data?.error || err.response?.data?.message
+    errorMessage.value = detail
+      ? `Chẩn đoán thất bại: ${detail}`
+      : 'Không thể kết nối đến hệ thống AI. Vui lòng thử lại sau.'
+  } finally {
+    isAnalyzing.value = false
   }
 }
 </script>
@@ -261,6 +325,14 @@ function onFileChange(e) {
 
 .diagnostic__upload:hover {
   background: var(--ag-surface-container-low);
+}
+
+.diagnostic__upload-preview {
+  max-width: 100%;
+  max-height: 280px;
+  border-radius: 8px;
+  object-fit: contain;
+  margin-bottom: 12px;
 }
 
 .diagnostic__upload-input {
@@ -643,6 +715,46 @@ function onFileChange(e) {
   flex-direction: column;
   gap: 16px;
   margin-bottom: 32px;
+}
+
+.diagnostic__analyzing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.diagnostic__analyzing-icon {
+  font-size: 24px;
+  animation: pulse 2s infinite;
+}
+
+.diagnostic__report-error {
+  font-size: 15px;
+  line-height: 24px;
+  color: #ffe3e3;
+  background: color-mix(in srgb, #b3261e 60%, transparent);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.diagnostic__prevention {
+  border-top: 1px solid color-mix(in srgb, #fff 20%, transparent);
+  padding-top: 16px;
+}
+
+.diagnostic__prevention-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ag-primary-fixed);
+  margin: 0 0 8px;
+}
+
+.diagnostic__cta:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .diagnostic__report-desc {
