@@ -2,10 +2,8 @@
 
 namespace App\Modules\AgriVerse\Providers;
 
-use App\Console\Commands\GenerateDailyReports;
-use App\Modules\AgriVerse\Console\FetchGHNAddresses;
-use App\Modules\AgriVerse\Events\OrderCancelled;
-use App\Modules\AgriVerse\Events\OrderConfirmed;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 use App\Modules\AgriVerse\Events\OrderCreated;
 use App\Modules\AgriVerse\Listeners\RestoreInventoryOnCancel;
 use App\Modules\AgriVerse\Listeners\SendOrderNotifications;
@@ -17,8 +15,6 @@ use App\Modules\AgriVerse\Policies\ProductPolicy;
 use App\Modules\AgriVerse\Policies\StorePolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
 
 class AgriVerseServiceProvider extends ServiceProvider
 {
@@ -29,10 +25,9 @@ class AgriVerseServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Route::middleware('api')
-            ->group(fn () => $this->loadRoutesFrom(__DIR__.'/../Routes/api.php'));
+        $this->loadRoutesFrom(__DIR__.'/../Routes/api.php');
 
-        Event::listen(
+        \Illuminate\Support\Facades\Event::listen(
             OrderCreated::class,
             SendOrderNotifications::class,
         );
@@ -76,10 +71,8 @@ class AgriVerseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                FetchGHNAddresses::class,
-                \App\Modules\AgriVerse\Console\Commands\FetchProductImages::class,
-                \App\Modules\AgriVerse\Console\Commands\ScrapeBonsaiArticles::class,
-                GenerateDailyReports::class,
+                \App\Modules\AgriVerse\Console\FetchGHNAddresses::class,
+                \App\Modules\AgriVerse\Console\TestPlantDoctorPipeline::class,
             ]);
         }
     }

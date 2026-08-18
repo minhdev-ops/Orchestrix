@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\AdminPermissionController;
 use App\Http\Controllers\api\auth\SocialAuthController;
 use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\ExpenseController;
+
 use App\Modules\AgriVerse\Http\Controllers\Api\AuthBridgeController;
 
 Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,1');
@@ -23,6 +25,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('user/update', [AuthController::class, 'updateProfile']);
     Route::post('/change-pass', [AuthController::class, 'changePass']);
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Personal Expenses
+    Route::post('expenses/create', [ExpenseController::class, 'store']);
+    Route::get('expense-categories', [ExpenseController::class, 'categories']);
+    Route::post('expense-categories/create', [ExpenseController::class, 'storeCategory']);
 
     // Admin Permission Management
     Route::middleware('permission:admin.access')->prefix('admin')->group(function () {

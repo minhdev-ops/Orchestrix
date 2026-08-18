@@ -243,6 +243,7 @@ function showMethodology() {
     alert(props.report.methodology_description)
   }
 }
+
 </script>
 
 <style scoped>

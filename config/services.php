@@ -69,11 +69,29 @@ return [
     ],
 
     'ai_plant_doctor' => [
+        // Provider: 'gemini' | 'openai' | 'vit_local' (model local best_vit.keras)
         'provider' => env('AI_PLANT_DOCTOR_PROVIDER', 'gemini'),
         'gemini_api_key' => env('AI_PLANT_DOCTOR_GEMINI_API_KEY'),
-        'gemini_model' => env('AI_PLANT_DOCTOR_GEMINI_MODEL', 'gemini-2.0-flash'),
+        'gemini_model' => env('AI_PLANT_DOCTOR_GEMINI_MODEL', 'gemini-3.1-flash-lite'),
         'openai_api_key' => env('AI_PLANT_DOCTOR_OPENAI_API_KEY'),
         'openai_model' => env('AI_PLANT_DOCTOR_OPENAI_MODEL', 'gpt-4o'),
+
+        // ViT local inference (microservice FastAPI, port 8501)
+        'vit_service_url' => env('AI_PLANT_DOCTOR_VIT_SERVICE_URL', 'http://localhost:8501'),
+        'vit_token' => env('AI_PLANT_DOCTOR_VIT_TOKEN', ''),
+        // Tự động phát hiện lá (Grounding DINO) trước khi predict
+        'vit_auto_detect' => (bool) env('AI_PLANT_DOCTOR_VIT_AUTO_DETECT', true),
+        'vit_defaults' => [
+            // Khi prediction confidence dưới ngưỡng này -> báo user chụp lại ảnh
+            'min_confidence' => (float) env('AI_PLANT_DOCTOR_VIT_MIN_CONFIDENCE', 0.45),
+            // Số top-k melting trả về
+            'top_k' => (int) env('AI_PLANT_DOCTOR_VIT_TOP_K', 5),
+            // Timeout gọi microservice (giây)
+            'timeout' => (int) env('AI_PLANT_DOCTOR_VIT_TIMEOUT', 30),
+        ],
+        // Bổ sung mô tả/biện pháp từ cloud (gemini|openai|null) sau khi ViT đã chẩn đoán.
+        // null = chỉ trả về kết quả ViT mà không bổ sung mô tả chi tiết.
+        'info_provider' => env('AI_PLANT_DOCTOR_INFO_PROVIDER', 'gemini'),
     ],
 
     'firebase' => [

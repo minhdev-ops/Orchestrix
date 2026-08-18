@@ -1,0 +1,13 @@
+# AI Inference Service dependencies
+tensorflow==2.17.*
+keras>=3.10
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic-settings>=2.4
+pillow>=10.0
+numpy>=1.26,<3.0
+anyio>=4.0
+python-multipart>=0.0.9
+# For Grounding DINO (leaf detection) - required for leaf-level diagnosis
+transformers>=4.35
+torch>=2.1

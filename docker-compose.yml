@@ -109,6 +109,49 @@ services:
     networks:
       - agriverse
 
+  # AI Inference Service (FastAPI + TensorFlow cho best_vit.keras, 71 classes)
+  ai_service:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+    container_name: agriverse-ai-service
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    volumes:
+      # Model file chia sẻ read-only, không copy vào image -> image nhỏ, đổi model không build lại
+      - ./best_vit.keras:/models/best_vit.keras:ro
+      # Override labels nếu muốn chỉnh sửa mà không build lại image
+      - ./ai_service/labels.txt:/app/labels.txt:ro
+    environment:
+      - AI_MODEL_PATH=/models/best_vit.keras
+      - AI_LABELS_PATH=/app/labels.txt
+      - AI_INPUT_SIZE=224
+      - AI_TOP_K=5
+      - AI_DEVICE=auto
+      - AI_STRIP_AUGMENTATION=false
+      # Token bảo vệ endpoint (rỗng = bỏ qua kiểm tra; set để bật)
+      - AI_AUTH_TOKEN=${AI_PLANT_DOCTOR_VIT_TOKEN:-}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8501/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    networks:
+      - agriverse
+
+  # Node.js (for frontend build)
+  node:
+    image: node:20-alpine
+    container_name: agriverse-node
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    command: sh -c "npm install && npm run build"
+    networks:
+      - agriverse
+
   wildfly:
     build:
       context: ${JAKARTA_PATH:-../03.JakartaEE/JakartaEE}
